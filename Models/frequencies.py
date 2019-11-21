@@ -1,0 +1,17 @@
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, Integer, String, Date, Float, Text, Boolean, Interval
+
+Base = declarative_base()
+
+
+class Frequency(Base):
+    __tablename__ = 'frequencies'
+    trip_id = Column(Text, nullable=False)
+    start_time = Column(Integer,nullable=False)
+    end_time = Column(Interval, nullable=False)
+    headway_secs = Column(Integer, nullable=False)
+    exact_times = Column(Text, nullable=False)
+
+    def __repr__(self):
+        return "<Frequency(times='{}')>" \
+            .format(self.exact_times)
