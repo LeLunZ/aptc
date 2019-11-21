@@ -72,6 +72,8 @@ with open('bus_stops.csv') as csv_file:
                 }
                 response = requests.post(url, data=payload, params=querystring)
                 print(response.content)
+                # get public transport by xpath
+                # save
 print(f'Processed {line_count} lines.')
 
 # while True:
