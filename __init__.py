@@ -65,6 +65,7 @@ def get_all_routes_of_transport_and_station(transport_number, station):
 
 
 def load_route(url):
+    route_page = requests.get(url)
     pass
 
 

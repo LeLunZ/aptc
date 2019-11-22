@@ -1,9 +1,11 @@
 from Models.agency import *
+from Models.stop import Stop
+from Models.trip import Trip
 
 DATABASE_URI = 'postgres+psycopg2://postgres:password@localhost:5432/postgres'
 
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, aliased
 
 engine = create_engine(DATABASE_URI)
 
@@ -12,8 +14,10 @@ Session = sessionmaker(bind=engine)
 s = Session()
 
 
-def add_agency():
-    pass
+def add_agency(agency):
+    data = s.query(Agency).filter(Agency.agency_name == agency.agency_name).first()
+    if data is None:
+        s.add(agency)
 
 
 def add_calendar():
@@ -29,11 +33,14 @@ def add_route():
 
 
 def add_shape():
+    # shape wont be needed
     pass
 
 
-def add_stop():
-    pass
+def add_stop(stop):
+    data = s.query(Stop).filter(Stop.stop_name == stop.stop_name).first()
+    if data is None:
+        s.add(stop)
 
 
 def add_stop_time():
@@ -44,9 +51,10 @@ def add_transfer():
     pass
 
 
-def add_trip():
-    pass
-
+def add_trip(trip):
+    data = s.query(Trip).filter(Trip.trip_id == trip.trip_id && Trip.route_id == trip.route_id).first()
+    if data is None:
+        s.add(trip)
 
 def new_session():
     global s
