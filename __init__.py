@@ -5,6 +5,69 @@ import csv
 from lxml import html
 from crud import *
 
+
+def get_location_suggestion_from_string(location):
+    oebb_location = requests.get(
+        'http://fahrplan.oebb.at/bin/ajax-getstop.exe/dn?REQ0JourneyStopsS0A=1&REQ0JourneyStopsB=12&S=' + location + '?&js=false&')
+    locations = oebb_location.content[8:-22]
+    locations = json.loads(locations.decode('iso-8859-1'))
+    return locations
+
+
+def get_all_station_ids_from_station(station):
+    querystring = {"ld": "3"}
+    payload = {
+        'sqView': '1&input=' + station[
+            'value'] + '&time=21:42&maxJourneys=50&dateBegin=&dateEnd=&selectDate=&productsFilter=1011111111011&editStation=yes&dirInput=&',
+        'input': station['value'],
+        'inputRef': station['value'] + '#' + str(int(station['extId'])),
+        'sqView=1&start': 'Information aufrufen',
+        'productsFilter': '1011111111011'
+    }
+    response = requests.post("https://fahrplan.oebb.at/bin/stboard.exe/dn", data=payload,
+                             params=querystring)
+    tree = html.fromstring(response.content)
+    all_stations = tree.xpath('//*/option/@value')
+    return all_stations
+
+
+def get_all_routes_from_station(station_id):
+    routes_of_station = requests.get(
+        'http://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_liveticker&evaId=' + str(
+            int(station_id)) + '&boardType=arr&time=00:00'
+                               '&additionalTime=0&disableEquivs=yes&maxJourneys=100000&outputMode=tickerDataOnly&start=yes&selectDate'
+                               '=today')
+    json_data = json.loads(routes_of_station.content.decode('iso-8859-1')[14:-1])
+    return json_data
+
+
+def get_all_routes_of_transport_and_station(transport_number, station):
+    url = "http://fahrplan.oebb.at/bin/trainsearch.exe/dn"
+    querystring = {"ld": "2"}
+    payload = {
+        'trainname': transport_number,
+        'stationname': station['value'],
+        'REQ0JourneyStopsSID': station['id'],
+        'selectDate': 'oneday',
+        'date': "Do, 21.11.2019",
+        'wDayExt0': 'Mo|Di|Mi|Do|Fr|Sa|So',
+        'periodStart': '15.09.2019',
+        'periodEnd': '12.12.2020',
+        'time': '',
+        'maxResults': 10000,
+        'stationFilter': '81,01,02,03,04,05,06,07,08,09',
+        'start': 'Suchen'
+    }
+    response = requests.post(url, data=payload, params=querystring)
+    tree = html.fromstring(response.content)
+    all_routes = tree.xpath('//*/td[@class=$name]/a/@href', name='fcell')
+    return all_routes
+
+
+def load_route(url):
+    pass
+
+
 with open('bus_stops.csv') as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=',')
     line_count = 0
@@ -13,67 +76,28 @@ with open('bus_stops.csv') as csv_file:
             print(f'Column names are {", ".join(row)}')
             line_count += 1
         else:
-            oebbLocation = requests.get(
-                'http://fahrplan.oebb.at/bin/ajax-getstop.exe/dn?REQ0JourneyStopsS0A=1&REQ0JourneyStopsB=12&S=' + row[
-                    0] + '?&js=false&')
-            location_data = oebbLocation.content[8:-22]
-            location_data = json.loads(location_data.decode('iso-8859-1'))
+            location_data = get_location_suggestion_from_string(row[0])
             suggestion = location_data['suggestions'][0]
             line_count += 1
             main_station = suggestion
-            # search for other occurrences
-            querystring = {"ld": "3"}
-
-            payload = {
-                'sqView': '1&input=' + main_station[
-                    'value'] + '&time=21:42&maxJourneys=50&dateBegin=&dateEnd=&selectDate=&productsFilter=1011111111011&editStation=yes&dirInput=&',
-                'input': main_station['value'],
-                'inputRef': main_station['value'] + '#' + str(int(main_station['extId'])),
-                'sqView=1&start': 'Information aufrufen',
-                'productsFilter': '1011111111011'
-            }
-
-            response = requests.post("https://fahrplan.oebb.at/bin/stboard.exe/dn", data=payload,
-                                     params=querystring)
-            tree = html.fromstring(response.content)
-            all_stations = tree.xpath('//*/option/@value')
+            all_stations = get_all_station_ids_from_station(main_station)
             if all_stations == []:
                 all_stations = [main_station['extId']]
             else:
                 all_stations = list(map(lambda x: x.split('|')[-1], all_stations))
             public_transportation_journey = []
             for station_id in all_stations:
-                routes_of_station = requests.get(
-                    'http://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_liveticker&evaId=' + str(
-                        int(station_id)) + '&boardType=arr&time=00:00'
-                                           '&additionalTime=0&disableEquivs=yes&maxJourneys=100000&outputMode=tickerDataOnly&start=yes&selectDate'
-                                           '=today')
-                json_data = json.loads(routes_of_station.content.decode('iso-8859-1')[14:-1])
+                json_data = get_all_routes_from_station(station_id)
                 if json_data['maxJ'] is not None:
                     public_transportation_journey.extend(
-                        list(map(lambda x: (x),json_data['journey'])))
+                        list(map(lambda x: x, json_data['journey'])))
+
+            routes = []
             for route in public_transportation_journey:
-                public_transportation_number = route['pr']
-                url = "http://fahrplan.oebb.at/bin/trainsearch.exe/dn"
-                querystring = {"ld": "2"}
-                payload = {
-                    'trainname': public_transportation_number,
-                    'stationname': main_station['value'],
-                    'REQ0JourneyStopsSID': main_station['id'],
-                    'selectDate': 'oneday',
-                    'date': "Do, 21.11.2019",
-                    'wDayExt0': 'Mo|Di|Mi|Do|Fr|Sa|So',
-                    'periodStart': '15.09.2019',
-                    'periodEnd': '12.12.2020',
-                    'time': '',
-                    'maxResults': 10000,
-                    'stationFilter': '81,01,02,03,04,05,06,07,08,09',
-                    'start': 'Suchen'
-                }
-                response = requests.post(url, data=payload, params=querystring)
-                print(response.content)
-                # get public transport by xpath
-                # save
+                routes.extend(get_all_routes_of_transport_and_station(route['pr'], main_station))
+            for route in routes:
+                load_route(route)
+
 print(f'Processed {line_count} lines.')
 
 # while True:
