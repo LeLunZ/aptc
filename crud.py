@@ -38,9 +38,18 @@ def add_shape():
 
 
 def add_stop(stop):
-    data = s.query(Stop).filter(Stop.stop_name == stop.stop_name).first()
+    data: Stop = s.query(Stop).filter(Stop.stop_name == stop.stop_name).first()
     if data is None:
         s.add(stop)
+    elif stop.stop_lat is not None or stop.stop_url is not None or stop.location_type is not None:
+        if data.stop_lat is None and stop.stop_lat is not None:
+            data.stop_lat = stop.stop_lat
+            data.stop_lon = stop.stop_lon
+        if data.stop_url is None and stop.stop_url is not None:
+            data.stop_url = stop.stop_url
+        if data.location_type is None and stop.location_type is not None:
+            data.location_type = stop.location_type
+        commit()
 
 
 def add_stop_time():
@@ -52,9 +61,10 @@ def add_transfer():
 
 
 def add_trip(trip):
-    data = s.query(Trip).filter(Trip.trip_id == trip.trip_id && Trip.route_id == trip.route_id).first()
+    data = s.query(Trip).filter(Trip.trip_id == trip.trip_id and Trip.route_id == trip.route_id).first()
     if data is None:
         s.add(trip)
+
 
 def new_session():
     global s
