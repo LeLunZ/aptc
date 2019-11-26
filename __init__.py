@@ -81,8 +81,19 @@ def load_route(url):
                               second="zebracol-1")
     all_links_of_station = tree.xpath('//*/tr[@class=$first or @class=$second]/*/a/@href', first='zebracol-2',
                                       second="zebracol-1")
-    all_extra_info = tree.xpath('//*/tr[@class=$first or @class=$second]/*/a/@href', first='zebracol-2',
-                                      second="zebracol-1") # TODO: fix xpath for this one
+    extra_info_operator = tree.xpath('//*/strong[text() =$first]/../text()', first='Betreiber:')
+    extra_info_traffic_day = tree.xpath('//*/strong[text() =$first]/../text()', first='Verkehrstage:')
+    extra_info_remarks = tree.xpath('//*/strong[text() =$first]/../text()', first='Bemerkungen:')
+    if extra_info_operator:
+        operator = list(filter(lambda x: x.strip() != '', extra_info_operator))[0].strip()
+        pass
+    if extra_info_traffic_day:
+        traffic_day = list(filter(lambda x: x.strip() != '', extra_info_traffic_day))[0].strip()
+        pass
+    if extra_info_remarks:
+        remarks = list(filter(lambda x: x != '', map(lambda x: x.strip(), extra_info_remarks)))
+        pass
+    # TODO: Add to object. Upload to db
     for i in range(len(all_stations)):
         link = all_links_of_station[i].split('&input=')[1].split('&')[0]
         new_stop = Stop(stop_id=link, stop_name=all_stations[i])
@@ -109,46 +120,47 @@ def save_simple_stops(names, ids, main_station):
         commit()
 
 
-with open('bus_stops.csv') as csv_file:
-    csv_reader = csv.reader(csv_file, delimiter=',')
-    line_count = 0
-    for row in csv_reader:
-        if line_count == 0:
-            print(f'Column names are {", ".join(row)}')
-            line_count += 1
-        else:
-            location_data = get_location_suggestion_from_string(row[0])
-            suggestion = location_data['suggestions']
-            line_count += 1
-            main_station = suggestion[0]
-            new_stop = Stop(stop_id=str(int(main_station['extId'])), stop_name=main_station['value'],
-                            stop_lat=str_to_geocord(main_station['ycoord']),
-                            stop_lon=str_to_geocord(main_station['xcoord']))
-            add_stop(new_stop)
-            all_station_ids = get_all_station_ids_from_station(main_station)
-            if all_station_ids == []:
-                all_station_ids = [main_station['extId']]
+if __name__ == "__main__":
+    with open('bus_stops.csv') as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        line_count = 0
+        for row in csv_reader:
+            if line_count == 0:
+                print(f'Column names are {", ".join(row)}')
+                line_count += 1
             else:
-                all_station_names = list(map(lambda x: ''.join(x.split('|')[:-1]), all_station_ids))
-                all_station_ids = list(map(lambda x: x.split('|')[-1], all_station_ids))
-            public_transportation_journey = []
-            save_simple_stops(all_station_names, all_station_ids, new_stop)
-            for station_id in all_station_ids:
-                json_data = get_all_routes_from_station(station_id)
-                if json_data['maxJ'] is not None:
-                    public_transportation_journey.extend(
-                        list(map(lambda x: x, json_data['journey'])))
+                location_data = get_location_suggestion_from_string(row[0])
+                suggestion = location_data['suggestions']
+                line_count += 1
+                main_station = suggestion[0]
+                new_stop = Stop(stop_id=str(int(main_station['extId'])), stop_name=main_station['value'],
+                                stop_lat=str_to_geocord(main_station['ycoord']),
+                                stop_lon=str_to_geocord(main_station['xcoord']))
+                add_stop(new_stop)
+                all_station_ids = get_all_station_ids_from_station(main_station)
+                if all_station_ids == []:
+                    all_station_ids = [main_station['extId']]
+                else:
+                    all_station_names = list(map(lambda x: ''.join(x.split('|')[:-1]), all_station_ids))
+                    all_station_ids = list(map(lambda x: x.split('|')[-1], all_station_ids))
+                public_transportation_journey = []
+                save_simple_stops(all_station_names, all_station_ids, new_stop)
+                for station_id in all_station_ids:
+                    json_data = get_all_routes_from_station(station_id)
+                    if json_data['maxJ'] is not None:
+                        public_transportation_journey.extend(
+                            list(map(lambda x: x, json_data['journey'])))
 
-            routes = []
-            all_transport = get_all_name_of_transport_distinct(public_transportation_journey)
-            for route in all_transport:
-                routes.extend(get_all_routes_of_transport_and_station(route, main_station))
-            for route in routes:
-                load_route(route)
-            commit()
-            print("test")
+                routes = []
+                all_transport = get_all_name_of_transport_distinct(public_transportation_journey)
+                for route in all_transport:
+                    routes.extend(get_all_routes_of_transport_and_station(route, main_station))
+                for route in routes:
+                    load_route(route)
+                commit()
+                print("test")
 
-print(f'Processed {line_count} lines.')
+    print(f'Processed {line_count} lines.')
 
 # while True:
 #     re = requests.get("http://fahrplan.oebb.at/bin/stboard.exe/dn?ld=3&L=vs_postbus&")
