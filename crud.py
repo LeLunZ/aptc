@@ -15,7 +15,7 @@ s = Session()
 
 
 def add_agency(agency):
-    data = s.query(Agency).filter(Agency.agency_name == agency.agency_name).first()
+    data = s.query(Agency).filter(Agency.agency_id == agency.agency_id).first()
     if data is None:
         s.add(agency)
 

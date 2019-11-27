@@ -74,6 +74,13 @@ def get_all_name_of_transport_distinct(list_of_transport):
     return list(all_transport)
 
 
+def remove_param_from_url(url, to_remove):
+    splitted_url = url.split(to_remove)
+    left_part = splitted_url[0]
+    right_part = '&'.join(list(filter(lambda x: x.strip() != '', splitted_url[1].split('&')[::-1][:-1])))
+    return left_part + '&' + right_part
+
+
 def load_route(url):
     route_page = requests.get(url)
     tree = html.fromstring(route_page.content)
@@ -86,7 +93,18 @@ def load_route(url):
     extra_info_remarks = tree.xpath('//*/strong[text() =$first]/../text()', first='Bemerkungen:')
     if extra_info_operator:
         operator = list(filter(lambda x: x.strip() != '', extra_info_operator))[0].strip()
-        pass
+        try:
+            agency = operator.split(', ')
+            if len(agency) is 1:
+                agency_phone = None
+                agency_name = ','.join(agency[0].split(',')[:-1])
+            else:
+                agency_name = agency[0]
+                agency_phone = agency[1]
+            new_agency = Agency(agency_id=agency_name, agency_phone=agency_phone)
+            add_agency(new_agency)
+        except:
+            print(operator)
     if extra_info_traffic_day:
         traffic_day = list(filter(lambda x: x.strip() != '', extra_info_traffic_day))[0].strip()
         pass
@@ -96,8 +114,10 @@ def load_route(url):
     # TODO: Add to object. Upload to db
     for i in range(len(all_stations)):
         link = all_links_of_station[i].split('&input=')[1].split('&')[0]
-        new_stop = Stop(stop_id=link, stop_name=all_stations[i])
+        new_stop = Stop(stop_id=link, stop_name=all_stations[i],
+                        stop_url=remove_param_from_url(all_links_of_station[i], '&time='))
         add_stop(new_stop)
+
     pass
 
 
