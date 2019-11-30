@@ -1,4 +1,5 @@
 from Models.agency import *
+from Models.route import Route
 from Models.stop import Stop
 from Models.trip import Trip
 
@@ -28,8 +29,11 @@ def add_frequency():
     pass
 
 
-def add_route():
-    pass
+def add_route(route):
+    data: Route = s.query(Route).filter(
+        Route.agency_id == route.agency_id and Route.route_short_name == route.route_short_name)
+    if data is None:
+        s.add(route)
 
 
 def add_shape():

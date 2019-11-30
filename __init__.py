@@ -3,6 +3,8 @@ import json
 import requests
 import csv
 from lxml import html
+
+from Models.route import Route
 from crud import *
 import urllib.parse as urlparse
 from urllib.parse import parse_qs
@@ -82,6 +84,7 @@ def remove_param_from_url(url, to_remove):
 
 
 def load_route(url):
+    url = url.split('?')[0]
     route_page = requests.get(url)
     tree = html.fromstring(route_page.content)
     all_stations = tree.xpath('//*/tr[@class=$first or @class=$second]/*/a/text()', first='zebracol-2',
@@ -91,6 +94,7 @@ def load_route(url):
     extra_info_operator = tree.xpath('//*/strong[text() =$first]/../text()', first='Betreiber:')
     extra_info_traffic_day = tree.xpath('//*/strong[text() =$first]/../text()', first='Verkehrstage:')
     extra_info_remarks = tree.xpath('//*/strong[text() =$first]/../text()', first='Bemerkungen:')
+    new_agency = Agency()
     if extra_info_operator:
         operator = list(filter(lambda x: x.strip() != '', extra_info_operator))[0].strip()
         try:
@@ -101,7 +105,8 @@ def load_route(url):
             else:
                 agency_name = agency[0]
                 agency_phone = agency[1]
-            new_agency = Agency(agency_id=agency_name, agency_phone=agency_phone)
+            new_agency.agency_id = agency_name
+            new_agency.agency_phone = agency_phone
             add_agency(new_agency)
         except:
             print(operator)
@@ -112,6 +117,14 @@ def load_route(url):
         remarks = list(filter(lambda x: x != '', map(lambda x: x.strip(), extra_info_remarks)))
         pass
     # TODO: Add to object. Upload to db
+    # html summary clearfix -> label nowrap for route short name, route desc, route type is harder to get
+    new_route = Route(agency_id = new_agency.agency_id,
+    route_id = url.split('dn/')[-1],
+    route_short_name = None,
+    route_desc = None,
+    route_type = None,
+    route_url = url)
+    add_route(new_route)
     for i in range(len(all_stations)):
         link = all_links_of_station[i].split('&input=')[1].split('&')[0]
         new_stop = Stop(stop_id=link, stop_name=all_stations[i],
