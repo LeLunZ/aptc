@@ -36,6 +36,11 @@ def add_route(route):
         s.add(route)
 
 
+def route_exist(url):
+    data: Route = s.query(Route).filter(Route.route_url == url)
+    return data is None
+
+
 def add_shape():
     # shape wont be needed
     pass

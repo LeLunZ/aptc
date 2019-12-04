@@ -9,7 +9,7 @@ class Route(Base):
     agency_id = Column(Text, nullable=True)
     route_id = Column(Text, primary_key=True)
     route_short_name = Column(Text, nullable=False)
-    route_long_name = Column(Text, nullable=False)
+    route_long_name = Column(Text, nullable=True)
     route_desc = Column(Text, nullable=True)
     route_type = Column(Integer, nullable=True)
     route_url = Column(Text, nullable=True)

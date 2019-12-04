@@ -85,53 +85,56 @@ def remove_param_from_url(url, to_remove):
 
 def load_route(url):
     url = url.split('?')[0]
-    route_page = requests.get(url)
-    tree = html.fromstring(route_page.content)
-    all_stations = tree.xpath('//*/tr[@class=$first or @class=$second]/*/a/text()', first='zebracol-2',
-                              second="zebracol-1")
-    all_links_of_station = tree.xpath('//*/tr[@class=$first or @class=$second]/*/a/@href', first='zebracol-2',
-                                      second="zebracol-1")
-    extra_info_operator = tree.xpath('//*/strong[text() =$first]/../text()', first='Betreiber:')
-    extra_info_traffic_day = tree.xpath('//*/strong[text() =$first]/../text()', first='Verkehrstage:')
-    extra_info_remarks = tree.xpath('//*/strong[text() =$first]/../text()', first='Bemerkungen:')
-    new_agency = Agency()
-    if extra_info_operator:
-        operator = list(filter(lambda x: x.strip() != '', extra_info_operator))[0].strip()
-        try:
-            agency = operator.split(', ')
-            if len(agency) is 1:
-                agency_phone = None
-                agency_name = ','.join(agency[0].split(',')[:-1])
-            else:
-                agency_name = agency[0]
-                agency_phone = agency[1]
-            new_agency.agency_id = agency_name
-            new_agency.agency_phone = agency_phone
-            add_agency(new_agency)
-        except:
-            print(operator)
-    if extra_info_traffic_day:
-        traffic_day = list(filter(lambda x: x.strip() != '', extra_info_traffic_day))[0].strip()
-        pass
-    if extra_info_remarks:
-        remarks = list(filter(lambda x: x != '', map(lambda x: x.strip(), extra_info_remarks)))
-        pass
-    # TODO: Add to object. Upload to db
-    # html summary clearfix -> label nowrap for route short name, route desc, route type is harder to get
-    new_route = Route(agency_id = new_agency.agency_id,
-    route_id = url.split('dn/')[-1],
-    route_short_name = None,
-    route_desc = None,
-    route_type = None,
-    route_url = url)
-    add_route(new_route)
-    for i in range(len(all_stations)):
-        link = all_links_of_station[i].split('&input=')[1].split('&')[0]
-        new_stop = Stop(stop_id=link, stop_name=all_stations[i],
-                        stop_url=remove_param_from_url(all_links_of_station[i], '&time='))
-        add_stop(new_stop)
+    if not route_exist(url):
+        route_page = requests.get(url)
+        tree = html.fromstring(route_page.content)
+        all_stations = tree.xpath('//*/tr[@class=$first or @class=$second]/*/a/text()', first='zebracol-2',
+                                  second="zebracol-1")
+        all_links_of_station = tree.xpath('//*/tr[@class=$first or @class=$second]/*/a/@href', first='zebracol-2',
+                                          second="zebracol-1")
+        extra_info_operator = tree.xpath('//*/strong[text() =$first]/../text()', first='Betreiber:')
+        extra_info_traffic_day = tree.xpath('//*/strong[text() =$first]/../text()', first='Verkehrstage:')
+        extra_info_remarks = tree.xpath('//*/strong[text() =$first]/../text()', first='Bemerkungen:')
+        new_agency = Agency()
+        if extra_info_operator:
+            operator = list(filter(lambda x: x.strip() != '', extra_info_operator))[0].strip()
+            try:
+                agency = operator.split(', ')
+                if len(agency) is 1:
+                    agency_phone = None
+                    agency_name = ','.join(agency[0].split(',')[:-1])
+                else:
+                    agency_name = agency[0]
+                    agency_phone = agency[1]
+                new_agency.agency_id = agency_name
+                new_agency.agency_phone = agency_phone
+                add_agency(new_agency)
+            except:
+                print(operator)
+        if extra_info_traffic_day:
+            traffic_day = list(filter(lambda x: x.strip() != '', extra_info_traffic_day))[0].strip()
+            pass
+        if extra_info_remarks:
+            remarks = list(filter(lambda x: x != '', map(lambda x: x.strip(), extra_info_remarks)))
+            pass
+        # TODO: Add to object. Upload to db
+        # html summary clearfix -> label nowrap for route short name, route desc, route type is harder to get
+        route_short_name = tree.xpath('((//*/tr[@class=$first])[1]/td[@class=$second])[last()]/text()', first='zebracol-2', second='center sepline')[0].strip()
+        route_info = tree.xpath('//*/div[@class=$first]/*/span[@class=$second]/text()', first='summary clearfix',
+                                second='label nowrap')
+        new_route = Route(agency_id=new_agency.agency_id,
+                          route_id=url.split('dn/')[-1],
+                          route_short_name=route_short_name,
+                          route_type=None,
+                          route_url=url)
+        add_route(new_route)
+        for i in range(len(all_stations)):
+            link = all_links_of_station[i].split('&input=')[1].split('&')[0]
+            new_stop = Stop(stop_id=link, stop_name=all_stations[i],
+                            stop_url=remove_param_from_url(all_links_of_station[i], '&time='))
+            add_stop(new_stop)
 
-    pass
+        pass
 
 
 def str_to_geocord(cord: str):
