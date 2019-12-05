@@ -9,6 +9,8 @@ from crud import *
 import urllib.parse as urlparse
 from urllib.parse import parse_qs
 
+logos_set = set()
+
 
 def get_location_suggestion_from_string(location):
     oebb_location = requests.get(
@@ -39,8 +41,8 @@ def get_all_routes_from_station(station_id):
     routes_of_station = requests.get(
         'http://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_liveticker&evaId=' + str(
             int(station_id)) + '&boardType=arr&time=00:00'
-                               '&additionalTime=0&disableEquivs=yes&maxJourneys=100000&outputMode=tickerDataOnly&start=yes&selectDate'
-                               '=today&productsFilter=0000111011')
+                               '&additionalTime=0&maxJourneys=100000&outputMode=tickerDataOnly&start=yes&selectDate'
+                               '=today&productsFilter=1011111111011')
     json_data = json.loads(routes_of_station.content.decode('iso-8859-1')[14:-1])
     return json_data
 
@@ -120,10 +122,32 @@ def load_route(url):
         if extra_info_remarks:
             remarks = list(filter(lambda x: x != '', map(lambda x: x.strip(), extra_info_remarks)))
             pass
-        route_short_name = tree.xpath('((//*/tr[@class=$first])[1]/td[@class=$second])[last()]/text()', first='zebracol-2', second='center sepline')[0].strip()
-        route_info = tree.xpath('//*/div[@class=$first]/*/span[@class=$second]/text()', first='summary clearfix',
-                                second='label nowrap')
+        route_short_name = \
+        tree.xpath('((//*/tr[@class=$first])[1]/td[@class=$second])[last()]/text()', first='zebracol-2',
+                   second='center sepline')[0].strip()
+        route_info = tree.xpath('//*/span[@class=$first]/img/@src', first='prodIcon')[0]
         route_type = None
+        if route_info not in logos_set:
+            print('if route_info == \'' + route_info + '\':')
+            print(url)
+            logos_set.add(route_info)
+
+        if route_info == '/img/vs_oebb/rex_pic.gif':
+            route_type = 2  # Regional zug
+        elif route_info == '/img/vs_oebb/r_pic.gif':
+            route_type = 2
+        elif route_info == '/img/vs_oebb/s_pic.gif':
+            route_type = 1
+        elif route_info == '/img/vs_oebb/os_pic.gif':
+            route_type = 2
+        elif route_info == '/img/vs_oebb/ex_pic.gif':
+            route_type = 2
+        elif route_info == '/img/vs_oebb/hog_pic.gif':
+            route_type = 3
+        elif route_info == '/img/vs_oebb/nmg_pic.gif':
+            route_type = 3
+        elif route_info == '/img/vs_oebb/ntr_pic.gif':
+            route_type = 0
         new_route = Route(agency_id=new_agency.agency_id,
                           route_id=url.split('dn/')[-1],
                           route_short_name=route_short_name,
