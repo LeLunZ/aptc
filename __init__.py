@@ -201,7 +201,7 @@ if __name__ == "__main__":
                 add_stop(new_stop)
                 all_station_ids = get_all_station_ids_from_station(main_station)
                 all_station_names = None
-                if all_station_ids is None or all_station_ids:
+                if all_station_ids is None or not all_station_ids:
                     all_station_ids = [main_station['extId']]
                 else:
                     all_station_names = list(map(lambda x: ''.join(x.split('|')[:-1]), all_station_ids))
@@ -209,7 +209,10 @@ if __name__ == "__main__":
                 public_transportation_journey = []
                 save_simple_stops(all_station_names, all_station_ids, new_stop)
                 for station_id in all_station_ids:
-                    json_data = get_all_routes_from_station(station_id)
+                    json_data = None
+                    count = 0
+                    while (json_data is None or json_data['maxJ'] is None) and count < 4:
+                        json_data = get_all_routes_from_station(station_id)
                     if json_data['maxJ'] is not None:
                         public_transportation_journey.extend(
                             list(map(lambda x: x, json_data['journey'])))
