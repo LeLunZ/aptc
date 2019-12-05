@@ -114,6 +114,7 @@ def load_route(url):
                 print(operator)
         if extra_info_traffic_day:
             traffic_day = list(filter(lambda x: x.strip() != '', extra_info_traffic_day))[0].strip()
+        
             pass
         if extra_info_remarks:
             remarks = list(filter(lambda x: x != '', map(lambda x: x.strip(), extra_info_remarks)))
@@ -175,7 +176,8 @@ if __name__ == "__main__":
                                 stop_lon=str_to_geocord(main_station['xcoord']))
                 add_stop(new_stop)
                 all_station_ids = get_all_station_ids_from_station(main_station)
-                if all_station_ids == []:
+                all_station_names = None
+                if all_station_ids is None or all_station_ids:
                     all_station_ids = [main_station['extId']]
                 else:
                     all_station_names = list(map(lambda x: ''.join(x.split('|')[:-1]), all_station_ids))
