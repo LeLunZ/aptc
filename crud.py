@@ -31,13 +31,13 @@ def add_frequency():
 
 def add_route(route):
     data: Route = s.query(Route).filter(
-        Route.agency_id == route.agency_id and Route.route_short_name == route.route_short_name)
+        Route.agency_id == route.agency_id and Route.route_short_name == route.route_short_name).first()
     if data is None:
         s.add(route)
 
 
 def route_exist(url):
-    data: Route = s.query(Route).filter(Route.route_url == url)
+    data: Route = s.query(Route).filter(Route.route_url == url).first()
     return data is None
 
 
