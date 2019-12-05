@@ -38,7 +38,7 @@ def add_route(route):
 
 def route_exist(url):
     data: Route = s.query(Route).filter(Route.route_url == url).first()
-    return data is None
+    return data is not None
 
 
 def add_shape():

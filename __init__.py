@@ -113,21 +113,21 @@ def load_route(url):
             except:
                 print(operator)
         if extra_info_traffic_day:
-            traffic_day = list(filter(lambda x: x.strip() != '', extra_info_traffic_day))[0].strip()
-        
+            traffic_day = list(filter(lambda x: x.strip() != '', extra_info_traffic_day))
+            if traffic_day or traffic_day is None:
+                traffic_day = traffic_day[0].strip()
             pass
         if extra_info_remarks:
             remarks = list(filter(lambda x: x != '', map(lambda x: x.strip(), extra_info_remarks)))
             pass
-        # TODO: Add to object. Upload to db
-        # html summary clearfix -> label nowrap for route short name, route desc, route type is harder to get
         route_short_name = tree.xpath('((//*/tr[@class=$first])[1]/td[@class=$second])[last()]/text()', first='zebracol-2', second='center sepline')[0].strip()
         route_info = tree.xpath('//*/div[@class=$first]/*/span[@class=$second]/text()', first='summary clearfix',
                                 second='label nowrap')
+        route_type = None
         new_route = Route(agency_id=new_agency.agency_id,
                           route_id=url.split('dn/')[-1],
                           route_short_name=route_short_name,
-                          route_type=None,
+                          route_type=route_type,
                           route_url=url)
         add_route(new_route)
         for i in range(len(all_stations)):
