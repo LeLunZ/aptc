@@ -3,6 +3,8 @@ import json
 import requests
 import csv
 from lxml import html
+from requests.adapters import HTTPAdapter
+from urllib3 import Retry
 
 from Models.route import Route
 from crud import *
@@ -12,8 +14,28 @@ from urllib.parse import parse_qs
 logos_set = set()
 
 
+def requests_retry_session(
+    retries=5,
+    backoff_factor=0.3,
+    status_forcelist=(500, 502, 504),
+    session=None,
+):
+    session = session or requests.Session()
+    retry = Retry(
+        total=retries,
+        read=retries,
+        connect=retries,
+        backoff_factor=backoff_factor,
+        status_forcelist=status_forcelist,
+    )
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+    return session
+
+
 def get_location_suggestion_from_string(location):
-    oebb_location = requests.get(
+    oebb_location = requests_retry_session().get(
         'http://fahrplan.oebb.at/bin/ajax-getstop.exe/dn?REQ0JourneyStopsS0A=1&REQ0JourneyStopsB=12&S=' + location + '?&js=false&')
     locations = oebb_location.content[8:-22]
     locations = json.loads(locations.decode('iso-8859-1'))
@@ -30,7 +52,7 @@ def get_all_station_ids_from_station(station):
         'sqView=1&start': 'Information aufrufen',
         'productsFilter': '0000111011'
     }
-    response = requests.post("https://fahrplan.oebb.at/bin/stboard.exe/dn", data=payload,
+    response = requests_retry_session().post("https://fahrplan.oebb.at/bin/stboard.exe/dn", data=payload,
                              params=querystring)
     tree = html.fromstring(response.content)
     all_stations = tree.xpath('//*/option/@value')
@@ -38,7 +60,7 @@ def get_all_station_ids_from_station(station):
 
 
 def get_all_routes_from_station(station_id):
-    routes_of_station = requests.get(
+    routes_of_station = requests_retry_session().get(
         'http://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_liveticker&evaId=' + str(
             int(station_id)) + '&boardType=arr&time=00:00'
                                '&additionalTime=0&maxJourneys=100000&outputMode=tickerDataOnly&start=yes&selectDate'
@@ -64,7 +86,7 @@ def get_all_routes_of_transport_and_station(transport_number, station):
         'stationFilter': '81,01,02,03,04,05,06,07,08,09',
         'start': 'Suchen'
     }
-    response = requests.post(url, data=payload, params=querystring)
+    response = requests_retry_session().post(url, data=payload, params=querystring)
     tree = html.fromstring(response.content)
     all_routes = tree.xpath('//*/td[@class=$name]/a/@href', name='fcell')
     return all_routes
@@ -89,7 +111,7 @@ def remove_param_from_url(url, to_remove):
 def load_route(url):
     url = url.split('?')[0]
     if not route_exist(url):
-        route_page = requests.get(url)
+        route_page = requests_retry_session().get(url)
         tree = html.fromstring(route_page.content)
         all_stations = tree.xpath('//*/tr[@class=$first or @class=$second]/*/a/text()', first='zebracol-2',
                                   second="zebracol-1")
