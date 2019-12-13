@@ -6,7 +6,7 @@ Base = declarative_base()
 
 class Trip(Base):
     __tablename__ = 'trips'
-    route_id = Column(Text, nullable=False)
+    route_id = Column(Integer, nullable=False)
     service_id = Column(Text, nullable=False)
     trip_short_name = Column(Text, nullable=True)
     trip_headsign = Column(Text, nullable=True)
@@ -16,7 +16,7 @@ class Trip(Base):
     shape_id = Column(Text, nullable=True)
     wheelchair_accessible = Column(Text, nullable=True)
     trip_bikes_allowed = Column(Text, nullable=True)
-    trip_id = Column(Text, nullable=False, primary_key=True)
+    trip_id = Column(Integer, nullable=False, primary_key=True)
 
     def __repr__(self):
         return "<Trip(name='{}', id={})>" \

@@ -7,18 +7,22 @@ from requests.adapters import HTTPAdapter
 from urllib3 import Retry
 
 from Models.route import Route
+from Models.stop_times import StopTime
 from crud import *
 import urllib.parse as urlparse
 from urllib.parse import parse_qs
 
 logos_set = set()
 
+trip_count = 0
+stop_times_count = 0
+
 
 def requests_retry_session(
-    retries=5,
-    backoff_factor=0.3,
-    status_forcelist=(500, 502, 504),
-    session=None,
+        retries=5,
+        backoff_factor=0.3,
+        status_forcelist=(500, 502, 504),
+        session=None,
 ):
     session = session or requests.Session()
     retry = Retry(
@@ -53,7 +57,7 @@ def get_all_station_ids_from_station(station):
         'productsFilter': '0000111011'
     }
     response = requests_retry_session().post("https://fahrplan.oebb.at/bin/stboard.exe/dn", data=payload,
-                             params=querystring)
+                                             params=querystring)
     tree = html.fromstring(response.content)
     all_stations = tree.xpath('//*/option/@value')
     return all_stations
@@ -145,8 +149,8 @@ def load_route(url):
             remarks = list(filter(lambda x: x != '', map(lambda x: x.strip(), extra_info_remarks)))
             pass
         route_short_name = \
-        tree.xpath('((//*/tr[@class=$first])[1]/td[@class=$second])[last()]/text()', first='zebracol-2',
-                   second='center sepline')[0].strip()
+            tree.xpath('((//*/tr[@class=$first])[1]/td[@class=$second])[last()]/text()', first='zebracol-2',
+                       second='center sepline')[0].strip()
         route_info = tree.xpath('//*/span[@class=$first]/img/@src', first='prodIcon')[0]
         route_type = None
         if route_info not in logos_set:
@@ -175,13 +179,27 @@ def load_route(url):
                           route_short_name=route_short_name,
                           route_type=route_type,
                           route_url=url)
-        add_route(new_route)
+        route = add_route(new_route)
+        trips = []
+        global trip_count, stop_times_count
+
         for i in range(len(all_stations)):
+            all_times = list(map(lambda x: x.strip(),
+                                 tree.xpath('//*/tr[@class=$first or @class=$second][$count]/td[@class=$third]/text()',
+                                            first='zebracol-2',
+                                            second="zebracol-1", third='center sepline', count=i + 1)))
             link = all_links_of_station[i].split('&input=')[1].split('&')[0]
             new_stop = Stop(stop_id=link, stop_name=all_stations[i],
                             stop_url=remove_param_from_url(all_links_of_station[i], '&time='))
-            add_stop(new_stop)
-
+            stop = add_stop(new_stop)
+            new_trip = Trip(route_id=route.route_id, service_id=None, trip_id=trip_count, )
+            trip: Trip = add_trip(new_trip)
+            new_stop_time = StopTime(stop_id=stop.stop_id, trip_id=trip.trip_id,
+                                     arrival_time=all_times[0] if all_times[0] == '' else all_times[0] + ':00',
+                                     departure_time=all_times[1] if all_times[1] == '' else all_times[1] + ':00',
+                                     stop_sequence=i + 1, pickup_type=0, drop_off_type=0)
+            trip_count += 1
+            stop_times_count += 1
         pass
 
 

@@ -19,6 +19,9 @@ def add_agency(agency):
     data = s.query(Agency).filter(Agency.agency_id == agency.agency_id).first()
     if data is None:
         s.add(agency)
+    else:
+        agency = data
+    return agency
 
 
 def add_calendar():
@@ -34,6 +37,9 @@ def add_route(route):
         Route.route_id == route.route_id).first()
     if data is None:
         s.add(route)
+    else:
+        route = data
+    return route
 
 
 def route_exist(url):
@@ -59,6 +65,8 @@ def add_stop(stop):
         if data.location_type is None and stop.location_type is not None:
             data.location_type = stop.location_type
         commit()
+        stop = data
+    return stop
 
 
 def add_stop_time():
@@ -70,10 +78,12 @@ def add_transfer():
 
 
 def add_trip(trip):
-    data = s.query(Trip).filter(Trip.trip_id == trip.trip_id and Trip.route_id == trip.route_id).first()
+    data: Trip = s.query(Trip).filter(Trip.trip_id == trip.trip_id and Trip.route_id == trip.route_id).first()
     if data is None:
         s.add(trip)
-
+    else:
+        trip = data
+    return trip
 
 def new_session():
     global s
