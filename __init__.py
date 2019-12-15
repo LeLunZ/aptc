@@ -200,6 +200,7 @@ def load_route(url):
                                      stop_sequence=i + 1, pickup_type=0, drop_off_type=0)
             trip_count += 1
             stop_times_count += 1
+            add_stop_time(new_stop_time)
         pass
 
 

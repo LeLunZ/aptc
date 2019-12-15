@@ -1,6 +1,7 @@
 from Models.agency import *
 from Models.route import Route
 from Models.stop import Stop
+from Models.stop_times import StopTime
 from Models.trip import Trip
 
 DATABASE_URI = 'postgres+psycopg2://postgres:password@localhost:5432/postgres'
@@ -69,8 +70,10 @@ def add_stop(stop):
     return stop
 
 
-def add_stop_time():
-    pass
+def add_stop_time(stoptime):
+    data: StopTime = s.query(StopTime).filter(StopTime.trip_id == stoptime.stop_id and StopTime.trip_id == stoptime.trip_id).first()
+    if data is None:
+        s.add(stoptime)
 
 
 def add_transfer():
