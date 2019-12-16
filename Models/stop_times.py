@@ -15,7 +15,7 @@ class StopTime(Base):
     route_short_name = Column(Text, nullable=True)
     pickup_type = Column(Integer, nullable=True)
     drop_off_type = Column(Integer, nullable=True)
-    shape_dost_traveled = Column(Float, nullable=True)
+    shape_dist_traveled = Column(Float, nullable=True)
 
     def __repr__(self):
         return "<Route(id='{}', arrival='{}', departure={})>" \

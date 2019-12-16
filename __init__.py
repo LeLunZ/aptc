@@ -183,7 +183,6 @@ def load_route(url):
         route = add_route(new_route)
         trips = []
         global trip_count, stop_times_count
-
         for i in range(len(all_stations)):
             all_times = list(map(lambda x: x.strip(),
                                  tree.xpath('//*/tr[@class=$first or @class=$second][$count]/td[@class=$third]/text()',
@@ -193,15 +192,15 @@ def load_route(url):
             new_stop = Stop(stop_id=link, stop_name=all_stations[i],
                             stop_url=remove_param_from_url(all_links_of_station[i], '&time='))
             stop = add_stop(new_stop)
-            new_trip = Trip(route_id=route.route_id, service_id=None, trip_id=trip_count, )
+            new_trip = Trip(route_id=route.route_id, service_id=None, trip_id=trip_count)
             trip: Trip = add_trip(new_trip)
             new_stop_time = StopTime(stop_id=stop.stop_id, trip_id=trip.trip_id,
                                      arrival_time=all_times[0] if all_times[0] == '' else all_times[0] + ':00',
                                      departure_time=all_times[1] if all_times[1] == '' else all_times[1] + ':00',
                                      stop_sequence=i + 1, pickup_type=0, drop_off_type=0)
-            trip_count += 1
             stop_times_count += 1
             add_stop_time(new_stop_time)
+        trip_count += 1
         pass
 
 
