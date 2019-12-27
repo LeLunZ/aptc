@@ -224,11 +224,11 @@ if __name__ == "__main__":
         csv_reader = csv.reader(csv_file, delimiter=',')
         row_count = sum(1 for row in csv_reader)
         try:
-            begin = os.environ['csvbegin'] - 1
+            begin = int(os.environ['csvbegin']) - 1
         except KeyError:
             begin = 1
         try:
-            end = os.environ['csvend'] - 1
+            end = int(os.environ['csvend']) - 1
         except KeyError:
             end = row_count - 1
         csv_file.seek(0)
