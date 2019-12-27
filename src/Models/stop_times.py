@@ -18,4 +18,4 @@ class StopTime(Base):
     shape_dist_traveled = Column(Float, nullable=True)
 
     def __repr__(self):
-        return "<Route(route_id='{}', arrival='{}', departure={})>"
+        return "<Route(id='{}', arrival='{}', departure={})>"
