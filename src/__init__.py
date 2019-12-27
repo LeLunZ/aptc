@@ -1,21 +1,19 @@
 import json
+from itertools import islice
 
 import requests
 import csv
 from lxml import html
 from requests.adapters import HTTPAdapter
 from urllib3 import Retry
+import os
 
 from Models.route import Route
 from Models.stop_times import StopTime
 from crud import *
+
 import urllib.parse as urlparse
 from urllib.parse import parse_qs
-
-logos_set = set()
-
-trip_count = 0
-stop_times_count = 0
 
 
 def requests_retry_session(
@@ -154,11 +152,6 @@ def load_route(url):
                        second='center sepline')[0].strip()
         route_info = tree.xpath('//*/span[@class=$first]/img/@src', first='prodIcon')[0]
         route_type = None
-        if route_info not in logos_set:
-            print('if route_info == \'' + route_info + '\':')
-            print(url)
-            logos_set.add(route_info)
-
         if route_info == '/img/vs_oebb/rex_pic.gif':
             route_type = 2  # Regional zug
         elif route_info == '/img/vs_oebb/r_pic.gif':
@@ -182,7 +175,6 @@ def load_route(url):
                           route_url=url)
         route = add_route(new_route)
         trips = []
-        global trip_count, stop_times_count
         for i in range(len(all_stations)):
             all_times = list(map(lambda x: x.strip(),
                                  tree.xpath('//*/tr[@class=$first or @class=$second][$count]/td[@class=$third]/text()',
@@ -192,15 +184,14 @@ def load_route(url):
             new_stop = Stop(stop_id=link, stop_name=all_stations[i],
                             stop_url=remove_param_from_url(all_links_of_station[i], '&time='))
             stop = add_stop(new_stop)
-            new_trip = Trip(route_id=route.route_id, service_id=None, trip_id=trip_count)
+            new_trip = Trip(route_id=route.route_id, service_id=None)
             trip: Trip = add_trip(new_trip)
+            commit()
             new_stop_time = StopTime(stop_id=stop.stop_id, trip_id=trip.trip_id,
                                      arrival_time=all_times[0] if all_times[0] == '' else all_times[0] + ':00',
                                      departure_time=all_times[1] if all_times[1] == '' else all_times[1] + ':00',
                                      stop_sequence=i + 1, pickup_type=0, drop_off_type=0)
-            stop_times_count += 1
             add_stop_time(new_stop_time)
-        trip_count += 1
         pass
 
 
@@ -223,52 +214,59 @@ def save_simple_stops(names, ids, main_station):
         commit()
 
 
+def skip_stop(seq, begin, end):
+    for i, item in enumerate(seq):
+        if begin <= i <= end:
+            yield item
+
 if __name__ == "__main__":
     with open('bus_stops.csv') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
-        line_count = 0
-        for row in csv_reader:
-            if line_count == 0:
-                print(f'Column names are {", ".join(row)}')
-                line_count += 1
+        row_count = sum(1 for row in csv_reader)
+        try:
+            begin = os.environ['csvbegin'] - 1
+        except KeyError:
+            begin = 1
+        try:
+            end = os.environ['csvend'] - 1
+        except KeyError:
+            end = row_count - 1
+        csv_file.seek(0)
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        for row in skip_stop(csv_reader, begin, end):
+            location_data = get_location_suggestion_from_string(row[0])
+            suggestion = location_data['suggestions']
+            main_station = suggestion[0]
+            new_stop = Stop(stop_id=str(int(main_station['extId'])), stop_name=main_station['value'],
+                            stop_lat=str_to_geocord(main_station['ycoord']),
+                            stop_lon=str_to_geocord(main_station['xcoord']))
+            add_stop(new_stop)
+            all_station_ids = get_all_station_ids_from_station(main_station)
+            all_station_names = None
+            if all_station_ids is None or not all_station_ids:
+                all_station_ids = [main_station['extId']]
             else:
-                location_data = get_location_suggestion_from_string(row[0])
-                suggestion = location_data['suggestions']
-                line_count += 1
-                main_station = suggestion[0]
-                new_stop = Stop(stop_id=str(int(main_station['extId'])), stop_name=main_station['value'],
-                                stop_lat=str_to_geocord(main_station['ycoord']),
-                                stop_lon=str_to_geocord(main_station['xcoord']))
-                add_stop(new_stop)
-                all_station_ids = get_all_station_ids_from_station(main_station)
-                all_station_names = None
-                if all_station_ids is None or not all_station_ids:
-                    all_station_ids = [main_station['extId']]
-                else:
-                    all_station_names = list(map(lambda x: ''.join(x.split('|')[:-1]), all_station_ids))
-                    all_station_ids = list(map(lambda x: x.split('|')[-1], all_station_ids))
-                public_transportation_journey = []
-                save_simple_stops(all_station_names, all_station_ids, new_stop)
-                for station_id in all_station_ids:
-                    json_data = None
-                    count = 0
-                    while (json_data is None or json_data['maxJ'] is None) and count < 4:
-                        json_data = get_all_routes_from_station(station_id)
-                        count += 1
-                    if json_data['maxJ'] is not None:
-                        public_transportation_journey.extend(
-                            list(map(lambda x: x, json_data['journey'])))
+                all_station_names = list(map(lambda x: ''.join(x.split('|')[:-1]), all_station_ids))
+                all_station_ids = list(map(lambda x: x.split('|')[-1], all_station_ids))
+            public_transportation_journey = []
+            save_simple_stops(all_station_names, all_station_ids, new_stop)
+            for station_id in all_station_ids:
+                json_data = None
+                count = 0
+                while (json_data is None or json_data['maxJ'] is None) and count < 4:
+                    json_data = get_all_routes_from_station(station_id)
+                    count += 1
+                if json_data['maxJ'] is not None:
+                    public_transportation_journey.extend(
+                        list(map(lambda x: x, json_data['journey'])))
 
-                routes = []
-                all_transport = get_all_name_of_transport_distinct(public_transportation_journey)
-                for route in all_transport:
-                    routes.extend(get_all_routes_of_transport_and_station(route, main_station))
-                for route in routes:
-                    load_route(route)
-                commit()
-                print("test")
-
-    print(f'Processed {line_count} lines.')
+            routes = []
+            all_transport = get_all_name_of_transport_distinct(public_transportation_journey)
+            for route in all_transport:
+                routes.extend(get_all_routes_of_transport_and_station(route, main_station))
+            for route in routes:
+                load_route(route)
+            commit()
 
 # while True:
 #     re = requests.get("http://fahrplan.oebb.at/bin/stboard.exe/dn?ld=3&L=vs_postbus&")

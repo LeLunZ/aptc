@@ -16,7 +16,7 @@ class Trip(Base):
     shape_id = Column(Text, nullable=True)
     wheelchair_accessible = Column(Text, nullable=True)
     trip_bikes_allowed = Column(Text, nullable=True)
-    trip_id = Column(Integer, nullable=False, primary_key=True)
+    trip_id = Column(Integer, nullable=False, primary_key=True, autoincrement=True)
 
     def __repr__(self):
         return "<Trip(name='{}', id={})>" \

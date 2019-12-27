@@ -6,7 +6,7 @@ Base = declarative_base()
 
 class Frequency(Base):
     __tablename__ = 'frequencies'
-    trip_id = Column(Text, nullable=False)
+    trip_id = Column(Integer, nullable=False)
     start_time = Column(Integer,nullable=False)
     end_time = Column(Interval, nullable=False)
     headway_secs = Column(Integer, nullable=False)

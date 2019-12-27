@@ -1,12 +1,17 @@
-from Models.agency import *
+import os
+
+from Models.agency import Agency
 from Models.route import Route
 from Models.stop import Stop
 from Models.stop_times import StopTime
 from Models.trip import Trip
 
-DATABASE_URI = 'postgres+psycopg2://postgres:password@localhost:5432/postgres'
+try:
+    DATABASE_URI = os.environ['postgres']
+except KeyError:
+    DATABASE_URI = 'postgres+psycopg2://postgres:password@localhost:5432/postgres'
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, and_
 from sqlalchemy.orm import sessionmaker, aliased
 
 engine = create_engine(DATABASE_URI)
@@ -70,8 +75,9 @@ def add_stop(stop):
     return stop
 
 
-def add_stop_time(stoptime):
-    data: StopTime = s.query(StopTime).filter(StopTime.trip_id == stoptime.stop_id and StopTime.trip_id == stoptime.trip_id).first()
+def add_stop_time(stoptime: StopTime):
+    data: StopTime = s.query(StopTime).filter(
+        and_(StopTime.stop_id == stoptime.stop_id, StopTime.trip_id == stoptime.trip_id)).first()
     if data is None:
         s.add(stoptime)
 
@@ -81,15 +87,20 @@ def add_transfer():
 
 
 def add_trip(trip):
-    data: Trip = s.query(Trip).filter(Trip.trip_id == trip.trip_id and Trip.route_id == trip.route_id).first()
+    data: Trip = s.query(Trip).filter(and_(Trip.trip_id == trip.trip_id, Trip.route_id == trip.route_id)).first()
     if data is None:
         s.add(trip)
     else:
         trip = data
     return trip
 
+
 def new_session():
     global s
+    try:
+        s.close()
+    except:
+        pass
     s = Session()
 
 
