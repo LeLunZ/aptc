@@ -1,4 +1,7 @@
 import json
+import logging
+
+from Models.calendar import Calendar
 from itertools import islice
 
 import requests
@@ -14,7 +17,22 @@ from crud import *
 
 import urllib.parse as urlparse
 from urllib.parse import parse_qs
+# TODO CSV export
 
+service_months = {
+    'Jan': 1,
+    'Feb': 2,
+    'Mär': 3,
+    'Apr': 4,
+    'Mai': 5,
+    'Jun': 6,
+    'Jul': 7,
+    'Aug': 8,
+    'Sep': 9,
+    'Okt': 10,
+    'Nov': 11,
+    'Dez': 12
+}
 
 def requests_retry_session(
         retries=5,
@@ -174,6 +192,18 @@ def load_route(url):
                           route_type=route_type,
                           route_url=url)
         route = add_route(new_route)
+        try:
+            service_info = extra_info_traffic_day.split('bis ')[1:2].split(' ')
+            day = service_info[0]
+            month = service_months[service_info[1]]
+            year = service_info[2]
+            end_date = int(f'{year}{month}{day}')
+            calendar = add_calendar(Calendar(service_id=route.route_id, end_date=end_date))
+        except:
+            class FakeCalendar:
+                def __init__(self):
+                    self.service_id = None
+            calendar = FakeCalendar()
         trips = []
         for i in range(len(all_stations)):
             all_times = list(map(lambda x: x.strip(),
@@ -184,7 +214,7 @@ def load_route(url):
             new_stop = Stop(stop_id=link, stop_name=all_stations[i],
                             stop_url=remove_param_from_url(all_links_of_station[i], '&time='))
             stop = add_stop(new_stop)
-            new_trip = Trip(route_id=route.route_id, service_id=None)
+            new_trip = Trip(route_id=route.route_id, service_id=calendar.service_id)
             trip: Trip = add_trip(new_trip)
             commit()
             new_stop_time = StopTime(stop_id=stop.stop_id, trip_id=trip.trip_id,
@@ -266,6 +296,11 @@ if __name__ == "__main__":
                 routes.extend(get_all_routes_of_transport_and_station(route, main_station))
             for route in routes:
                 load_route(route)
+
+            # 0% csvEintrag
+            # logging
+            # logging.basicConfig('logs.log', '')
+            # logging.log()
             commit()
 
 # while True:

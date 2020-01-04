@@ -6,6 +6,8 @@ from Models.stop import Stop
 from Models.stop_times import StopTime
 from Models.trip import Trip
 
+from Models.calendar import Calendar
+
 try:
     DATABASE_URI = os.environ['postgres']
 except KeyError:
@@ -84,6 +86,15 @@ def add_stop_time(stoptime: StopTime):
 
 def add_transfer():
     pass
+
+
+def add_calendar(service: Calendar):
+    data: Calendar = s.query(Calendar).filter(Calendar.service_id == service.service_id).first()
+    if data is None:
+        s.add(service)
+    else:
+        service = data
+    return service
 
 
 def add_trip(trip):

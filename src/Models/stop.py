@@ -7,7 +7,7 @@ Base = declarative_base()
 class Stop(Base):
     __tablename__ = 'stops'
     stop_id = Column(Text, primary_key=True)
-    stop_code = Column(Text, nullable=False, unique=True)
+    stop_code = Column(Text, nullable=False )
     stop_name = Column(Text, nullable=False)
     stop_desc = Column(Text, nullable=True)
     stop_lat = Column(Float, nullable=True)
