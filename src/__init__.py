@@ -7,7 +7,7 @@ from lxml import html
 from requests.adapters import HTTPAdapter
 from urllib3 import Retry
 import os
-
+import logging
 from Models.route import Route
 from Models.stop_times import StopTime
 from crud import *
@@ -15,6 +15,11 @@ from crud import *
 import urllib.parse as urlparse
 from urllib.parse import parse_qs
 
+logging.basicConfig(filename='./aptc.log',
+                            filemode='a',
+                            format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
+                            datefmt='%H:%M:%S',
+                            level=logging.DEBUG)
 
 def requests_retry_session(
         retries=5,
@@ -221,6 +226,10 @@ def skip_stop(seq, begin, end):
 
 if __name__ == "__main__":
     with open('bus_stops.csv') as csv_file:
+        error = False
+        def log_error(msg):
+            if not error:
+                logging.error(msg)
         csv_reader = csv.reader(csv_file, delimiter=',')
         row_count = sum(1 for row in csv_reader)
         try:
@@ -234,39 +243,59 @@ if __name__ == "__main__":
         csv_file.seek(0)
         csv_reader = csv.reader(csv_file, delimiter=',')
         for row in skip_stop(csv_reader, begin, end):
-            location_data = get_location_suggestion_from_string(row[0])
-            suggestion = location_data['suggestions']
-            main_station = suggestion[0]
-            new_stop = Stop(stop_id=str(int(main_station['extId'])), stop_name=main_station['value'],
-                            stop_lat=str_to_geocord(main_station['ycoord']),
-                            stop_lon=str_to_geocord(main_station['xcoord']))
-            add_stop(new_stop)
-            all_station_ids = get_all_station_ids_from_station(main_station)
-            all_station_names = None
-            if all_station_ids is None or not all_station_ids:
-                all_station_ids = [main_station['extId']]
-            else:
-                all_station_names = list(map(lambda x: ''.join(x.split('|')[:-1]), all_station_ids))
-                all_station_ids = list(map(lambda x: x.split('|')[-1], all_station_ids))
-            public_transportation_journey = []
-            save_simple_stops(all_station_names, all_station_ids, new_stop)
-            for station_id in all_station_ids:
-                json_data = None
-                count = 0
-                while (json_data is None or json_data['maxJ'] is None) and count < 4:
-                    json_data = get_all_routes_from_station(station_id)
-                    count += 1
-                if json_data['maxJ'] is not None:
-                    public_transportation_journey.extend(
-                        list(map(lambda x: x, json_data['journey'])))
+            try:
+                location_data = get_location_suggestion_from_string(row[0])
+                suggestion = location_data['suggestions']
+                main_station = suggestion[0]
+                try:
+                    new_stop = Stop(stop_id=str(int(main_station['extId'])), stop_name=main_station['value'],
+                                    stop_lat=str_to_geocord(main_station['ycoord']),
+                                    stop_lon=str_to_geocord(main_station['xcoord']))
+                    add_stop(new_stop)
+                    all_station_ids = get_all_station_ids_from_station(main_station)
+                    all_station_names = None
+                    if all_station_ids is None or not all_station_ids:
+                        all_station_ids = [main_station['extId']]
+                    else:
+                        all_station_names = list(map(lambda x: ''.join(x.split('|')[:-1]), all_station_ids))
+                        all_station_ids = list(map(lambda x: x.split('|')[-1], all_station_ids))
+                    public_transportation_journey = []
+                    save_simple_stops(all_station_names, all_station_ids, new_stop)
+                    for station_id in all_station_ids:
+                        json_data = None
+                        count = 0
+                        while (json_data is None or json_data['maxJ'] is None) and count < 4:
+                            json_data = get_all_routes_from_station(station_id)
+                            count += 1
+                        if json_data['maxJ'] is not None:
+                            public_transportation_journey.extend(
+                                list(map(lambda x: x, json_data['journey'])))
 
-            routes = []
-            all_transport = get_all_name_of_transport_distinct(public_transportation_journey)
-            for route in all_transport:
-                routes.extend(get_all_routes_of_transport_and_station(route, main_station))
-            for route in routes:
-                load_route(route)
-            commit()
+                    routes = []
+                    try:
+                        all_transport = get_all_name_of_transport_distinct(public_transportation_journey)
+                        for route in all_transport:
+                            try:
+                                routes.extend(get_all_routes_of_transport_and_station(route, main_station))
+                            except:
+                                logging.error(f'get_all_routes_of_transport_and_station {route} {main_station}')
+                                error = True
+                                raise Exception()
+                        for route in routes:
+                            try:
+                                load_route(route)
+                            except:
+                                logging.error(f'load_route {route}')
+                                error = True
+                                raise Exception()
+                        commit()
+                    except:
+                        log_error(f'get_all_name_of_transport_distinct {public_transportation_journey}')
+                except:
+                    logging.error(f"get_all_station_ids_from_station {main_station}")
+            except:
+                logging.error(f'get_location_suggestion_from_string {row}')
+            logging.debug(f"finished {row}")
 
 # while True:
 #     re = requests.get("http://fahrplan.oebb.at/bin/stboard.exe/dn?ld=3&L=vs_postbus&")
