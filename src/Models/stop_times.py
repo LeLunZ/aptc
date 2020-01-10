@@ -25,5 +25,5 @@ class StopTime(Base):
 
     def tocsv(self):
         return [self.trip_id, self.stop_sequence, self.stop_id, self.arrival_time, self.departure_time,
-                self.stop_headsign, self.route_short_name, self.pickup_type, self.drop_off_type,
+                self.stop_headsign, self.pickup_type, self.drop_off_type,
                 self.shape_dist_traveled]
