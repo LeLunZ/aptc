@@ -28,10 +28,10 @@ from urllib.parse import parse_qs
 # TODO CSV export
 
 logging.basicConfig(filename='./aptc.log',
-                            filemode='a',
-                            format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
-                            datefmt='%H:%M:%S',
-                            level=logging.DEBUG)
+                    filemode='a',
+                    format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
+                    datefmt='%H:%M:%S',
+                    level=logging.DEBUG)
 
 service_months = {
     'Jan': 1,
@@ -67,6 +67,9 @@ def requests_retry_session(
     session.mount('http://', adapter)
     session.mount('https://', adapter)
     return session
+
+
+routes_trips = {}
 
 
 def get_location_suggestion_from_string(location):
@@ -208,14 +211,20 @@ def load_route(url):
             route_type = 0
         elif route_info == '/img/vs_oebb/hmp_pic.gif':
             route_type = 3
+        global routes_trips
 
-        new_route = Route(agency_id=new_agency.agency_id,
-                          route_id=url.split('dn/')[-1],
-                          route_short_name=route_short_name,
-                          route_long_name=route_long_name,
-                          route_type=route_type,
-                          route_url=url)
-        route = add_route(new_route)
+        if all_stations not in routes_trips:
+            new_route = Route(agency_id=new_agency.agency_id,
+                              route_id=url.split('dn/')[-1],
+                              route_short_name=route_short_name,
+                              route_long_name=route_long_name,
+                              route_type=route_type,
+                              route_url=url)
+            route = add_route(new_route)
+            routes_trips[all_stations] = route
+        else:
+            route = routes_trips[all_stations]
+
         try:
             if not extra_info_traffic_day:
                 raise Exception()
@@ -363,6 +372,7 @@ def export_all_tables():
         for file in file_names:
             zip.write(file)
 
+
 if __name__ == "__main__":
     try:
         if os.environ['export']:
@@ -428,7 +438,8 @@ if __name__ == "__main__":
                             try:
                                 routes.extend(get_all_routes_of_transport_and_station(route, main_station))
                             except Exception as e:
-                                logging.error(f'get_all_routes_of_transport_and_station {route} {main_station} {str(e)}')
+                                logging.error(
+                                    f'get_all_routes_of_transport_and_station {route} {main_station} {str(e)}')
                         for route in routes:
                             try:
                                 load_route(route)

@@ -8,7 +8,7 @@ class StopTime(Base):
     __tablename__ = 'stop_times'
     trip_id = Column(Integer, nullable=False, primary_key=True)
     stop_sequence = Column(Integer, nullable=False)
-    stop_id = Column(Text, nullable=False, primary_key=True)
+    stop_id = Column(Integer, nullable=False, primary_key=True)
     arrival_time = Column(Interval, nullable=False)
     departure_time = Column(Interval, nullable=False)
     stop_headsign = Column(Text, nullable=True)
@@ -25,5 +25,5 @@ class StopTime(Base):
 
     def tocsv(self):
         return [self.trip_id, self.stop_sequence, self.stop_id, self.arrival_time, self.departure_time,
-                self.stop_headsign, self.route_short_name, self.pickup_type, self.drop_off_type,
+                self.stop_headsign, self.pickup_type, self.drop_off_type,
                 self.shape_dist_traveled]
