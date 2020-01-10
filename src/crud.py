@@ -13,7 +13,7 @@ from Models.shape import Shape
 from Models.transfers import Transfer
 
 try:
-    DATABASE_URI = os.environ['postgres']
+    DATABASE_URI = 'postgres+psycopg2://' + str(os.environ['postgres'])
 except KeyError:
     DATABASE_URI = 'postgres+psycopg2://postgres:password@localhost:5432/postgres'
 
