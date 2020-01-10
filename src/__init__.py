@@ -27,6 +27,17 @@ from urllib.parse import parse_qs
 
 # TODO CSV export
 
+try:
+    logging.getLogger("requests").setLevel(logging.FATAL)
+except:
+    pass
+
+try:
+    logging.getLogger("urllib3").setLevel(logging.FATAL)
+except:
+    pass
+
+
 logging.basicConfig(filename='./aptc.log',
                     filemode='a',
                     format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
