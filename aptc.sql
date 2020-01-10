@@ -1,3 +1,6 @@
+CREATE DOMAIN wgs84_lon AS DOUBLE PRECISION CHECK (VALUE >= -180 AND VALUE <= 180);
+CREATE DOMAIN wgs84_lat AS DOUBLE PRECISION CHECK (VALUE >= -90 AND VALUE <= 90);
+
 create table agency
 (
     agency_id       text
@@ -121,3 +124,4 @@ create table stop_times
     constraint stop_times_pk
         primary key (trip_id, stop_id, stop_sequence)
 );
+
