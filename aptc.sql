@@ -107,7 +107,7 @@ create table stop_times
 (
     trip_id             integer not null,
     stop_sequence       integer not null,
-    stop_id             text    not null,
+    stop_id             integer not null,
     arrival_time        text    not null,
     departure_time      text    not null,
     stop_headsign       text,
