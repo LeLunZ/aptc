@@ -8,6 +8,10 @@ from Models.trip import Trip
 
 from Models.calendar import Calendar
 
+from Models.frequencies import Frequency
+from Models.shape import Shape
+from Models.transfers import Transfer
+
 try:
     DATABASE_URI = os.environ['postgres']
 except KeyError:
@@ -32,21 +36,17 @@ def add_agency(agency):
     return agency
 
 
-def add_calendar():
-    pass
-
-
 def add_frequency():
     pass
 
 
-def add_route(route):
+def add_route(route:Route):
     data: Route = s.query(Route).filter(
         Route.route_id == route.route_id).first()
     if data is None:
         s.add(route)
     else:
-        route = data
+        route.location_type
     return route
 
 
@@ -89,7 +89,12 @@ def add_transfer():
 
 
 def add_calendar(service: Calendar):
-    data: Calendar = s.query(Calendar).filter(Calendar.service_id == service.service_id).first()
+    data: Calendar = s.query(Calendar).filter(
+        and_(Calendar.start_date == service.start_date, Calendar.end_date == service.end_date,
+             Calendar.monday == service.monday, Calendar.tuesday == service.tuesday,
+             Calendar.wednesday == service.wednesday, Calendar.thursday == service.thursday,
+             Calendar.friday == service.friday, Calendar.saturday == service.saturday,
+             Calendar.sunday == service.sunday)).first()
     if data is None:
         s.add(service)
     else:
@@ -104,6 +109,49 @@ def add_trip(trip):
     else:
         trip = data
     return trip
+
+
+def get_from_table(t):
+    return s.query(t).all()
+
+
+def get_from_table_first(t):
+    return s.query(t).first()
+
+def get_agencies():
+    return s.query(Agency).all()
+
+
+def get_calendars():
+    return s.query(Calendar).all()
+
+
+def get_frequencies():
+    return s.query(Frequency).all()
+
+
+def get_routes():
+    return s.query(Route).all()
+
+
+def get_shapes():
+    return s.query(Shape).all()
+
+
+def get_stops():
+    return s.query(Stop).all()
+
+
+def get_stop_times():
+    return s.query(StopTime).all()
+
+
+def get_transfers():
+    return s.query(Transfer).all()
+
+
+def get_trips():
+    return s.query(Trip).all()
 
 
 def new_session():

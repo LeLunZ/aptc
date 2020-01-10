@@ -16,3 +16,11 @@ class Agency(AgencyBase):
     def __repr__(self):
         return "<Agency(name='{}', url='{}', id={})>" \
             .format(self.agency_name, self.agency_url, self.agency_id)
+
+    @staticmethod
+    def firstline():
+        return ['agency_id', 'agency_name', 'agency_url', 'agency_timezone', 'agency_lang', 'agency_phone']
+
+    def tocsv(self):
+        return [self.agency_id, self.agency_name, self.agency_url, self.agency_timezone, self.agency_lang,
+                self.agency_phone]

@@ -1,7 +1,16 @@
 import json
 import logging
+from Models.agency import Agency
+from Models.route import Route
+from Models.stop import Stop
+from Models.stop_times import StopTime
+from Models.trip import Trip
 
 from Models.calendar import Calendar
+
+from Models.frequencies import Frequency
+from Models.shape import Shape
+from Models.transfers import Transfer
 from itertools import islice
 
 import requests
@@ -10,15 +19,19 @@ from lxml import html
 from requests.adapters import HTTPAdapter
 from urllib3 import Retry
 import os
-
-from Models.route import Route
-from Models.stop_times import StopTime
+from zipfile import ZipFile
 from crud import *
 
 import urllib.parse as urlparse
 from urllib.parse import parse_qs
 
 # TODO CSV export
+
+logging.basicConfig(filename='./aptc.log',
+                            filemode='a',
+                            format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
+                            datefmt='%H:%M:%S',
+                            level=logging.DEBUG)
 
 service_months = {
     'Jan': 1,
@@ -159,9 +172,11 @@ def load_route(url):
                 add_agency(new_agency)
             except:
                 print(operator)
+        else:
+            new_agency = get_from_table_first(Agency)
         if extra_info_traffic_day:
             traffic_day = list(filter(lambda x: x.strip() != '', extra_info_traffic_day))
-            if traffic_day or traffic_day is None:
+            if traffic_day:
                 traffic_day = traffic_day[0].strip()
             pass
         if extra_info_remarks:
@@ -170,6 +185,9 @@ def load_route(url):
         route_short_name = \
             tree.xpath('((//*/tr[@class=$first])[1]/td[@class=$second])[last()]/text()', first='zebracol-2',
                        second='center sepline')[0].strip()
+        if ' ' in route_short_name:
+            route_long_name = route_short_name
+            route_short_name = route_short_name.split(' ')[1]
         route_info = tree.xpath('//*/span[@class=$first]/img/@src', first='prodIcon')[0]
         route_type = None
         if route_info == '/img/vs_oebb/rex_pic.gif':
@@ -188,26 +206,101 @@ def load_route(url):
             route_type = 3
         elif route_info == '/img/vs_oebb/ntr_pic.gif':
             route_type = 0
+        elif route_info == '/img/vs_oebb/hmp_pic.gif':
+            route_type = 3
+
         new_route = Route(agency_id=new_agency.agency_id,
                           route_id=url.split('dn/')[-1],
                           route_short_name=route_short_name,
+                          route_long_name=route_long_name,
                           route_type=route_type,
                           route_url=url)
         route = add_route(new_route)
         try:
-            service_info = extra_info_traffic_day.split('bis ')[1:2].split(' ')
-            day = service_info[0]
+            if not extra_info_traffic_day:
+                raise Exception()
+            print(f'{traffic_day}', flush=True)
+            if isinstance(traffic_day, list):
+                logging.error(f'traffic day is list {traffic_day}')
+                raise Exception()
+            calendar = Calendar(service_id=route.route_id)
+            weekdays = []
+            official_weekdays = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
+            splited_traffic_day = str(traffic_day).replace(';', '')
+            splited_traffic_day = splited_traffic_day.split(' ')
+            for i in official_weekdays:
+                if i in splited_traffic_day:
+                    weekdays.append([i, official_weekdays.index(i)])
+
+            weekdays.sort(key=lambda x: x[1])
+            if (len(weekdays) > 1 and f'{weekdays[0][0]} - {weekdays[1][0]}' in traffic_day) or len(weekdays) is 0:
+                if len(weekdays) is 0:
+                    weekdays[0][1] = 0
+                    weekdays[1][1] = 6
+                if weekdays[1][1] >= 0 >= weekdays[0][1]:
+                    calendar.monday = True
+                else:
+                    calendar.monday = False
+                if weekdays[1][1] >= 1 >= weekdays[0][1]:
+                    calendar.tuesday = True
+                else:
+                    calendar.tuesday = False
+                if weekdays[1][1] >= 2 >= weekdays[0][1]:
+                    calendar.wednesday = True
+                else:
+                    calendar.wednesday = False
+                if weekdays[1][1] >= 3 >= weekdays[0][1]:
+                    calendar.thursday = True
+                else:
+                    calendar.thursday = False
+                if weekdays[1][1] >= 4 >= weekdays[0][1]:
+                    calendar.friday = True
+                else:
+                    calendar.friday = False
+                if weekdays[1][1] >= 5 >= weekdays[0][1]:
+                    calendar.saturday = True
+                else:
+                    calendar.saturday = False
+                if weekdays[1][1] >= 6 >= weekdays[0][1]:
+                    calendar.sunday = True
+                else:
+                    calendar.sunday = False
+            else:
+                logging.error(f'traffic day no valid weekdays {traffic_day}')
+                raise Exception()
+            if 'bis ' not in traffic_day:
+                logging.error(f'traffic day no bis found {traffic_day}')
+                raise Exception()
+            print(f'traffic_day split comming {traffic_day}', flush=True)
+            service_info = ''.join(traffic_day.split('bis ')[1:4]).split(' ')
+            day = service_info[0].replace('.', '')
             month = service_months[service_info[1]]
             year = service_info[2]
+            if len(day) is 1:
+                day = f'0{day}'
+            if month < 10:
+                month = f'0{month}'
+
             end_date = int(f'{year}{month}{day}')
-            calendar = add_calendar(Calendar(service_id=route.route_id, end_date=end_date))
-        except:
+            calendar.end_date = end_date
+            service_info = ''.join(traffic_day.split('am ')[1:3]).split(' ')
+            day = service_info[0].replace('.', '')
+            if service_info[1] != 'bis':
+                month = service_months[service_info[1]]
+            if len(day) is 1:
+                day = f'0{day}'
+            if month < 10:
+                month = f'0{month}'
+            start_date = f'{year}{month}{day}'
+            calendar.start_date = int(start_date)
+            calendar = add_calendar(calendar)
+        except Exception as e:
+            print(str(e), flush=True)
             class FakeCalendar:
                 def __init__(self):
                     self.service_id = None
 
             calendar = FakeCalendar()
-        trips = []
         for i in range(len(all_stations)):
             all_times = list(map(lambda x: x.strip(),
                                  tree.xpath('//*/tr[@class=$first or @class=$second][$count]/td[@class=$third]/text()',
@@ -215,8 +308,10 @@ def load_route(url):
                                             second="zebracol-1", third='center sepline', count=i + 1)))
             link = all_links_of_station[i].split('&input=')[1].split('&')[0]
             new_stop = Stop(stop_id=link, stop_name=all_stations[i],
-                            stop_url=remove_param_from_url(all_links_of_station[i], '&time='))
+                            stop_url=remove_param_from_url(all_links_of_station[i], '&time='), location_type=0)
             stop = add_stop(new_stop)
+            stop.location_type = 0
+            stop.parent_station = None
             new_trip = Trip(route_id=route.route_id, service_id=calendar.service_id)
             trip: Trip = add_trip(new_trip)
             commit()
@@ -240,6 +335,7 @@ def save_simple_stops(names, ids, main_station):
             stop_location_type = 0
             if index is 0:
                 main_station.location_type = 1
+                main_station.parent_station = None
                 continue
             new_stop = Stop(stop_id=id, stop_name=name, location_type=stop_location_type,
                             parent_station=main_station.stop_id)
@@ -253,7 +349,31 @@ def skip_stop(seq, begin, end):
             yield item
 
 
+def export_all_tables():
+    tables = [Agency, Calendar, Frequency, Route, Shape, Stop, StopTime, Transfer, Trip]
+
+    file_names = []
+    os.chdir('./db')
+    for i in tables:
+        file_names.append(f'./{i.__table__.name}.txt')
+        with open(f'./{i.__table__.name}.txt', 'w') as outfile:
+            outcsv = csv.writer(outfile, delimiter=',')
+            records = get_from_table(i)
+            outcsv.writerow(i.firstline())
+            [outcsv.writerow(row.tocsv()) for row in records]
+
+    with ZipFile('./Archiv.zip', 'w') as zip:
+        for file in file_names:
+            zip.write(file)
+
 if __name__ == "__main__":
+    try:
+        if os.environ['export']:
+            export_all_tables()
+            exit()
+    except KeyError:
+        pass
+
     with open('bus_stops.csv') as csv_file:
         error = False
 
@@ -266,11 +386,11 @@ if __name__ == "__main__":
         csv_reader = csv.reader(csv_file, delimiter=',')
         row_count = sum(1 for row in csv_reader)
         try:
-            begin = os.environ['csvbegin'] - 1
+            begin = int(os.environ['csvbegin']) - 1
         except KeyError:
             begin = 1
         try:
-            end = os.environ['csvend'] - 1
+            end = int(os.environ['csvend']) - 1
         except KeyError:
             end = row_count - 1
         csv_file.seek(0)
@@ -284,7 +404,7 @@ if __name__ == "__main__":
                     new_stop = Stop(stop_id=str(int(main_station['extId'])), stop_name=main_station['value'],
                                     stop_lat=str_to_geocord(main_station['ycoord']),
                                     stop_lon=str_to_geocord(main_station['xcoord']))
-                    add_stop(new_stop)
+                    new_stop = add_stop(new_stop)
                     all_station_ids = get_all_station_ids_from_station(main_station)
                     all_station_names = None
                     if all_station_ids is None or not all_station_ids:
@@ -310,26 +430,23 @@ if __name__ == "__main__":
                         for route in all_transport:
                             try:
                                 routes.extend(get_all_routes_of_transport_and_station(route, main_station))
-                            except:
-                                logging.error(f'get_all_routes_of_transport_and_station {route} {main_station}')
-                                error = True
-                                raise Exception()
+                            except Exception as e:
+                                logging.error(f'get_all_routes_of_transport_and_station {route} {main_station} {str(e)}')
                         for route in routes:
                             try:
                                 load_route(route)
                             except:
                                 logging.error(f'load_route {route}')
-                                error = True
-                                raise Exception()
                         commit()
-                    except:
-                        log_error(f'get_all_name_of_transport_distinct {public_transportation_journey}')
-                except:
-                    logging.error(f"get_all_station_ids_from_station {main_station}")
-            except:
-                logging.error(f'get_location_suggestion_from_string {row}')
+                    except Exception as e:
+                        log_error(f'get_all_name_of_transport_distinct {public_transportation_journey} {str(e)}')
+                except Exception as e:
+                    logging.error(f"get_all_station_ids_from_station {main_station} {str(e)}")
+            except Exception as e:
+                logging.error(f'get_location_suggestion_from_string {row} {str(e)}')
             logging.debug(f"finished {row}")
 
+exit(0)
 # while True:
 #     re = requests.get("http://fahrplan.oebb.at/bin/stboard.exe/dn?ld=3&L=vs_postbus&")
 #     if re.status_code != 200:
