@@ -20,3 +20,8 @@ For changing the location of the crawler to start and to end in the .csv file pa
 example:
 
 `docker compose run -e csvbegin=3 -e csvend=10 app`
+
+
+# Export
+
+`docker compose run -e export=TRUE app`
