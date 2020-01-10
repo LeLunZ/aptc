@@ -171,7 +171,7 @@ def load_route(url):
                 new_agency.agency_phone = agency_phone
                 add_agency(new_agency)
             except:
-                print(operator)
+                pass
         else:
             new_agency = get_from_table_first(Agency)
         if extra_info_traffic_day:
@@ -219,7 +219,6 @@ def load_route(url):
         try:
             if not extra_info_traffic_day:
                 raise Exception()
-            print(f'{traffic_day}', flush=True)
             if isinstance(traffic_day, list):
                 logging.error(f'traffic day is list {traffic_day}')
                 raise Exception()
@@ -271,7 +270,6 @@ def load_route(url):
             if 'bis ' not in traffic_day:
                 logging.error(f'traffic day no bis found {traffic_day}')
                 raise Exception()
-            print(f'traffic_day split comming {traffic_day}', flush=True)
             service_info = ''.join(traffic_day.split('bis ')[1:4]).split(' ')
             day = service_info[0].replace('.', '')
             month = service_months[service_info[1]]
@@ -295,7 +293,6 @@ def load_route(url):
             calendar.start_date = int(start_date)
             calendar = add_calendar(calendar)
         except Exception as e:
-            print(str(e), flush=True)
             class FakeCalendar:
                 def __init__(self):
                     self.service_id = None
