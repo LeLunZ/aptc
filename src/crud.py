@@ -40,13 +40,12 @@ def add_frequency():
     pass
 
 
-def add_route(route:Route):
-    data: Route = s.query(Route).filter(
-        Route.route_id == route.route_id).first()
+def add_route(route: Route):
+    data: Route = s.query(Route).filter(Route.route_long_name == route.route_long_name).first()
     if data is None:
         s.add(route)
     else:
-        route.location_type
+        route = data
     return route
 
 
@@ -79,9 +78,14 @@ def add_stop(stop):
 
 def add_stop_time(stoptime: StopTime):
     data: StopTime = s.query(StopTime).filter(
-        and_(StopTime.stop_id == stoptime.stop_id, StopTime.trip_id == stoptime.trip_id)).first()
+        and_(StopTime.stop_id == stoptime.stop_id, StopTime.trip_id == stoptime.trip_id,
+             StopTime.departure_time == stoptime.departure_time, StopTime.arrival_time == stoptime.arrival_time,
+             StopTime.stop_sequence == stoptime.stop_sequence)).first()
     if data is None:
         s.add(stoptime)
+    else:
+        stoptime = data
+    return stoptime
 
 
 def add_transfer():
@@ -103,11 +107,9 @@ def add_calendar(service: Calendar):
 
 
 def add_trip(trip):
-    data: Trip = s.query(Trip).filter(and_(Trip.trip_id == trip.trip_id, Trip.route_id == trip.route_id)).first()
-    if data is None:
-        s.add(trip)
-    else:
-        trip = data
+    s.add(trip)
+    commit()
+    s.refresh(trip)
     return trip
 
 
@@ -117,6 +119,7 @@ def get_from_table(t):
 
 def get_from_table_first(t):
     return s.query(t).first()
+
 
 def get_agencies():
     return s.query(Agency).all()

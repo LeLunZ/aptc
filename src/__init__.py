@@ -37,7 +37,6 @@ try:
 except:
     pass
 
-
 logging.basicConfig(filename='./aptc.log',
                     filemode='a',
                     format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
@@ -158,6 +157,8 @@ def remove_param_from_url(url, to_remove):
     return left_part + '&' + right_part
 
 
+
+
 def load_route(url):
     url = url.split('?')[0]
     if not route_exist(url):
@@ -182,6 +183,10 @@ def load_route(url):
                     agency_name = agency[0]
                     agency_phone = agency[1]
                 new_agency.agency_id = agency_name
+                new_agency.agency_lang = 'de'
+                new_agency.agency_timezone = 'Europe/Vienna'
+                new_agency.agency_url = 'https://www.google.com/search?q=' + agency_name
+                new_agency.agency_name = agency_name
                 new_agency.agency_phone = agency_phone
                 add_agency(new_agency)
             except:
@@ -223,19 +228,12 @@ def load_route(url):
         elif route_info == '/img/vs_oebb/hmp_pic.gif':
             route_type = 3
         global routes_trips
-
-        if all_stations not in routes_trips:
-            new_route = Route(agency_id=new_agency.agency_id,
-                              route_id=url.split('dn/')[-1],
-                              route_short_name=route_short_name,
-                              route_long_name=route_long_name,
-                              route_type=route_type,
-                              route_url=url)
-            route = add_route(new_route)
-            routes_trips[all_stations] = route
-        else:
-            route = routes_trips[all_stations]
-
+        new_route = Route(route_id=url.split('dn/')[-1],agency_id=new_agency.agency_id,
+                          route_short_name=route_short_name,
+                          route_long_name=route_long_name,
+                          route_type=route_type,
+                          route_url=url)
+        route = add_route(new_route)
         try:
             if not extra_info_traffic_day:
                 raise Exception()
@@ -318,6 +316,8 @@ def load_route(url):
                     self.service_id = None
 
             calendar = FakeCalendar()
+        new_trip = Trip(route_id=route.route_id, service_id=calendar.service_id, oebb_url=url)
+        trip: Trip = add_trip(new_trip)
         for i in range(len(all_stations)):
             all_times = list(map(lambda x: x.strip(),
                                  tree.xpath('//*/tr[@class=$first or @class=$second][$count]/td[@class=$third]/text()',
@@ -329,9 +329,6 @@ def load_route(url):
             stop = add_stop(new_stop)
             stop.location_type = 0
             stop.parent_station = None
-            new_trip = Trip(route_id=route.route_id, service_id=calendar.service_id)
-            trip: Trip = add_trip(new_trip)
-            commit()
             new_stop_time = StopTime(stop_id=stop.stop_id, trip_id=trip.trip_id,
                                      arrival_time=all_times[0] if all_times[0] == '' else all_times[0] + ':00',
                                      departure_time=all_times[1] if all_times[1] == '' else all_times[1] + ':00',
@@ -419,7 +416,7 @@ if __name__ == "__main__":
                 suggestion = location_data['suggestions']
                 main_station = suggestion[0]
                 try:
-                    new_stop = Stop(stop_id=str(int(main_station['extId'])), stop_name=main_station['value'],
+                    new_stop = Stop(stop_id=main_station['extId'], stop_name=main_station['value'],
                                     stop_lat=str_to_geocord(main_station['ycoord']),
                                     stop_lon=str_to_geocord(main_station['xcoord']))
                     new_stop = add_stop(new_stop)

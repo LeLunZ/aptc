@@ -6,7 +6,7 @@ Base = declarative_base()
 
 class Shape(Base):
     __tablename__ = 'shapes'
-    shape_id = Column(Text, primary_key=True)
+    shape_id = Column(Integer, primary_key=True, autoincrement=True)
     shape_pt_sequence = Column(Integer, nullable=False)
     shape_dist_traveled = Column(Float, nullable=True)
     shape_pt_lat = Column(Float, nullable=False)

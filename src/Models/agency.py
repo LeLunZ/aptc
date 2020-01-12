@@ -7,7 +7,7 @@ AgencyBase = declarative_base()
 class Agency(AgencyBase):
     __tablename__ = 'agency'
     agency_id = Column(Text, primary_key=True)
-    agency_name = Column(Text, nullable=True)
+    agency_name = Column(Text, nullable=True, unique=True)
     agency_url = Column(Text, nullable=True)
     agency_timezone = Column(Text, nullable=True)
     agency_lang = Column(Text, nullable=True)
