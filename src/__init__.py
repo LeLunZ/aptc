@@ -27,6 +27,8 @@ from urllib.parse import parse_qs
 
 # TODO CSV export
 
+stop_dict = {}
+
 try:
     logging.getLogger("requests").setLevel(logging.FATAL)
 except:
@@ -315,6 +317,7 @@ def load_route(url):
             calendar = FakeCalendar()
         new_trip = Trip(route_id=route.route_id, service_id=calendar.service_id, oebb_url=url)
         trip: Trip = add_trip(new_trip)
+        global stop_dict
         for i in range(len(all_stations)):
             all_times = list(map(lambda x: x.strip(),
                                  tree.xpath('//*/tr[@class=$first or @class=$second][$count]/td[@class=$third]/text()',
@@ -324,14 +327,23 @@ def load_route(url):
                             stop_url=remove_param_from_url(all_links_of_station[i], '&time='), location_type=0)
             stop = add_stop(new_stop)
             if (stop.stop_lat is None or stop.stop_lon is None):
-                try:
-                    stop_suggestions = get_location_suggestion_from_string(stop.stop_name)
-                    current_station = stop_suggestions['suggestions'][0]
-                    stop.stop_lat = str_to_geocord(current_station['ycoord'])
-                    stop.stop_lon = str_to_geocord(current_station['xcoord'])
+                if stop.stop_name in stop_dict:
+                    coords = stop_dict.pop(stop.stop_name)
+                    stop.stop_lat = coords['y']
+                    stop.stop_lon = coords['x']
                     commit()
-                except:
-                    pass
+                else:
+                    try:
+                        stop_suggestions = get_location_suggestion_from_string(stop.stop_name)
+                        for stop_suggestion in stop_suggestions['suggestions']:
+                            stop_dict[stop_suggestion['value']] = {'y': str_to_geocord(stop_suggestion['ycoord']),
+                                                                    'x': str_to_geocord(stop_suggestion['xcoord'])}
+                        current_station_cord = stop_dict.pop(stop_suggestions['suggestions'][0]['value'])
+                        stop.stop_lat = current_station_cord['y']
+                        stop.stop_lon = current_station_cord['x']
+                        commit()
+                    except:
+                        pass
             stop.location_type = 0
             stop.parent_station = None
             new_stop_time = StopTime(stop_id=stop.stop_id, trip_id=trip.trip_id,
@@ -412,6 +424,10 @@ if __name__ == "__main__":
             end = int(os.environ['csvend']) - 1
         except KeyError:
             end = row_count - 1
+        csv_file.seek(0)
+        for count, i in enumerate(csv_reader):
+            if count is not 0:
+                stop_dict[i[0]] = {'x': float(i[7]), 'y': float(i[8])}
         csv_file.seek(0)
         csv_reader = csv.reader(csv_file, delimiter=',')
         for row in skip_stop(csv_reader, begin, end):

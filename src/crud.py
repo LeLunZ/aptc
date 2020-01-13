@@ -24,7 +24,7 @@ engine = create_engine(DATABASE_URI)
 
 Session = sessionmaker(bind=engine)
 
-s = Session()
+s = Session(autoflush=False)
 
 def add_agency(agency):
     data = s.query(Agency).filter(Agency.agency_name == agency.agency_name).first()
