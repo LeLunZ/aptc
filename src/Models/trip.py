@@ -6,7 +6,7 @@ Base = declarative_base()
 
 class Trip(Base):
     __tablename__ = 'trips'
-    route_id = Column(Text, nullable=False)
+    route_id = Column(Integer, nullable=False)
     service_id = Column(Integer, nullable=True)
     trip_short_name = Column(Text, nullable=True)
     trip_headsign = Column(Text, nullable=True)

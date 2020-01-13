@@ -9,7 +9,7 @@ class StopTime(Base):
     stop_times_id = Column(Integer, primary_key=True, autoincrement=True)
     trip_id = Column(Integer, nullable=False)
     stop_sequence = Column(Integer, nullable=False)
-    stop_id = Column(Text, nullable=False)
+    stop_id = Column(Integer, nullable=False)
     arrival_time = Column(Interval, nullable=False)
     departure_time = Column(Interval, nullable=False)
     stop_headsign = Column(Text, nullable=True)

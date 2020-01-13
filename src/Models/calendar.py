@@ -6,7 +6,7 @@ Base = declarative_base()
 
 class Calendar(Base):
     __tablename__ = 'calendar'
-    service_id = Column(Text, primary_key=True)
+    service_id = Column(Integer, primary_key=True, autoincrement=True)
     monday = Column(Boolean, nullable=False)
     tuesday = Column(Boolean, nullable=False)
     wednesday = Column(Boolean, nullable=False)

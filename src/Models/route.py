@@ -6,8 +6,8 @@ Base = declarative_base()
 
 class Route(Base):
     __tablename__ = 'routes'
-    agency_id = Column(Text, nullable=True)
-    route_id = Column(Text, primary_key=True)
+    agency_id = Column(Integer, nullable=True)
+    route_id = Column(Integer, primary_key=True, autoincrement=True)
     route_short_name = Column(Text, nullable=False)
     route_long_name = Column(Text, nullable=True)
     route_desc = Column(Text, nullable=True)

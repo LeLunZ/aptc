@@ -11,7 +11,7 @@ create domain gtfstime as text
 
 create table agency
 (
-    agency_id       text not null
+    agency_id       serial not null
         constraint agency_pk
             primary key
         constraint agency_agency_id_key
@@ -28,11 +28,11 @@ create unique index agency_agency_name_uindex
 
 create table stops
 (
-    stop_id             text not null
+    stop_id             integer not null
         constraint stops_pkey
             primary key,
     stop_code           text,
-    stop_name           text not null,
+    stop_name           text    not null,
     stop_desc           text,
     stop_lat            wgs84_lat,
     stop_lon            wgs84_lon,
@@ -45,22 +45,22 @@ create table stops
 
 create table routes
 (
-    agency_id        text,
-    route_short_name text not null,
+    agency_id        integer,
+    route_short_name text   not null,
     route_long_name  text,
     route_desc       text,
     route_type       integer,
     route_url        text,
     route_color      text,
     route_text_color text,
-    route_id         text not null
+    route_id         serial not null
         constraint routes_pkey
             primary key
 );
 
 create table calendar
 (
-    service_id text       not null
+    service_id serial     not null
         constraint calendar_pkey
             primary key,
     monday     boolean    not null,
@@ -90,15 +90,15 @@ create table shapes
 
 create table trips
 (
-    route_id              text not null,
-    service_id            text,
+    route_id              integer not null,
+    service_id            integer,
     trip_short_name       text,
     trip_headsign         text,
     direction_id          boolean,
     block_id              text,
     shape_id              text,
     wheelchair_accessible text,
-    trip_id               text not null
+    trip_id               serial  not null
         constraint trips_pkey
             primary key,
     oebb_url              text
@@ -124,9 +124,9 @@ create table transfers
 
 create table stop_times
 (
-    trip_id             text    not null,
+    trip_id             integer not null,
     stop_sequence       integer not null,
-    stop_id             text    not null,
+    stop_id             integer not null,
     arrival_time        text    not null,
     departure_time      text    not null,
     stop_headsign       text,

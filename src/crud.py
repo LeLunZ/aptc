@@ -26,11 +26,12 @@ Session = sessionmaker(bind=engine)
 
 s = Session()
 
-
 def add_agency(agency):
-    data = s.query(Agency).filter(Agency.agency_id == agency.agency_id).first()
+    data = s.query(Agency).filter(Agency.agency_name == agency.agency_name).first()
     if data is None:
         s.add(agency)
+        commit()
+        s.refresh(agency)
     else:
         agency = data
     return agency
@@ -44,6 +45,8 @@ def add_route(route: Route):
     data: Route = s.query(Route).filter(Route.route_long_name == route.route_long_name).first()
     if data is None:
         s.add(route)
+        commit()
+        s.refresh(route)
     else:
         route = data
     return route
@@ -63,6 +66,8 @@ def add_stop(stop):
     data: Stop = s.query(Stop).filter(Stop.stop_name == stop.stop_name).first()
     if data is None:
         s.add(stop)
+        commit()
+        s.refresh(stop)
     elif stop.stop_lat is not None or stop.stop_url is not None or stop.location_type is not None:
         if data.stop_lat is None and stop.stop_lat is not None:
             data.stop_lat = stop.stop_lat
@@ -83,6 +88,8 @@ def add_stop_time(stoptime: StopTime):
              StopTime.stop_sequence == stoptime.stop_sequence)).first()
     if data is None:
         s.add(stoptime)
+        commit()
+        s.refresh(stoptime)
     else:
         stoptime = data
     return stoptime
@@ -101,6 +108,8 @@ def add_calendar(service: Calendar):
              Calendar.sunday == service.sunday)).first()
     if data is None:
         s.add(service)
+        commit()
+        s.refresh(service)
     else:
         service = data
     return service

@@ -82,7 +82,7 @@ def requests_retry_session(
 routes_trips = {}
 
 
-def get_location_suggestion_from_string(location):
+def get_location_suggestion_from_string(location: str):
     oebb_location = requests_retry_session().get(
         'http://fahrplan.oebb.at/bin/ajax-getstop.exe/dn?REQ0JourneyStopsS0A=1&REQ0JourneyStopsB=12&S=' + location + '?&js=false&')
     locations = oebb_location.content[8:-22]
@@ -126,7 +126,7 @@ def get_all_routes_of_transport_and_station(transport_number, station):
         'stationname': station['value'],
         'REQ0JourneyStopsSID': station['id'],
         'selectDate': 'oneday',
-        'date': "Do, 21.11.2019",
+        'date': "Mo, 13.01.2020",
         'wDayExt0': 'Mo|Di|Mi|Do|Fr|Sa|So',
         'periodStart': '15.09.2019',
         'periodEnd': '12.12.2020',
@@ -157,8 +157,6 @@ def remove_param_from_url(url, to_remove):
     return left_part + '&' + right_part
 
 
-
-
 def load_route(url):
     url = url.split('?')[0]
     if not route_exist(url):
@@ -182,13 +180,12 @@ def load_route(url):
                 else:
                     agency_name = agency[0]
                     agency_phone = agency[1]
-                new_agency.agency_id = agency_name
                 new_agency.agency_lang = 'de'
                 new_agency.agency_timezone = 'Europe/Vienna'
                 new_agency.agency_url = 'https://www.google.com/search?q=' + agency_name
                 new_agency.agency_name = agency_name
                 new_agency.agency_phone = agency_phone
-                add_agency(new_agency)
+                new_agency = add_agency(new_agency)
             except:
                 pass
         else:
@@ -196,7 +193,7 @@ def load_route(url):
         if extra_info_traffic_day:
             traffic_day = list(filter(lambda x: x.strip() != '', extra_info_traffic_day))
             if traffic_day:
-                traffic_day = traffic_day[0].strip()
+                traffic_day = traffic_day[0].strip().replace(';', '')
             pass
         if extra_info_remarks:
             remarks = list(filter(lambda x: x != '', map(lambda x: x.strip(), extra_info_remarks)))
@@ -228,7 +225,7 @@ def load_route(url):
         elif route_info == '/img/vs_oebb/hmp_pic.gif':
             route_type = 3
         global routes_trips
-        new_route = Route(route_id=url.split('dn/')[-1],agency_id=new_agency.agency_id,
+        new_route = Route(agency_id=new_agency.agency_id,
                           route_short_name=route_short_name,
                           route_long_name=route_long_name,
                           route_type=route_type,
@@ -240,7 +237,7 @@ def load_route(url):
             if isinstance(traffic_day, list):
                 logging.error(f'traffic day is list {traffic_day}')
                 raise Exception()
-            calendar = Calendar(service_id=route.route_id)
+            calendar = Calendar()
             weekdays = []
             official_weekdays = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
             splited_traffic_day = str(traffic_day).replace(';', '')
@@ -323,10 +320,18 @@ def load_route(url):
                                  tree.xpath('//*/tr[@class=$first or @class=$second][$count]/td[@class=$third]/text()',
                                             first='zebracol-2',
                                             second="zebracol-1", third='center sepline', count=i + 1)))
-            link = all_links_of_station[i].split('&input=')[1].split('&')[0]
-            new_stop = Stop(stop_id=link, stop_name=all_stations[i],
+            new_stop = Stop(stop_name=all_stations[i],
                             stop_url=remove_param_from_url(all_links_of_station[i], '&time='), location_type=0)
             stop = add_stop(new_stop)
+            if (stop.stop_lat is None or stop.stop_lon is None):
+                try:
+                    stop_suggestions = get_location_suggestion_from_string(stop.stop_name)
+                    current_station = stop_suggestions['suggestions'][0]
+                    stop.stop_lat = str_to_geocord(current_station['ycoord'])
+                    stop.stop_lon = str_to_geocord(current_station['xcoord'])
+                    commit()
+                except:
+                    pass
             stop.location_type = 0
             stop.parent_station = None
             new_stop_time = StopTime(stop_id=stop.stop_id, trip_id=trip.trip_id,
@@ -351,15 +356,14 @@ def save_simple_stops(names, ids, main_station):
                 main_station.location_type = 1
                 main_station.parent_station = None
                 continue
-            new_stop = Stop(stop_id=id, stop_name=name, location_type=stop_location_type,
+            new_stop = Stop(stop_name=name, location_type=stop_location_type,
                             parent_station=main_station.stop_id)
-            add_stop(new_stop)
-        commit()
+            new_stop = add_stop(new_stop)
 
 
 def skip_stop(seq, begin, end):
     for i, item in enumerate(seq):
-        if begin <= i <= end:
+        if begin <= i <= end and item[-1] and item[-1] is not '':
             yield item
 
 
@@ -416,7 +420,7 @@ if __name__ == "__main__":
                 suggestion = location_data['suggestions']
                 main_station = suggestion[0]
                 try:
-                    new_stop = Stop(stop_id=main_station['extId'], stop_name=main_station['value'],
+                    new_stop = Stop(stop_name=main_station['value'],
                                     stop_lat=str_to_geocord(main_station['ycoord']),
                                     stop_lon=str_to_geocord(main_station['xcoord']))
                     new_stop = add_stop(new_stop)
