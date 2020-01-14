@@ -203,8 +203,8 @@ def load_route(url):
         route_short_name = \
             tree.xpath('((//*/tr[@class=$first])[1]/td[@class=$second])[last()]/text()', first='zebracol-2',
                        second='center sepline')[0].strip()
+        route_long_name = route_short_name
         if ' ' in route_short_name:
-            route_long_name = route_short_name
             route_short_name = route_short_name.split(' ')[1]
         route_info = tree.xpath('//*/span[@class=$first]/img/@src', first='prodIcon')[0]
         route_type = None
@@ -237,22 +237,22 @@ def load_route(url):
             if not extra_info_traffic_day:
                 raise Exception()
             if isinstance(traffic_day, list):
-                logging.error(f'traffic day is list {traffic_day}')
+                logging.error(f'traffic day is list {extra_info_traffic_day} {url}')
                 raise Exception()
             calendar = Calendar()
             weekdays = []
             official_weekdays = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
-            splited_traffic_day = str(traffic_day).replace(';', '')
+            splited_traffic_day = str(traffic_day).replace(';', '').replace(',', '')
             splited_traffic_day = splited_traffic_day.split(' ')
             for i in official_weekdays:
                 if i in splited_traffic_day:
                     weekdays.append([i, official_weekdays.index(i)])
-
             weekdays.sort(key=lambda x: x[1])
-            if (len(weekdays) > 1 and f'{weekdays[0][0]} - {weekdays[1][0]}' in traffic_day) or len(weekdays) is 0:
+            if (len(weekdays) > 1 and (f'{weekdays[0][0]} - {weekdays[1][0]}' in traffic_day)) or len(
+                    weekdays) is 0:
                 if len(weekdays) is 0:
                     weekdays[0][1] = 0
-                    weekdays[1][1] = 6
+                    weekdays[1][1] = 6  # TODO implementieren von Ausnahme Tagen, funny Calendar
                 if weekdays[1][1] >= 0 >= weekdays[0][1]:
                     calendar.monday = True
                 else:
@@ -282,10 +282,10 @@ def load_route(url):
                 else:
                     calendar.sunday = False
             else:
-                logging.error(f'traffic day no valid weekdays {traffic_day}')
+                logging.error(f'traffic day no valid weekdays {extra_info_traffic_day} {url}')
                 raise Exception()
             if 'bis ' not in traffic_day:
-                logging.error(f'traffic day no bis found {traffic_day}')
+                logging.error(f'traffic day no bis found {extra_info_traffic_day} {url}')
                 raise Exception()
             service_info = ''.join(traffic_day.split('bis ')[1:4]).split(' ')
             day = service_info[0].replace('.', '')
@@ -316,6 +316,8 @@ def load_route(url):
 
             calendar = FakeCalendar()
         new_trip = Trip(route_id=route.route_id, service_id=calendar.service_id, oebb_url=url)
+        if new_trip.service_id is None:
+            return
         trip: Trip = add_trip(new_trip)
         global stop_dict
         for i in range(len(all_stations)):
@@ -326,7 +328,7 @@ def load_route(url):
             new_stop = Stop(stop_name=all_stations[i],
                             stop_url=remove_param_from_url(all_links_of_station[i], '&time='), location_type=0)
             stop = add_stop(new_stop)
-            if (stop.stop_lat is None or stop.stop_lon is None):
+            if stop.stop_lat is None or stop.stop_lon is None:
                 if stop.stop_name in stop_dict:
                     coords = stop_dict.pop(stop.stop_name)
                     stop.stop_lat = coords['y']
@@ -337,7 +339,7 @@ def load_route(url):
                         stop_suggestions = get_location_suggestion_from_string(stop.stop_name)
                         for stop_suggestion in stop_suggestions['suggestions']:
                             stop_dict[stop_suggestion['value']] = {'y': str_to_geocord(stop_suggestion['ycoord']),
-                                                                    'x': str_to_geocord(stop_suggestion['xcoord'])}
+                                                                   'x': str_to_geocord(stop_suggestion['xcoord'])}
                         current_station_cord = stop_dict.pop(stop_suggestions['suggestions'][0]['value'])
                         stop.stop_lat = current_station_cord['y']
                         stop.stop_lon = current_station_cord['x']
@@ -368,7 +370,8 @@ def save_simple_stops(names, ids, main_station):
                 main_station.location_type = 1
                 main_station.parent_station = None
                 continue
-            new_stop = Stop(stop_name=name, location_type=stop_location_type,
+            new_stop = Stop(stop_name=name, stop_lat=main_station.stop_lat, stop_lon=main_station.stop_lon,
+                            location_type=stop_location_type,
                             parent_station=main_station.stop_id)
             new_stop = add_stop(new_stop)
 

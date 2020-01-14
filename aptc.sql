@@ -55,7 +55,9 @@ create table routes
     route_text_color text,
     route_id         serial not null
         constraint routes_pkey
-            primary key
+            primary key,
+    constraint routes_sk
+        unique (agency_id, route_long_name)
 );
 
 create table calendar

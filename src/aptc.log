@@ -1,0 +1,725 @@
+09:32:35,490 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/915888/638278/503416/53588/181
+09:32:37,662 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/547680/515738/366540/710/181
+09:32:41,449 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/996069/665345/356714/153666/181
+09:32:51,142 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/286425/480215/35684/77633/181
+09:32:51,402 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/927831/694017/408824/104866/181
+09:32:57,751 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/787668/647344/406312/59400/181
+09:32:57,823 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/874467/676277/932908/174966/181
+09:32:59,922 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/697878/582500/927024/230886/181
+09:33:02,57 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/915888/646081/503416/53588/181
+09:33:02,652 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/286425/436290/35684/77633/181
+09:33:02,728 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/927831/650107/408824/104865/181
+09:33:08,816 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/915888/692669/503416/53588/181
+09:33:08,879 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/716277/626132/773650/148067/181
+09:33:08,952 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/286425/482922/35684/77633/181
+09:33:09,25 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/927831/696767/408824/104865/181
+09:33:09,473 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/563484/547802/803704/214024/181
+09:33:09,578 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/547680/542534/366540/711/181
+09:33:09,647 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/154899/411607/179560/38149/181
+09:33:09,765 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/371118/483680/10562/118428/181
+09:33:09,838 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/787668/622546/406312/59400/181
+09:33:09,909 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/874467/651479/932908/174966/181
+09:33:09,989 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/67173/382381/446838/201030/181
+09:33:10,58 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/996069/692024/356714/153666/181
+09:33:10,126 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/110811/396938/32264/20806/181
+09:33:10,206 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/944811/675000/273306/178284/181
+09:33:10,315 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/171081/417090/271614/78781/181
+09:33:10,396 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/697878/592689/927024/230888/181
+09:33:10,489 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/61635/380608/352534/155725/181
+09:33:10,911 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/795198/638877/392280/68926/181
+09:33:10,990 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/915888/679107/503416/53589/181
+09:33:12,5 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/716277/612762/773650/148066/181
+09:33:12,117 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/286425/469478/35684/77634/181
+09:33:12,254 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/927831/683361/408824/104865/181
+09:33:12,341 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/474132/532128/740512/212213/181
+09:33:12,491 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/563484/561912/803704/214026/181
+09:33:12,582 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/547680/556644/366540/713/181
+09:33:13,12 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/154899/425779/179560/38147/181
+09:33:15,480 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/371118/497852/10562/118426/181
+09:33:15,555 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/787668/636702/406312/59402/181
+09:33:15,659 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/874467/678332/932908/174966/181
+09:33:15,788 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/67173/409323/446838/201028/181
+09:33:15,857 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/996069/721009/356714/153666/181
+09:33:16,619 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/110811/425923/32264/20806/181
+09:33:16,710 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/944811/703923/273306/178286/181
+09:33:16,789 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/171081/446013/271614/78783/181
+09:33:16,858 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/697878/621612/927024/230890/181
+09:33:16,935 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/61635/409531/352534/155727/181
+09:33:17,936 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/439095/535351/356982/32132/181
+09:33:18,9 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/137079/434679/972278/440453/181
+09:33:18,83 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/640500/602486/830000/201508/181
+09:33:18,155 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/697881/621613/157334/153969/181
+09:33:19,261 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/788892/651950/597228/35660/181
+09:33:19,386 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/999225/722061/137344/264414/181
+09:33:19,553 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/411132/526030/553832/139884/181
+09:33:19,642 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/811212/659390/527558/6638/181
+09:33:19,728 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/727866/631608/614274/64529/181
+09:33:19,795 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/997638/721532/817922/76430/181
+09:33:19,878 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/492249/553069/406656/39261/181
+09:33:19,956 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/269028/478662/961916/391299/181
+09:33:20,32 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/14463/393807/322962/156678/181
+09:33:20,116 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/382992/516650/504914/124812/181
+09:33:20,249 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/870084/679014/327028/126534/181
+09:33:20,348 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/781872/649610/236814/142238/181
+09:33:20,425 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/61938/409632/642922/300837/181
+09:33:20,513 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/307638/491532/805622/300288/181
+09:33:20,892 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/704745/623901/33310/218284/181
+09:33:21,144 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/975849/714269/693582/21533/181
+09:33:21,212 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/943530/703496/348082/140495/181
+09:33:22,147 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/281493/482817/238332/25362/181
+09:33:22,236 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/847203/671387/398698/83080/181
+09:33:22,309 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/182880/449946/412772/145455/181
+09:33:22,401 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/513708/560222/788516/223052/181
+09:33:22,501 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/841620/669526/8080/276531/181
+09:33:22,588 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/288972/485310/104998/43857/181
+09:33:22,669 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/985635/717531/899252/121114/181
+09:33:25,199 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/635988/600982/275874/74093/181
+09:33:25,323 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/101007/422655/702064/317398/181
+09:33:25,416 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/898485/688481/285734/156664/181
+09:33:25,917 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/443100/536686/311030/7852/181
+09:33:25,987 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/887061/684673/196202/197624/181
+09:33:26,96 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/205479/457479/425700/144396/181
+09:33:26,186 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/841488/669482/151956/204558/181
+09:33:32,467 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/713286/626748/860054/192306/181
+09:33:32,536 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/784248/650402/998440/237846/181
+09:33:32,615 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/682296/616418/450182/2384/181
+09:33:32,682 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/630102/599020/912508/246264/181
+09:33:32,754 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/291750/486236/458344/131967/181
+09:33:32,852 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/45699/404219/117766/43696/181
+09:33:34,412 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/234999/467319/920316/381872/181
+09:33:34,491 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/329250/498736/484652/132624/181
+09:33:34,581 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/723336/630098/674840/96357/181
+09:33:39,841 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/674493/613817/247858/100952/181
+09:33:39,921 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/99156/422038/411660/172829/181
+09:33:39,993 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/335064/500674/364014/70371/181
+09:33:40,72 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/618633/595197/510480/49082/181
+09:33:40,159 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/835611/668459/911688/177315/181
+09:33:40,226 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/899160/689734/813846/107203/181
+09:33:40,319 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/90672/420238/103696/21625/181
+09:33:40,397 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/4734/391596/611914/304379/181
+09:33:40,860 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/149847/439971/820518/360310/181
+09:33:40,931 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/591603/587223/523392/64496/181
+09:33:41,8 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/94824/421630/925054/430921/181
+09:33:41,81 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/466377/545484/458172/73627/181
+09:33:41,170 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/559341/576472/496394/61751/181
+09:33:41,245 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/103038/424371/289704/110508/181
+09:33:41,313 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/7239/392438/246292/120736/181
+09:33:41,381 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/481671/550582/789804/234349/181
+09:33:41,475 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/735945/635340/389682/50479/181
+09:33:41,551 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/797331/655802/75974/227796/181
+09:33:41,668 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/665700/612826/948270/252235/181
+09:33:41,762 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/378366/517048/338030/42894/181
+09:33:41,833 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/325308/499437/522638/152883/181
+09:33:41,907 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/263640/479704/947724/385982/181
+09:33:41,994 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/975207/716893/874008/111936/181
+09:33:42,131 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/833514/669662/752586/98457/181
+09:33:42,225 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/40635/405369/645854/309385/181
+09:33:42,527 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/447618/541030/427560/64578/181
+09:33:42,603 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/851088/675520/305948/130727/181
+09:33:42,721 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/361212/512228/637850/198527/181
+09:33:46,214 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/700599/625358/312454/77306/181
+09:33:46,547 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/926862/701358/807506/94799/181
+09:33:46,914 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/833241/670151/940328/192418/181
+09:33:47,28 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/389577/522263/77014/91354/181
+09:33:47,193 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/989364/722952/822892/81658/181
+09:33:47,295 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/725430/634975/131940/175840/181
+09:33:47,386 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/688101/622532/739442/140355/181
+09:33:47,455 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/698994/627432/679356/106680/181
+09:33:47,536 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/923940/702414/645964/15003/181
+09:33:47,612 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/972003/718435/936644/144323/181
+09:33:47,696 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/773625/652309/234954/140401/181
+09:33:47,838 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/566817/583373/238620/69633/181
+09:33:48,140 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/315867/499723/13444/98572/181
+09:33:48,239 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/34950/406084/475836/226274/181
+09:33:48,325 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/13662/398988/600144/295525/181
+09:33:48,407 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/205227/462843/145852/4525/181
+09:33:48,487 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/403029/528777/89472/89616/181
+09:33:48,569 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/964719/716007/519576/61795/181
+09:33:49,652 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/540627/574643/598900/119252/181
+09:33:52,950 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/890691/691331/383930/104944/181
+09:33:53,27 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/626433/603245/773692/178048/181
+09:33:54,387 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/270288/484530/241188/30512/181
+09:33:54,463 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/805146/662816/9958/263418/181
+09:33:54,536 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/413175/532159/823448/274015/181
+09:33:54,604 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/17151/400151/619972/304286/181
+09:33:54,676 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/170853/451385/224126/55130/181
+09:33:54,753 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/818541/667281/521672/12030/181
+09:33:54,824 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/690267/624523/759852/149857/181
+09:33:55,405 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/837339/673547/153046/202611/181
+09:33:55,487 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/386595/523299/902736/322525/181
+09:33:55,568 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/663993/615765/397608/22550/181
+09:34:00,839 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/107880/430394/714020/321074/181
+09:34:00,921 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/266529/483277/50178/63779/181
+09:34:00,987 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/845913/676405/540998/11498/181
+09:34:01,55 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/969510/717604/854302/104008/181
+09:34:01,180 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/422379/535227/94988/93327/181
+09:34:01,262 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/437955/540419/464916/86502/181
+09:34:01,329 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/538323/573875/165248/96847/181
+09:34:01,862 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/747180/643494/304954/96614/181
+09:34:01,935 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/514806/566036/179026/82121/181
+09:34:02,22 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/421905/535069/821136/269966/181
+09:34:02,93 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/640338/607880/828084/200630/181
+09:34:02,315 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/508563/563955/890016/275522/181
+09:34:02,387 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/917475/700259/926154/157288/181
+09:34:02,480 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/598437/593913/871856/236486/181
+09:34:02,624 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/739518/640940/844482/175773/181
+09:34:05,31 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/438510/540604/901598/304668/181
+09:34:05,151 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/872070/685124/804776/111738/181
+09:34:05,245 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/462615/548639/816216/253944/181
+09:34:05,323 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/54813/412705/624972/294257/181
+09:34:06,33 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/539817/574373/318936/20514/181
+09:34:06,113 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/113301/432201/322632/123593/181
+09:34:17,17 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/169863/451055/104368/4482/181
+09:34:17,122 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/763491/648931/306958/101064/181
+09:34:17,223 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/145737/443013/548922/225929/181
+09:34:17,295 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/223992/469098/382480/116624/181
+09:34:17,369 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/49188/410830/913254/440280/181
+09:34:17,443 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/350709/511337/736984/251639/181
+09:34:17,513 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/737550/640284/846732/177567/181
+09:34:17,630 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/988881/724061/894564/117707/181
+09:34:17,704 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/572256/585408/516150/67323/181
+09:34:17,886 root ERROR traffic day no valid weekdays ['\n', '\n', '\nWien Westbahnhof --> Linz/Donau Hbf:\nfährt am 15. Dez 2019 bis 12. Dez 2020 Mo - Do, Sa, So; auch 1. Mai\n', '\nLinz/Donau Hbf --> Salzburg Hbf:\nfährt am 16. Dez 2019 bis 12. Dez 2020 Mo - Do, Sa; nicht an allg. Feiertg\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/795198/574521/392280/68926/181
+09:34:19,9 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/795198/639477/392280/68926/181
+09:34:29,5 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/286425/470020/35684/77633/181
+09:35:03,144 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/492249/551456/406656/39245/181
+09:35:03,976 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/269028/477049/961916/391283/181
+09:35:05,962 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/14463/392268/322962/156660/181
+09:35:06,87 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/382992/515154/504914/124793/181
+09:35:07,191 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/61938/408432/642922/300815/181
+09:35:07,256 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/795198/583440/392280/68926/181
+09:35:07,330 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/915888/623670/503416/53589/181
+09:35:07,402 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/716277/557133/773650/148068/181
+09:35:14,269 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/286425/414814/35684/77633/181
+09:35:14,361 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/927831/628616/408824/104866/181
+09:35:14,476 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/474132/478855/740512/212212/181
+09:35:14,560 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/563484/508639/803704/214025/181
+09:35:14,636 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/547680/503371/366540/712/181
+09:35:14,705 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/154899/373171/179560/38147/181
+09:35:14,826 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/371118/446403/10562/118425/181
+09:35:14,917 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/787668/585253/406312/59401/181
+09:35:15,178 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/874467/614232/932908/174965/181
+09:35:15,286 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/67173/345134/446838/201029/181
+09:35:15,361 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/996069/654902/356714/153666/181
+09:35:15,474 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/110811/360636/32264/20805/181
+09:35:15,573 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/944811/647921/273306/178284/181
+09:35:15,646 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/171081/390011/271614/78781/181
+09:35:15,721 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/697878/565610/927024/230888/181
+09:35:15,799 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/61635/353529/352534/155725/181
+09:35:15,874 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/439095/479349/356982/32130/181
+09:35:15,950 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/137079/378677/972278/440451/181
+09:35:16,57 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/640500/550317/830000/201500/181
+09:35:16,129 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/697881/569565/157334/153960/181
+09:35:16,214 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/788892/599902/597228/35651/181
+09:35:16,312 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/999225/670270/137344/264403/181
+09:35:16,398 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/411132/474239/553832/139873/181
+09:35:16,481 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/811212/607599/527558/6627/181
+09:35:17,16 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/727866/579817/614274/64518/181
+09:35:17,93 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/997638/669741/817922/76419/181
+09:35:17,182 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/492249/501278/406656/39250/181
+09:35:17,293 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/269028/426871/961916/391288/181
+09:35:18,359 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/14463/342016/322962/156667/181
+09:35:18,967 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/382992/464859/504914/124801/181
+09:35:19,38 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/870084/627223/327028/126523/181
+09:35:19,117 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/781872/597819/236814/142227/181
+09:35:19,200 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/61938/357841/642922/300826/181
+09:35:19,280 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/307638/439763/805622/300265/181
+09:35:19,352 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/704745/572132/33310/218261/181
+09:35:19,436 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/975849/662500/693582/21510/181
+09:35:19,522 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/943530/651727/348082/140472/181
+09:35:19,591 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/281493/431048/238332/25339/181
+09:35:20,598 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/847203/619618/398698/83057/181
+09:35:20,692 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/182880/398177/412772/145432/181
+09:35:20,849 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/513708/508453/788516/223029/181
+09:35:20,944 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/841620/617757/8080/276508/181
+09:35:21,22 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/288972/433541/104998/43834/181
+09:35:21,124 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/985635/665762/899252/121091/181
+09:35:21,199 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/635988/549213/275874/74070/181
+09:35:21,291 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/101007/371869/702064/317363/181
+09:35:21,363 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/898485/637695/285734/156629/181
+09:35:21,432 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/443100/485900/311030/7817/181
+09:35:21,501 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/887061/634000/196202/197586/181
+09:35:21,591 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/205479/406806/425700/144358/181
+09:35:21,677 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/841488/618809/151956/204520/181
+09:35:22,442 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/713286/576075/860054/192268/181
+09:35:22,553 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/784248/599729/998440/237808/181
+09:35:22,624 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/682296/565745/450182/2346/181
+09:35:22,709 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/630102/548347/912508/246226/181
+09:35:22,957 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/291750/435563/458344/131929/181
+09:35:23,39 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/45699/353546/117766/43658/181
+09:35:30,846 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/234999/416646/920316/381834/181
+09:35:31,563 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/329250/448063/484652/132586/181
+09:35:31,644 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/723336/579425/674840/96319/181
+09:35:32,78 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/674493/563144/247858/100914/181
+09:35:32,177 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/99156/371365/411660/172791/181
+09:35:32,255 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/335064/450001/364014/70333/181
+09:35:35,447 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/618633/544524/510480/49044/181
+09:35:35,518 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/835611/616850/911688/177323/181
+09:35:35,594 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/899160/638033/813846/107220/181
+09:35:35,662 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/90672/368537/103696/21642/181
+09:35:35,736 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/4734/339891/611914/304398/181
+09:35:35,837 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/149847/388262/820518/360330/181
+09:35:35,933 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/591603/535514/523392/64516/181
+09:35:38,14 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/94824/369921/925054/430941/181
+09:35:38,124 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/466377/493772/458172/73650/181
+09:35:38,252 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/559341/524760/496394/61774/181
+09:35:38,347 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/103038/372659/289704/110531/181
+09:35:38,477 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/7239/340726/246292/120759/181
+09:35:38,568 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/481671/498870/789804/234372/181
+09:35:38,658 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/735945/583628/389682/50502/181
+09:35:38,734 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/797331/604090/75974/227819/181
+09:35:38,801 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/665700/560213/948270/252265/181
+09:35:39,338 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/378366/464435/338030/42924/181
+09:35:39,415 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/325308/446749/522638/152915/181
+09:35:39,489 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/263640/426193/947724/386015/181
+09:35:39,558 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/975207/663382/874008/111969/181
+09:35:39,647 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/833514/616151/752586/98490/181
+09:35:39,720 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/40635/351858/645854/309418/181
+09:35:39,814 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/447618/487519/427560/64611/181
+09:35:39,902 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/851088/622009/305948/130760/181
+09:35:39,999 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/361212/458717/637850/198560/181
+09:35:40,74 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/700599/571846/312454/77346/181
+09:35:40,167 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/926862/647267/807506/94840/181
+09:35:40,246 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/833241/616354/940328/192417/181
+09:35:40,779 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/389577/468466/77014/91353/181
+09:35:40,888 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/989364/668395/822892/81660/181
+09:35:40,981 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/725430/580417/131940/175843/181
+09:35:42,729 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/688101/567974/739442/140358/181
+09:35:42,798 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/698994/571605/679356/106685/181
+09:35:42,872 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/923940/646587/645964/15008/181
+09:35:42,948 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/972003/662714/936644/144321/181
+09:35:43,39 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/773625/596588/234954/140399/181
+09:35:43,136 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/566817/527652/238620/69631/181
+09:35:49,679 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/315867/444002/13444/98570/181
+09:35:49,887 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/34950/350790/475836/226268/181
+09:35:49,965 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/13662/343694/600144/295519/181
+09:35:50,52 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/205227/407620/145852/4517/181
+09:35:50,115 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/403029/473641/89472/89607/181
+09:35:50,185 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/964719/660871/519576/61786/181
+09:35:50,257 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/540627/519539/598900/119241/181
+09:35:50,323 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/890691/636227/383930/104933/181
+09:35:50,398 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/626433/548859/773692/178035/181
+09:36:02,996 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/270288/430435/241188/30498/181
+09:36:03,77 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/805146/612476/9958/263403/181
+09:36:03,191 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/413175/481819/823448/274000/181
+09:36:03,265 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/17151/349836/619972/304269/181
+09:36:03,609 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/170853/401070/224126/55113/181
+09:36:04,230 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/818541/618017/521672/12011/181
+09:36:04,313 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/690267/575259/759852/149838/181
+09:36:04,392 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/837339/624283/153046/202592/181
+09:36:04,834 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/386595/474035/902736/322506/181
+09:36:04,916 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/663993/566501/397608/22531/181
+09:36:05,152 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/107880/381130/714020/321055/181
+09:36:05,454 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/266529/434013/50178/63760/181
+09:36:05,537 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/845913/627516/540998/11472/181
+09:36:08,112 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/969510/668715/854302/103982/181
+09:36:08,223 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/422379/486338/94988/93301/181
+09:36:08,297 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/437955/491530/464916/86476/181
+09:36:08,368 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/538323/527671/165248/96817/181
+09:36:08,436 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/747180/597290/304954/96584/181
+09:36:09,368 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/514806/519856/179026/82089/181
+09:36:09,526 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/421905/488889/821136/269934/181
+09:36:09,596 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/640338/561700/828084/200598/181
+09:36:09,667 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/508563/517775/890016/275490/181
+09:36:10,982 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/917475/654079/926154/157256/181
+09:36:11,59 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/598437/547733/871856/236454/181
+09:36:11,139 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/739518/594760/844482/175741/181
+09:36:11,261 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/438510/495031/901598/304629/181
+09:36:11,341 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/872070/639551/804776/111699/181
+09:36:11,411 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/462615/503082/816216/253903/181
+09:36:11,500 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/54813/367300/624972/294215/181
+09:36:13,871 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/539817/529087/318936/20471/181
+09:36:13,944 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/113301/386915/322632/123550/181
+09:36:18,940 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/169863/405781/104368/4437/181
+09:36:19,28 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/763491/603657/306958/101019/181
+09:36:19,104 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/145737/397856/548922/225882/181
+09:36:19,186 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/223992/423948/382480/116576/181
+09:36:19,271 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/49188/365680/913254/440232/181
+09:36:20,96 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/350709/466247/736984/251589/181
+09:36:20,167 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/737550/595242/846732/177516/181
+09:36:20,238 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/988881/679019/894564/117656/181
+09:36:20,335 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/572256/541871/516150/67323/181
+09:36:22,870 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/141033/398130/36288/28868/181
+09:36:22,952 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/661032/571486/345784/47452/181
+09:36:23,37 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/258426/437284/417756/122737/181
+09:36:23,150 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/273705/442572/210956/14243/181
+09:36:23,239 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/98391/384134/904866/419637/181
+09:36:23,975 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/790434/626564/810920/141983/181
+09:36:24,80 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/876525/665986/337864/123243/181
+09:36:24,172 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/405933/509122/763610/246495/181
+09:36:24,317 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/962568/694859/396956/122378/181
+09:36:24,471 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/3546/375185/154924/76281/181
+09:36:24,568 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/204546/442266/730824/297230/181
+09:36:25,231 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/136119/419457/38232/26258/181
+09:36:25,308 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/695715/605989/919680/227937/181
+09:36:25,391 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/823440/648564/155068/196949/181
+09:36:25,479 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/752271/624903/627670/63078/181
+09:36:28,592 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/40842/387760/625640/299207/181
+09:36:28,718 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/491694/538044/137198/95301/181
+09:36:28,789 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/991641/704693/529138/65981/181
+09:36:28,868 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/368139/497804/205770/19829/181
+09:36:28,953 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/605976/579593/645914/120965/181
+09:36:29,74 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/164100/432301/294106/92354/181
+09:36:29,177 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/220839/451214/362254/107516/181
+09:36:29,260 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/441936/524913/420356/62869/181
+09:36:30,333 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/223260/452021/300908/76038/181
+09:36:30,843 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/721062/617955/486630/2966/181
+09:36:30,916 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/218910/450571/620864/237468/181
+09:36:30,985 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/822156/651653/572242/12076/181
+09:36:31,52 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/23478/385427/709384/346874/181
+09:36:31,128 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/771315/634706/568176/26992/181
+09:36:31,198 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/830310/654371/378516/87522/181
+09:36:31,272 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/327843/486882/583902/182681/181
+09:36:31,342 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/502122/544975/883922/274599/181
+09:36:31,421 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/115644/416149/999696/461313/181
+09:36:31,488 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/654888/595897/324286/56167/181
+09:36:31,577 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/844341/659048/177274/192825/181
+09:36:31,652 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/950316/694373/340222/146677/181
+09:36:35,876 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/742503/625102/451154/21941/181
+09:36:35,989 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/49071/393958/151580/59451/181
+09:36:36,90 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/340545/491116/852458/312733/181
+09:36:36,177 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/674175/602326/737052/143821/181
+09:36:36,279 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/41754/391519/932438/452322/181
+09:36:38,793 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/72444/401749/604776/278262/181
+09:36:38,888 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/790728/641177/65244/230977/181
+09:36:38,959 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/467010/533271/44838/133275/181
+09:36:39,27 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/485454/539419/226846/48420/181
+09:36:39,105 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/170862/434555/877498/381821/181
+09:36:39,175 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/711093/614632/451628/11244/181
+09:36:39,256 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/175455/436086/580078/231582/181
+09:36:39,350 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/709365/614056/222714/125127/181
+09:36:39,459 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/853137/661980/705026/68164/181
+09:36:39,536 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/633825/588876/898684/238098/181
+09:36:41,312 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/562149/564984/919598/272448/181
+09:36:41,400 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/59838/397547/771842/366008/181
+09:36:41,476 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/103386/412063/269582/100363/181
+09:36:41,567 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/968784/700529/547786/49070/181
+09:36:43,831 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/4608/379137/35736/16368/181
+09:36:44,72 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/755874/629559/388670/57660/181
+09:36:44,273 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/959679/697494/33138/303362/181
+09:36:44,435 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/715590/616131/954676/238847/181
+09:36:44,552 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/651264/594689/135566/149345/181
+09:36:45,184 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/266628/466477/549562/185946/181
+09:36:45,262 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/14349/382384/16388/3453/181
+09:36:45,354 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/37725/390176/822716/398826/181
+09:36:45,431 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/889689/676058/500748/46189/181
+09:36:45,563 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/562761/567082/524950/74889/181
+09:36:45,642 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/843411/660715/493650/34312/181
+09:36:45,715 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/631509/590081/299256/60876/181
+09:36:46,22 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/115533/418089/797590/360286/181
+09:36:46,117 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/102015/413583/508548/220272/181
+09:36:46,251 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/634347/591027/743630/160370/181
+09:36:46,830 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/81708/406814/122040/33789/181
+09:36:46,908 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/166566/435100/560676/224822/181
+09:36:46,992 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/801240/646658/419882/57146/181
+09:36:47,82 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/926799/688511/12854/302514/181
+09:36:47,154 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/95553/411429/720020/328168/181
+09:36:47,250 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/717879/618871/604314/62874/181
+09:36:47,716 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/400191/512975/185600/40608/181
+09:36:47,865 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/425133/521349/294892/5735/181
+09:36:48,26 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/7260/382058/241288/118225/181
+09:36:48,128 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/727623/622179/77866/203610/181
+09:36:48,462 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/685491/608135/49648/203676/181
+09:36:48,583 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/851838/663584/213990/176955/181
+09:36:48,663 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/519216/552710/8884/168635/181
+09:36:49,115 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/550962/563292/444118/38411/181
+09:36:49,203 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/271518/470144/126986/27020/181
+09:36:49,314 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/777258/638724/597882/39863/181
+09:36:49,419 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/909498/682804/991230/192458/181
+09:36:49,498 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/733422/624112/807964/159518/181
+09:36:50,2 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/612687/588035/776490/184016/181
+09:36:50,80 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/227571/459663/833906/341097/181
+09:36:50,526 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/780903/644107/993354/236378/181
+09:36:50,624 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/155649/443606/790212/343223/181
+09:36:50,691 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/762909/653350/83042/212782/181
+09:36:59,729 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/171081/389787/271614/78780/181
+09:37:00,218 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/61635/353455/352534/155722/181
+09:37:00,466 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/795198/610611/392280/68926/181
+09:37:01,579 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/915888/650841/503416/53589/181
+09:37:01,688 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/716277/584304/773650/148068/181
+09:37:01,759 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/286425/441020/35684/77636/181
+09:37:01,854 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/927831/661293/408824/104865/181
+09:37:02,244 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/474132/510069/740512/212212/181
+09:37:02,335 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/563484/539853/803704/214025/181
+09:37:02,463 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/547680/534585/366540/712/181
+09:37:02,552 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/154899/403658/179560/38150/181
+09:37:04,641 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/371118/475731/10562/118429/181
+09:37:04,740 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/787668/614581/406312/59405/181
+09:37:05,356 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/874467/643514/932908/174971/181
+09:37:05,437 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/67173/376684/446838/201028/181
+09:37:05,523 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/996069/686316/356714/153667/181
+09:37:09,631 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/110811/391931/32264/20805/181
+09:37:09,716 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/944811/669931/273306/178285/181
+09:37:23,295 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/171081/412021/271614/78782/181
+09:37:23,381 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/697878/587620/927024/230889/181
+09:37:23,467 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/61635/375592/352534/155722/181
+09:37:23,551 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/439095/501412/356982/32127/181
+09:37:34,441 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/137079/401591/972278/440446/181
+09:37:34,519 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/640500/571170/830000/201500/181
+09:37:34,646 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/697881/590297/157334/153961/181
+09:37:34,955 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/788892/624090/597228/35650/181
+09:37:35,257 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/999225/694201/137344/264404/181
+09:37:35,329 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/411132/498178/553832/139872/181
+09:37:35,753 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/811212/631987/527558/6625/181
+09:37:35,836 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/727866/604205/614274/64516/181
+09:37:35,913 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/997638/694129/817922/76417/181
+09:37:35,989 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/492249/525666/406656/39248/181
+09:37:36,96 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/269028/451268/961916/391282/181
+09:37:36,266 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/14463/366413/322962/156661/181
+09:37:36,352 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/382992/489262/504914/124793/181
+09:37:36,797 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/870084/651626/327028/126515/181
+09:37:37,324 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/781872/622268/236814/142217/181
+09:37:37,393 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/61938/382290/642922/300816/181
+09:37:38,31 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/307638/464201/805622/300265/181
+09:37:38,343 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/704745/596570/33310/218261/181
+09:37:38,442 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/975849/686938/693582/21510/181
+09:37:38,563 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/943530/676165/348082/140472/181
+09:37:38,649 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/281493/455486/238332/25339/181
+09:37:38,728 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/847203/644056/398698/83057/181
+09:37:38,812 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/182880/422615/412772/145432/181
+09:37:38,887 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/513708/532891/788516/223029/181
+09:37:40,268 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/841620/642195/8080/276508/181
+09:37:40,347 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/288972/457979/104998/43834/181
+09:37:41,95 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/985635/690200/899252/121091/181
+09:37:41,175 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/635988/573651/275874/74070/181
+09:37:41,254 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/101007/395324/702064/317375/181
+09:37:41,380 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/898485/661150/285734/156641/181
+09:37:41,812 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/443100/509355/311030/7829/181
+09:37:43,765 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/887061/657342/196202/197601/181
+09:37:43,910 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/205479/430148/425700/144373/181
+09:37:44,70 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/841488/642151/151956/204535/181
+09:37:44,209 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/713286/599417/860054/192283/181
+09:37:44,301 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/784248/623071/998440/237823/181
+09:37:44,392 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/682296/589087/450182/2361/181
+09:37:44,485 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/630102/571689/912508/246241/181
+09:37:44,567 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/291750/458905/458344/131944/181
+09:37:44,666 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/45699/376888/117766/43673/181
+09:37:44,759 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/234999/439988/920316/381849/181
+09:37:44,842 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/329250/471405/484652/132601/181
+09:37:44,918 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/723336/602767/674840/96334/181
+09:37:45,0 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/674493/586486/247858/100929/181
+09:37:45,101 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/99156/394707/411660/172806/181
+09:37:45,199 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/335064/473343/364014/70348/181
+09:37:45,274 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/618633/567866/510480/49059/181
+09:37:45,359 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/835611/640192/911688/177338/181
+09:37:45,437 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/899160/661375/813846/107235/181
+09:37:51,949 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/90672/391879/103696/21657/181
+09:37:52,35 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/4734/363233/611914/304413/181
+09:37:52,121 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/149847/411604/820518/360345/181
+09:37:52,200 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/591603/558856/523392/64531/181
+09:37:52,275 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/94824/393263/925054/430956/181
+09:37:52,362 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/466377/517114/458172/73665/181
+09:37:52,516 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/559341/548102/496394/61789/181
+09:37:53,637 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/103038/396001/289704/110546/181
+09:37:53,720 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/7239/364068/246292/120774/181
+09:37:53,814 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/481671/523238/789804/234345/181
+09:37:53,901 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/735945/607996/389682/50475/181
+09:37:53,978 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/797331/628458/75974/227792/181
+09:37:54,64 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/665700/584581/948270/252238/181
+09:37:54,156 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/378366/488803/338030/42897/181
+09:37:54,243 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/325308/471117/522638/152888/181
+09:37:54,334 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/263640/450561/947724/385988/181
+09:37:54,419 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/975207/687750/874008/111942/181
+09:37:54,517 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/833514/640519/752586/98463/181
+09:37:54,600 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/40635/376226/645854/309391/181
+09:37:54,688 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/447618/511887/427560/64584/181
+09:37:54,785 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/851088/646377/305948/130733/181
+09:37:54,867 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/361212/483085/637850/198533/181
+09:37:54,953 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/700599/596283/312454/77306/181
+09:37:55,34 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/926862/671704/807506/94800/181
+09:37:55,120 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/833241/640497/940328/192419/181
+09:37:55,200 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/389577/492609/77014/91355/181
+09:37:55,283 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/989364/692538/822892/81662/181
+09:37:58,195 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/725430/604560/131940/175845/181
+09:37:58,274 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/688101/592117/739442/140360/181
+09:37:58,380 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/698994/595748/679356/106687/181
+09:37:58,522 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/923940/670730/645964/15010/181
+09:37:58,635 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/972003/686751/936644/144330/181
+09:37:58,709 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/773625/620625/234954/140408/181
+09:37:58,801 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/566817/551689/238620/69640/181
+09:37:58,883 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/315867/468039/13444/98579/181
+09:37:58,962 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/34950/374589/475836/226268/181
+09:37:59,42 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/13662/367640/600144/295518/181
+09:37:59,119 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/205227/431954/145852/4517/181
+09:37:59,224 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/403029/498164/89472/89607/181
+09:37:59,299 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/964719/686391/519576/61785/181
+09:38:01,65 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/540627/545046/598900/119241/181
+09:38:01,142 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/890691/661734/383930/104933/181
+09:38:01,236 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/626433/573648/773692/178037/181
+09:38:01,326 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/270288/454968/241188/30498/181
+09:38:01,414 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/805146/635202/9958/263403/181
+09:38:03,631 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/413175/504545/823448/274000/181
+09:38:03,707 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/17151/372537/619972/304271/181
+09:38:03,800 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/170853/423771/224126/55115/181
+09:38:03,898 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/818541/639676/521672/12011/181
+09:38:03,984 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/690267/596918/759852/149838/181
+09:38:04,63 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/837339/645942/153046/202592/181
+09:38:04,154 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/386595/495694/902736/322506/181
+09:38:04,244 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/663993/588216/397608/22527/181
+09:38:04,324 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/107880/402845/714020/321051/181
+09:38:04,411 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/266529/455728/50178/63756/181
+09:38:04,490 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/845913/648856/540998/11475/181
+09:38:04,563 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/969510/690055/854302/103985/181
+09:38:05,804 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/422379/507678/94988/93304/181
+09:38:05,893 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/437955/512870/464916/86479/181
+09:38:07,225 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/538323/546326/165248/96824/181
+09:38:07,342 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/747180/615945/304954/96591/181
+09:38:07,823 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/514806/538487/179026/82098/181
+09:38:07,895 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/421905/507520/821136/269943/181
+09:38:07,998 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/640338/580331/828084/200607/181
+09:38:08,87 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/508563/536406/890016/275499/181
+09:38:08,170 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/917475/672710/926154/157265/181
+09:38:08,253 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/598437/566364/871856/236463/181
+09:38:08,354 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/739518/613391/844482/175750/181
+09:38:08,440 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/438510/513055/901598/304645/181
+09:38:08,638 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/872070/657575/804776/111715/181
+09:38:09,252 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/462615/521090/816216/253921/181
+09:38:10,323 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/54813/385156/624972/294234/181
+09:38:10,413 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/539817/546824/318936/20491/181
+09:38:10,499 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/113301/404652/322632/123570/181
+09:38:10,569 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/169863/423506/104368/4459/181
+09:38:10,661 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/763491/621382/306958/101041/181
+09:38:10,746 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/145737/415464/548922/225906/181
+09:38:10,829 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/223992/441549/382480/116601/181
+09:38:11,209 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/49188/383281/913254/440257/181
+09:38:11,283 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/350709/483788/736984/251616/181
+09:38:11,366 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/737550/612735/846732/177544/181
+09:38:11,440 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/988881/696512/894564/117684/181
+09:38:11,557 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/572256/557637/516150/67353/181
+09:38:11,659 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/141033/413896/36288/28898/181
+09:38:11,828 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/661032/587229/345784/47484/181
+09:38:12,224 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/258426/453027/417756/122769/181
+09:38:12,322 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/273705/458120/210956/14277/181
+09:38:12,419 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/98391/399682/904866/419671/181
+09:38:12,496 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/790434/630363/810920/142018/181
+09:38:12,574 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/876525/659060/337864/123280/181
+09:38:12,649 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/405933/502196/763610/246532/181
+09:38:13,145 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/962568/687741/396956/122417/181
+09:38:14,246 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/3546/368067/154924/76320/181
+09:38:14,331 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/204546/437362/730824/297230/181
+09:38:28,511 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/136119/414553/38232/26258/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Tram%202&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:28,881 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/695715/601085/919680/227937/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Tram%202&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:29,59 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/823440/643660/155068/196949/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Tram%202&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:29,220 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/752271/619937/627670/63082/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Tram%202&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:29,310 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/40842/382794/625640/299211/181
+09:38:29,393 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/491694/533471/137198/95299/181
+09:38:29,403 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/991641/700120/529138/65979/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Tram%202&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:29,501 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/368139/492286/205770/19830/181
+09:38:29,588 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/605976/571565/645914/120968/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Tram%202&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:29,671 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/164100/424273/294106/92357/181
+09:38:29,746 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/220839/443186/362254/107519/181
+09:38:29,798 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/441936/517560/420356/62866/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Tram%202&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:29,884 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/223260/444668/300908/76035/181
+09:38:29,975 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/721062/610602/486630/2963/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Tram%202&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:30,58 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/218910/443218/620864/237465/181
+09:38:30,142 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/822156/644300/572242/12073/181
+09:38:30,167 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/23478/378074/709384/346871/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Tram%202&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:30,264 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/771315/627353/568176/26989/181
+09:38:30,357 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/830310/647018/378516/87519/181
+09:38:30,398 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/327843/479529/583902/182678/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Tram%202&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:30,500 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/502122/537622/883922/274596/181
+09:38:30,595 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/115644/408796/999696/461310/181
+09:38:30,678 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/654888/588544/324286/56164/181
+09:38:30,768 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/844341/651696/177274/192810/181
+09:38:30,792 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/950316/687021/340222/146662/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Tram%202&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:30,877 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/742503/617750/451154/21926/181
+09:38:30,966 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/49071/386606/151580/59436/181
+09:38:31,2 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/340545/483764/852458/312718/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Tram%202&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:31,86 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/674175/594974/737052/143806/181
+09:38:31,131 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/41754/384167/932438/452307/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Tram%202&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:31,240 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/72444/394397/604776/278247/181
+09:38:31,327 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/790728/633825/65244/230962/181
+09:38:31,441 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/467010/525919/44838/133260/181
+09:38:31,532 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/485454/532067/226846/48405/181
+09:38:31,609 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/170862/427203/877498/381806/181
+09:38:31,631 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/711093/608491/451628/11217/181?date=12.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Tram%202&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:31,713 root ERROR traffic day is list ['\n', '\n', '\n', '\n'] http://fahrplan.oebb.at/bin/traininfo.exe/dn/175455/429945/580078/231555/181
+09:38:31,714 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/175455/429945/580078/231555/181?date=12.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Tram%202&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:31,797 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/709365/609599/222714/125098/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Tram%202&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:31,882 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/853137/657526/705026/68134/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Tram%202&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:31,967 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/633825/584422/898684/238068/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Tram%202&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,49 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/562149/560544/919598/272416/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Tram%202&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,132 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/59838/393107/771842/365976/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Tram%202&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,221 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/103386/407623/269582/100331/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Tram%202&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,224 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/968784/696089/547786/49038/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Tram%202&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,226 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/4608/374697/35736/16336/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Tram%202&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,227 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/755874/625119/388670/57628/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Tram%202&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,228 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/959679/693054/33138/303330/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Tram%202&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,230 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/715590/611691/954676/238815/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Tram%202&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,231 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/651264/590730/135566/149305/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Tram%202&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,232 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/266628/462518/549562/185906/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Tram%202&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,233 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/14349/378601/16388/3411/181?date=12.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Tram%202&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,236 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/37725/387666/822716/398783/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Tram%202&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,238 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/889689/671724/500748/46189/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Tram%202&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,240 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/562761/563275/524950/74888/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Tram%202&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,242 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/795198/574261/392280/68926/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=RJ%20825&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,245 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/795198/573387/392280/68926/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=RJ%20543&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,247 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/795198/568687/392280/68926/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=RJX%2062&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,249 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/795198/651342/392280/68931/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20670&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,252 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/915888/668291/503416/53588/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20670&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,254 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/716277/601791/773650/148066/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20670&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,258 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/286425/458513/35684/77633/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20670&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,261 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/927831/672319/408824/104865/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20670&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,262 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/474132/521108/740512/212212/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20670&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,265 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/563484/550913/803704/214024/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20670&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,268 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/547680/545654/366540/710/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20670&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,270 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/154899/414805/179560/38147/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20670&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,271 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/371118/486881/10562/118425/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20670&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,274 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/787668/625731/406312/59401/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20670&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,277 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/874467/654676/932908/174965/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20670&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,280 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/67173/385854/446838/201028/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20670&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,283 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/996069/695493/356714/153666/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20670&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,286 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/110811/400407/32264/20806/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20670&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,288 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/944811/678495/273306/178284/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20670&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,291 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/171081/420591/271614/78780/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20670&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,293 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/697878/596190/927024/230887/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20670&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,296 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/61635/384125/352534/155722/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20670&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,299 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/439095/509949/356982/32126/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20670&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,302 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/137079/409315/972278/440446/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20670&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,304 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/640500/577125/830000/201500/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20670&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,308 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/697881/596259/157334/153960/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20670&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,312 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/788892/626604/597228/35650/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20670&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,315 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/999225/696725/137344/264403/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20670&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,318 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/795198/598409/392280/68926/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20201&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,319 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/915888/638639/503416/53589/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20201&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,322 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/716277/572120/773650/148066/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20201&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,324 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/286425/428875/35684/77633/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20201&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,326 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/927831/642690/408824/104865/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20201&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,328 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/474132/491472/740512/212212/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20201&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,330 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/563484/521350/803704/214024/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20201&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,333 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/795198/574399/392280/68926/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=RJX%20866&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,334 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/795198/573787/392280/68927/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=RJ%20649&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,336 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/795198/565125/392280/68926/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=RJX%20161&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,338 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/795198/598666/392280/68926/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20612&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,341 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/915888/638913/503416/53588/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20612&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,343 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/716277/572376/773650/148067/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20612&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,345 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/286425/429272/35684/77633/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20612&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,347 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/927831/643074/408824/104866/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20612&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,350 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/474132/491841/740512/212214/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20612&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,351 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/563484/521651/803704/214024/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20612&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,354 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/547680/516383/366540/711/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20612&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,355 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/154899/385456/179560/38149/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20612&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,357 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/371118/457529/10562/118428/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20612&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,359 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/787668/596379/406312/59404/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20612&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,362 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/874467/625457/932908/174965/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20612&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,364 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/67173/356359/446838/201029/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20612&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,365 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/996069/666005/356714/153666/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20612&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,367 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/110811/370919/32264/20806/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20612&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,369 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/944811/648919/273306/178286/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20612&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,373 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/171081/391276/271614/78780/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20612&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,375 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/697878/566875/927024/230887/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20612&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,377 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/61635/354818/352534/155722/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20612&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,380 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/439095/480704/356982/32126/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20612&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,381 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/137079/380032/972278/440447/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20612&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,384 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/640500/547839/830000/201502/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20612&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,388 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/697881/567049/157334/153960/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20612&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,390 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/788892/597406/597228/35650/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20612&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,394 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/999225/667697/137344/264403/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20612&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,397 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/411132/471666/553832/139873/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20612&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,400 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/811212/605058/527558/6625/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20612&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,403 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/727866/577276/614274/64516/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20612&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,406 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/997638/667200/817922/76417/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20612&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,409 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/492249/498737/406656/39248/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20612&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,411 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/269028/424330/961916/391286/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20612&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,414 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/14463/339475/322962/156665/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20612&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,418 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/382992/462318/504914/124799/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20612&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
+09:38:32,423 root ERROR load_route http://fahrplan.oebb.at/bin/traininfo.exe/dn/870084/624682/327028/126521/181?date=13.01.2020&dcArrSt=Linz/Donau Hbf&trainname=Bus%20612&stationname=Linz%2FDonau%20Hbf&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&

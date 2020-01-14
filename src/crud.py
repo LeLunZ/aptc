@@ -42,7 +42,7 @@ def add_frequency():
 
 
 def add_route(route: Route):
-    data: Route = s.query(Route).filter(Route.route_long_name == route.route_long_name).first()
+    data: Route = s.query(Route).filter(and_(Route.route_long_name == route.route_long_name, Route.agency_id == route.agency_id)).first()
     if data is None:
         s.add(route)
         commit()
@@ -53,7 +53,7 @@ def add_route(route: Route):
 
 
 def route_exist(url):
-    data: Route = s.query(Route).filter(Route.route_url == url).first()
+    data: Trip = s.query(Trip).filter(Trip.oebb_url == url).first()
     return data is not None
 
 
