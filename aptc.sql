@@ -1,14 +1,3 @@
-create domain wgs84_lat as double precision
-    constraint wgs84_lat_check check ((VALUE >= ('-90'::integer)::double precision) AND
-                                      (VALUE <= (90)::double precision));
-
-create domain wgs84_lon as double precision
-    constraint wgs84_lon_check check ((VALUE >= ('-180'::integer)::double precision) AND
-                                      (VALUE <= (180)::double precision));
-
-create domain gtfstime as text
-    constraint gtfstime_check check (VALUE ~ '^[0-9]?[0-9]:[0-5][0-9]:[0-5][0-9]$'::text);
-
 create table agency
 (
     agency_id       serial not null
@@ -77,7 +66,7 @@ create table calendar
     end_date   numeric(8) not null
 );
 
-create unique index calendar_end_date_start_date_monday_tuesday_wednesday_thursday_
+create index calendar_end_date_start_date_monday_tuesday_wednesday_thursday_
     on calendar (end_date, start_date, monday, tuesday, wednesday, thursday, friday, saturday, sunday);
 
 create table shapes
@@ -145,3 +134,17 @@ create table stop_times
             primary key
 );
 
+create table calendar_dates
+(
+    service_id     integer not null,
+    date           text    not null,
+    exception_type integer,
+    constraint calendar_dates_pk
+        primary key (service_id, date)
+);
+
+create index calendar_dates_service_id_index
+    on calendar_dates (service_id);
+
+create index calendar_dates_date_index
+    on calendar_dates (date);

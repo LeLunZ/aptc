@@ -1,17 +1,20 @@
 import json
 import logging
-from Models.agency import Agency
-from Models.route import Route
-from Models.stop import Stop
-from Models.stop_times import StopTime
-from Models.trip import Trip
 
-from Models.calendar import Calendar
+if __name__ == "__main__":
+    from Models.agency import Agency
+    from Models.route import Route
+    from Models.stop import Stop
+    from Models.stop_times import StopTime
+    from Models.trip import Trip
 
-from Models.frequencies import Frequency
-from Models.shape import Shape
-from Models.transfers import Transfer
-from Models.calendar_date import CalendarDate
+    from Models.calendar import Calendar
+
+    from Models.frequencies import Frequency
+    from Models.shape import Shape
+    from Models.transfers import Transfer
+    from Models.calendar_date import CalendarDate
+    from crud import *
 from itertools import islice
 
 import requests
@@ -21,7 +24,6 @@ from requests.adapters import HTTPAdapter
 from urllib3 import Retry
 import os
 from zipfile import ZipFile
-from crud import *
 
 import urllib.parse as urlparse
 from urllib.parse import parse_qs
@@ -82,11 +84,9 @@ def requests_retry_session(
     return session
 
 
-
-
 def get_location_suggestion_from_string(location: str):
     oebb_location = requests_retry_session().get(
-        'http://fahrplan.oebb.at/bin/ajax-getstop.exe/dn?REQ0JourneyStopsS0A=1&REQ0JourneyStopsB=12&S=' + location + '?&js=false&')
+        'http://fahrplan.oebb.at/bin/ajax-getstop.exe/dn?REQ0JourneyStopsS0A=1&REQ0JourneyStopsB=12&S=' + location + '?&js=false&', timeout=3, verify=False)
     locations = oebb_location.content[8:-22]
     locations = json.loads(locations.decode('iso-8859-1'))
     return locations
@@ -210,7 +210,7 @@ def load_route(url):
         route_info = tree.xpath('//*/span[@class=$first]/img/@src', first='prodIcon')[0]
         route_type = None
         if route_info == '/img/vs_oebb/rex_pic.gif':
-            route_type = 2  # Regional zug
+            route_type = 2
         elif route_info == '/img/vs_oebb/r_pic.gif':
             route_type = 2
         elif route_info == '/img/vs_oebb/s_pic.gif':
@@ -227,6 +227,9 @@ def load_route(url):
             route_type = 0
         elif route_info == '/img/vs_oebb/hmp_pic.gif':
             route_type = 3
+        else:
+            add_transport_name(route_info, url)
+
         new_route = Route(agency_id=new_agency.agency_id,
                           route_short_name=route_short_name,
                           route_long_name=route_long_name,
@@ -237,38 +240,41 @@ def load_route(url):
         if not extra_info_traffic_day or traffic_day is None or isinstance(traffic_day, list):
             extra_info_traffic_day = tree.xpath('//*/strong[text() =$first]/../*/pre/text()', first='Verkehrstage:')[0]
             extra_info_traffic_day = extra_info_traffic_day.split('\n')[3:]
+            extra_info_traffic_day = list(
+                filter(lambda traffic_line: traffic_line.strip() != '', extra_info_traffic_day))
             months_with_first_and_last_day = []
             day_exceptions = []
-            for month in extra_info_traffic_day:
+            for index_month, month in enumerate(extra_info_traffic_day):
                 short_month = month[0:3]
                 month_as_int = service_months[short_month]
                 month = month.replace(f'{short_month} ', '')
                 last_day_in_month = month.rfind('x') + 1
                 first_day_in_month = month.find('x') + 1
+                if index_month is 0 and month_as_int is 12 and len(extra_info_traffic_day) > 1:
+                    year = '2019'
+                else:
+                    year = '2020'
                 for day_index, day in enumerate(month):
                     if day != 'x':
-                        day_exceptions.append((month_as_int, day_index+1))
-                months_with_first_and_last_day.append((month_as_int,first_day_in_month, last_day_in_month))
+                        day_exceptions.append((year, month_as_int, day_index + 1))
+                months_with_first_and_last_day.append((month_as_int, first_day_in_month, last_day_in_month))
             day = months_with_first_and_last_day[0][1]
             month = months_with_first_and_last_day[0][0]
             year = '2020'
-            if len(day) is 1:
+            if day < 10:
                 day = f'0{day}'
             if month < 10:
                 month = f'0{month}'
-            if month is 12:
+            if month is 12 and len(months_with_first_and_last_day) > 1:
                 year = '2019'
             start_date = int(f'{year}{month}{day}')
-
             day = months_with_first_and_last_day[-1][2]
             month = months_with_first_and_last_day[-1][0]
             year = '2020'
-            if len(day) is 1:
+            if day < 10:
                 day = f'0{day}'
             if month < 10:
                 month = f'0{month}'
-            if month is 12:
-                year = '2019'
             end_date = int(f'{year}{month}{day}')
             calendar.start_date = start_date
             calendar.end_date = end_date
@@ -279,18 +285,30 @@ def load_route(url):
             calendar.friday = True
             calendar.saturday = True
             calendar.sunday = True
-            calendar = add_calendar(calendar)
+            exceptions_calendar_date: [CalendarDate] = []
+            calendar_data_as_string = ''
+            for exception_index, exception in enumerate(day_exceptions):
+                exceptions_calendar_date.append(CalendarDate())
+                exceptions_calendar_date[-1].exception_type = 2
+                day = exception[2]
+                month = exception[1]
+                year = exception[0]
+                if day < 10:
+                    day = f'0{day}'
+                if month < 10:
+                    month = f'0{month}'
+                date = int(f'{year}{month}{day}')
+                exceptions_calendar_date[-1].date = date
+                calendar_data_as_string += f',{date}'
+            calendar_data_as_string = calendar_data_as_string[1:]
+            calendar = add_calendar_dates(exceptions_calendar_date, calendar_data_as_string, calendar)
         else:
             try:
-                if not extra_info_traffic_day:
-                    raise Exception()
-                if isinstance(traffic_day, list):
-                    logging.error(f'traffic day is list {extra_info_traffic_day} {url}')
-                    raise Exception()
                 weekdays = []
                 official_weekdays = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
                 splited_traffic_day = str(traffic_day).replace(';', '').replace(',', '')
                 splited_traffic_day = splited_traffic_day.split(' ')
+                add_stop_time_text(str(splited_traffic_day), str(traffic_day), str(extra_info_traffic_day))
                 for i in official_weekdays:
                     if i in splited_traffic_day:
                         weekdays.append([i, official_weekdays.index(i)])
@@ -299,7 +317,7 @@ def load_route(url):
                         weekdays) is 0:
                     if len(weekdays) is 0:
                         weekdays[0][1] = 0
-                        weekdays[1][1] = 6  # TODO implementieren von Ausnahme Tagen, funny Calendar
+                        weekdays[1][1] = 6  # TODO implementieren von Ausnahme Tagen
                     if weekdays[1][1] >= 0 >= weekdays[0][1]:
                         calendar.monday = True
                     else:
@@ -329,21 +347,18 @@ def load_route(url):
                     else:
                         calendar.sunday = False
                 else:
-                    logging.error(f'traffic day no valid weekdays {extra_info_traffic_day} {url}')
-                    raise Exception()
+                    raise Exception(f'traffic day no valid weekdays {extra_info_traffic_day} {url}')
                 if 'bis ' not in traffic_day:
-                    logging.error(f'traffic day no bis found {extra_info_traffic_day} {url}')
-                    raise Exception()
+                    raise Exception(f'day no bis found {extra_info_traffic_day} {url}')
                 service_info = ''.join(traffic_day.split('bis ')[1]).split(' ')
                 day = service_info[0].replace('.', '')
                 month = service_months[service_info[1]]
-                year = service_info[2]
+                endyear = service_info[2]
                 if len(day) is 1:
                     day = f'0{day}'
                 if month < 10:
                     month = f'0{month}'
-
-                end_date = int(f'{year}{month}{day}')
+                end_date = int(f'{endyear}{month}{day}')
                 calendar.end_date = end_date
                 service_info = ''.join(traffic_day.split('am ')[1]).split(' ')
                 day = service_info[0].replace('.', '')
@@ -353,19 +368,18 @@ def load_route(url):
                     day = f'0{day}'
                 if month < 10:
                     month = f'0{month}'
-                year = service_info[2]
+                try:
+                    year = int(service_info[2])
+                except:
+                    year = endyear
                 start_date = f'{year}{month}{day}'
                 calendar.start_date = int(start_date)
                 calendar = add_calendar(calendar)
             except Exception as e:
-                class FakeCalendar:
-                    def __init__(self):
-                        self.service_id = None
-
-                calendar = FakeCalendar()
+                raise e
         new_trip = Trip(route_id=route.route_id, service_id=calendar.service_id, oebb_url=url)
         if new_trip.service_id is None:
-            return
+            raise Exception(f'no service_id {url}')
         trip: Trip = add_trip(new_trip)
         global stop_dict
         for i in range(len(all_stations)):
@@ -527,7 +541,7 @@ if __name__ == "__main__":
                             try:
                                 load_route(route)
                             except Exception as e:
-                                logging.error(f'load_route {route} {e}')
+                                logging.error(f'load_route {route} {repr(e)}')
                         commit()
                     except Exception as e:
                         log_error(f'get_all_name_of_transport_distinct {public_transportation_journey} {str(e)}')

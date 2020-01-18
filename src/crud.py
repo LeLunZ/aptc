@@ -7,17 +7,21 @@ from Models.stop_times import StopTime
 from Models.trip import Trip
 
 from Models.calendar import Calendar
-
+from sqlalchemy.dialects.postgresql import aggregate_order_by
 from Models.frequencies import Frequency
 from Models.shape import Shape
 from Models.transfers import Transfer
+from Models.calendar_date import CalendarDate
+from Models.transport_type_image import TransportTypeImage
+from Models.stop_time_text import StopTimeText
+from sqlalchemy.exc import SQLAlchemyError
 
 try:
     DATABASE_URI = 'postgres+psycopg2://' + str(os.environ['postgres'])
 except KeyError:
     DATABASE_URI = 'postgres+psycopg2://postgres:password@localhost:5432/postgres'
 
-from sqlalchemy import create_engine, and_
+from sqlalchemy import create_engine, and_, func, literal_column, Text
 from sqlalchemy.orm import sessionmaker, aliased
 
 engine = create_engine(DATABASE_URI)
@@ -25,6 +29,7 @@ engine = create_engine(DATABASE_URI)
 Session = sessionmaker(bind=engine)
 
 s = Session(autoflush=False)
+
 
 def add_agency(agency):
     data = s.query(Agency).filter(Agency.agency_name == agency.agency_name).first()
@@ -42,7 +47,8 @@ def add_frequency():
 
 
 def add_route(route: Route):
-    data: Route = s.query(Route).filter(and_(Route.route_long_name == route.route_long_name, Route.agency_id == route.agency_id)).first()
+    data: Route = s.query(Route).filter(
+        and_(Route.route_long_name == route.route_long_name, Route.agency_id == route.agency_id)).first()
     if data is None:
         s.add(route)
         commit()
@@ -60,6 +66,42 @@ def route_exist(url):
 def add_shape():
     # shape wont be needed
     pass
+
+
+def add_transport_name(route, url):
+    transport_type_name = TransportTypeImage(name=route, oebb_url=url)
+    try:
+        s.add(transport_type_name)
+        commit()
+    except SQLAlchemyError:
+        s.rollback()
+
+def add_stop_time_text(text1, text2, text3):
+    stop_time_text = StopTimeText(split_traffic_day=text1, traffic_day=text2, extra_info_traffic_day=text3)
+    try:
+        s.add(stop_time_text)
+        commit()
+    except SQLAlchemyError:
+        s.rollback()
+
+def add_calendar_dates(calendar_dates: [CalendarDate], only_dates_as_string: str, service: Calendar):
+    aggregate_function = func.string_agg(CalendarDate.date.cast(Text),
+                                         aggregate_order_by(literal_column("','"), CalendarDate.date))
+    all_calendar_dates_service_id = s.query(CalendarDate.service_id).group_by(CalendarDate.service_id).having(
+        aggregate_function == only_dates_as_string).first()
+    if all_calendar_dates_service_id is None:
+        s.add(service)
+        commit()
+        s.refresh(service)
+        for i in calendar_dates:
+            i.service_id = service.service_id
+            s.add(i)
+            commit()
+            s.refresh(i)
+    else:
+        calendar = s.query(Calendar).filter(Calendar.service_id == all_calendar_dates_service_id).first()
+        service = calendar
+    return service
 
 
 def add_stop(stop):

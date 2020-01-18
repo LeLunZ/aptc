@@ -5,9 +5,9 @@ CalendarDateBase = declarative_base()
 
 
 class CalendarDate(CalendarDateBase):
-    __tablename__ = 'agency'
+    __tablename__ = 'calendar_dates'
     service_id = Column(Integer, primary_key=True)
-    date = Column(Text, nullable=False)
+    date = Column(Integer, nullable=False, primary_key=True)
     exception_type = Column(Integer, nullable=False)
 
     def __repr__(self):
