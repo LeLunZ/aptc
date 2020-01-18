@@ -11,6 +11,7 @@ from Models.calendar import Calendar
 from Models.frequencies import Frequency
 from Models.shape import Shape
 from Models.transfers import Transfer
+from Models.calendar_date import CalendarDate
 from itertools import islice
 
 import requests
@@ -81,7 +82,6 @@ def requests_retry_session(
     return session
 
 
-routes_trips = {}
 
 
 def get_location_suggestion_from_string(location: str):
@@ -162,6 +162,7 @@ def remove_param_from_url(url, to_remove):
 def load_route(url):
     url = url.split('?')[0]
     if not route_exist(url):
+        traffic_day = None
         route_page = requests_retry_session().get(url)
         tree = html.fromstring(route_page.content)
         all_stations = tree.xpath('//*/tr[@class=$first or @class=$second]/*/a/text()', first='zebracol-2',
@@ -226,95 +227,142 @@ def load_route(url):
             route_type = 0
         elif route_info == '/img/vs_oebb/hmp_pic.gif':
             route_type = 3
-        global routes_trips
         new_route = Route(agency_id=new_agency.agency_id,
                           route_short_name=route_short_name,
                           route_long_name=route_long_name,
                           route_type=route_type,
                           route_url=url)
         route = add_route(new_route)
-        try:
-            if not extra_info_traffic_day:
-                raise Exception()
-            if isinstance(traffic_day, list):
-                logging.error(f'traffic day is list {extra_info_traffic_day} {url}')
-                raise Exception()
-            calendar = Calendar()
-            weekdays = []
-            official_weekdays = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
-            splited_traffic_day = str(traffic_day).replace(';', '').replace(',', '')
-            splited_traffic_day = splited_traffic_day.split(' ')
-            for i in official_weekdays:
-                if i in splited_traffic_day:
-                    weekdays.append([i, official_weekdays.index(i)])
-            weekdays.sort(key=lambda x: x[1])
-            if (len(weekdays) > 1 and (f'{weekdays[0][0]} - {weekdays[1][0]}' in traffic_day)) or len(
-                    weekdays) is 0:
-                if len(weekdays) is 0:
-                    weekdays[0][1] = 0
-                    weekdays[1][1] = 6  # TODO implementieren von Ausnahme Tagen, funny Calendar
-                if weekdays[1][1] >= 0 >= weekdays[0][1]:
-                    calendar.monday = True
-                else:
-                    calendar.monday = False
-                if weekdays[1][1] >= 1 >= weekdays[0][1]:
-                    calendar.tuesday = True
-                else:
-                    calendar.tuesday = False
-                if weekdays[1][1] >= 2 >= weekdays[0][1]:
-                    calendar.wednesday = True
-                else:
-                    calendar.wednesday = False
-                if weekdays[1][1] >= 3 >= weekdays[0][1]:
-                    calendar.thursday = True
-                else:
-                    calendar.thursday = False
-                if weekdays[1][1] >= 4 >= weekdays[0][1]:
-                    calendar.friday = True
-                else:
-                    calendar.friday = False
-                if weekdays[1][1] >= 5 >= weekdays[0][1]:
-                    calendar.saturday = True
-                else:
-                    calendar.saturday = False
-                if weekdays[1][1] >= 6 >= weekdays[0][1]:
-                    calendar.sunday = True
-                else:
-                    calendar.sunday = False
-            else:
-                logging.error(f'traffic day no valid weekdays {extra_info_traffic_day} {url}')
-                raise Exception()
-            if 'bis ' not in traffic_day:
-                logging.error(f'traffic day no bis found {extra_info_traffic_day} {url}')
-                raise Exception()
-            service_info = ''.join(traffic_day.split('bis ')[1:4]).split(' ')
-            day = service_info[0].replace('.', '')
-            month = service_months[service_info[1]]
-            year = service_info[2]
+        calendar = Calendar()
+        if not extra_info_traffic_day or traffic_day is None or isinstance(traffic_day, list):
+            extra_info_traffic_day = tree.xpath('//*/strong[text() =$first]/../*/pre/text()', first='Verkehrstage:')[0]
+            extra_info_traffic_day = extra_info_traffic_day.split('\n')[3:]
+            months_with_first_and_last_day = []
+            day_exceptions = []
+            for month in extra_info_traffic_day:
+                short_month = month[0:3]
+                month_as_int = service_months[short_month]
+                month = month.replace(f'{short_month} ', '')
+                last_day_in_month = month.rfind('x') + 1
+                first_day_in_month = month.find('x') + 1
+                for day_index, day in enumerate(month):
+                    if day != 'x':
+                        day_exceptions.append((month_as_int, day_index+1))
+                months_with_first_and_last_day.append((month_as_int,first_day_in_month, last_day_in_month))
+            day = months_with_first_and_last_day[0][1]
+            month = months_with_first_and_last_day[0][0]
+            year = '2020'
             if len(day) is 1:
                 day = f'0{day}'
             if month < 10:
                 month = f'0{month}'
+            if month is 12:
+                year = '2019'
+            start_date = int(f'{year}{month}{day}')
 
+            day = months_with_first_and_last_day[-1][2]
+            month = months_with_first_and_last_day[-1][0]
+            year = '2020'
+            if len(day) is 1:
+                day = f'0{day}'
+            if month < 10:
+                month = f'0{month}'
+            if month is 12:
+                year = '2019'
             end_date = int(f'{year}{month}{day}')
+            calendar.start_date = start_date
             calendar.end_date = end_date
-            service_info = ''.join(traffic_day.split('am ')[1:3]).split(' ')
-            day = service_info[0].replace('.', '')
-            if service_info[1] != 'bis':
-                month = service_months[service_info[1]]
-            if len(day) is 1:
-                day = f'0{day}'
-            if month < 10:
-                month = f'0{month}'
-            start_date = f'{year}{month}{day}'
-            calendar.start_date = int(start_date)
+            calendar.monday = True
+            calendar.tuesday = True
+            calendar.wednesday = True
+            calendar.thursday = True
+            calendar.friday = True
+            calendar.saturday = True
+            calendar.sunday = True
             calendar = add_calendar(calendar)
-        except Exception as e:
-            class FakeCalendar:
-                def __init__(self):
-                    self.service_id = None
+        else:
+            try:
+                if not extra_info_traffic_day:
+                    raise Exception()
+                if isinstance(traffic_day, list):
+                    logging.error(f'traffic day is list {extra_info_traffic_day} {url}')
+                    raise Exception()
+                weekdays = []
+                official_weekdays = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
+                splited_traffic_day = str(traffic_day).replace(';', '').replace(',', '')
+                splited_traffic_day = splited_traffic_day.split(' ')
+                for i in official_weekdays:
+                    if i in splited_traffic_day:
+                        weekdays.append([i, official_weekdays.index(i)])
+                weekdays.sort(key=lambda x: x[1])
+                if (len(weekdays) > 1 and (f'{weekdays[0][0]} - {weekdays[1][0]}' in traffic_day)) or len(
+                        weekdays) is 0:
+                    if len(weekdays) is 0:
+                        weekdays[0][1] = 0
+                        weekdays[1][1] = 6  # TODO implementieren von Ausnahme Tagen, funny Calendar
+                    if weekdays[1][1] >= 0 >= weekdays[0][1]:
+                        calendar.monday = True
+                    else:
+                        calendar.monday = False
+                    if weekdays[1][1] >= 1 >= weekdays[0][1]:
+                        calendar.tuesday = True
+                    else:
+                        calendar.tuesday = False
+                    if weekdays[1][1] >= 2 >= weekdays[0][1]:
+                        calendar.wednesday = True
+                    else:
+                        calendar.wednesday = False
+                    if weekdays[1][1] >= 3 >= weekdays[0][1]:
+                        calendar.thursday = True
+                    else:
+                        calendar.thursday = False
+                    if weekdays[1][1] >= 4 >= weekdays[0][1]:
+                        calendar.friday = True
+                    else:
+                        calendar.friday = False
+                    if weekdays[1][1] >= 5 >= weekdays[0][1]:
+                        calendar.saturday = True
+                    else:
+                        calendar.saturday = False
+                    if weekdays[1][1] >= 6 >= weekdays[0][1]:
+                        calendar.sunday = True
+                    else:
+                        calendar.sunday = False
+                else:
+                    logging.error(f'traffic day no valid weekdays {extra_info_traffic_day} {url}')
+                    raise Exception()
+                if 'bis ' not in traffic_day:
+                    logging.error(f'traffic day no bis found {extra_info_traffic_day} {url}')
+                    raise Exception()
+                service_info = ''.join(traffic_day.split('bis ')[1]).split(' ')
+                day = service_info[0].replace('.', '')
+                month = service_months[service_info[1]]
+                year = service_info[2]
+                if len(day) is 1:
+                    day = f'0{day}'
+                if month < 10:
+                    month = f'0{month}'
 
-            calendar = FakeCalendar()
+                end_date = int(f'{year}{month}{day}')
+                calendar.end_date = end_date
+                service_info = ''.join(traffic_day.split('am ')[1]).split(' ')
+                day = service_info[0].replace('.', '')
+                if service_info[1] != 'bis':
+                    month = service_months[service_info[1]]
+                if len(day) is 1:
+                    day = f'0{day}'
+                if month < 10:
+                    month = f'0{month}'
+                year = service_info[2]
+                start_date = f'{year}{month}{day}'
+                calendar.start_date = int(start_date)
+                calendar = add_calendar(calendar)
+            except Exception as e:
+                class FakeCalendar:
+                    def __init__(self):
+                        self.service_id = None
+
+                calendar = FakeCalendar()
         new_trip = Trip(route_id=route.route_id, service_id=calendar.service_id, oebb_url=url)
         if new_trip.service_id is None:
             return
@@ -383,7 +431,7 @@ def skip_stop(seq, begin, end):
 
 
 def export_all_tables():
-    tables = [Agency, Calendar, Frequency, Route, Shape, Stop, StopTime, Transfer, Trip]
+    tables = [Agency, Calendar, CalendarDate, Frequency, Route, Shape, Stop, StopTime, Transfer, Trip]
 
     file_names = []
     os.chdir('./db')
@@ -474,8 +522,8 @@ if __name__ == "__main__":
                         for route in routes:
                             try:
                                 load_route(route)
-                            except:
-                                logging.error(f'load_route {route}')
+                            except Exception as e:
+                                logging.error(f'load_route {route} {e}')
                         commit()
                     except Exception as e:
                         log_error(f'get_all_name_of_transport_distinct {public_transportation_journey} {str(e)}')

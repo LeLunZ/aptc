@@ -13,9 +13,7 @@ create table agency
 (
     agency_id       serial not null
         constraint agency_pk
-            primary key
-        constraint agency_agency_id_key
-            unique,
+            primary key,
     agency_name     text,
     agency_url      text,
     agency_timezone text,
@@ -28,11 +26,11 @@ create unique index agency_agency_name_uindex
 
 create table stops
 (
-    stop_id             integer not null
+    stop_id             serial not null
         constraint stops_pkey
             primary key,
     stop_code           text,
-    stop_name           text    not null,
+    stop_name           text   not null,
     stop_desc           text,
     stop_lat            wgs84_lat,
     stop_lon            wgs84_lon,
@@ -42,6 +40,9 @@ create table stops
     parent_station      text,
     wheelchair_boarding text
 );
+
+create unique index stops_stop_name_uindex
+    on stops (stop_name);
 
 create table routes
 (
@@ -76,7 +77,7 @@ create table calendar
     end_date   numeric(8) not null
 );
 
-create index calendar_end_date_start_date_monday_tuesday_wednesday_thursday_
+create unique index calendar_end_date_start_date_monday_tuesday_wednesday_thursday_
     on calendar (end_date, start_date, monday, tuesday, wednesday, thursday, friday, saturday, sunday);
 
 create table shapes
