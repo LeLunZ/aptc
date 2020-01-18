@@ -27,3 +27,6 @@ example:
 # Export
 
 `docker-compose run -e export=TRUE app`
+
+fährt täglich
+und Station/Stop_type
