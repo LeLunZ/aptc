@@ -137,7 +137,7 @@ create table stop_times
 create table calendar_dates
 (
     service_id     integer not null,
-    date           text    not null,
+    date           integer not null,
     exception_type integer,
     constraint calendar_dates_pk
         primary key (service_id, date)
@@ -148,3 +148,24 @@ create index calendar_dates_service_id_index
 
 create index calendar_dates_date_index
     on calendar_dates (date);
+
+create table transport_type_image
+(
+    name     text not null
+        constraint transport_type_image_pk
+            primary key,
+    oebb_url text
+);
+
+create unique index transport_type_image_name_uindex
+    on transport_type_image (name);
+
+create table stop_time_text
+(
+    split_traffic_day      text,
+    traffic_day            text,
+    extra_info_traffic_day text not null
+        constraint stop_time_text_pk
+            primary key
+);
+
