@@ -400,6 +400,10 @@ def load_route(url):
                                      arrival_time=all_times[0] if all_times[0] == '' else all_times[0] + ':00',
                                      departure_time=all_times[1] if all_times[1] == '' else all_times[1] + ':00',
                                      stop_sequence=i + 1, pickup_type=0, drop_off_type=0)
+            if new_stop_time.arrival_time == '':
+                new_stop_time.arrival_time = new_stop_time.departure_time
+            elif new_stop_time.departure_time == '':
+                new_stop_time.departure_time = new_stop_time.arrival_time
             add_stop_time(new_stop_time)
         pass
 
