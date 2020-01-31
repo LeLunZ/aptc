@@ -1,3 +1,12 @@
+DROP DOMAIN IF EXISTS wgs84_lat CASCADE;
+CREATE DOMAIN wgs84_lat AS DOUBLE PRECISION CHECK(VALUE >= -90 AND VALUE <= 90);
+
+DROP DOMAIN IF EXISTS wgs84_lon CASCADE;
+CREATE DOMAIN wgs84_lon AS DOUBLE PRECISION CHECK(VALUE >= -180 AND VALUE <= 180);
+
+DROP DOMAIN IF EXISTS gtfstime CASCADE;
+CREATE DOMAIN gtfstime AS text CHECK(VALUE ~ '^[0-9]?[0-9]:[0-5][0-9]:[0-5][0-9]$');
+
 create table agency
 (
     agency_id       serial not null

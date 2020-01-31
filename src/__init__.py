@@ -110,7 +110,7 @@ def get_all_station_ids_from_station(station):
 
 
 def get_all_routes_from_station(station_id):
-    date = '07.10.2019'
+    date = '03.03.2020'
     routes_of_station = requests_retry_session().get(
         'http://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_scotty.vs_liveticker&evaId=' + str(
             int(station_id)) + '&boardType=arr&time=00:00'
@@ -128,7 +128,7 @@ def get_all_routes_of_transport_and_station(transport_number, station):
         'stationname': station['value'],
         'REQ0JourneyStopsSID': station['id'],
         'selectDate': 'oneday',
-        'date': "Mo, 13.01.2020",
+        'date': "Mo, 03.02.2020",
         'wDayExt0': 'Mo|Di|Mi|Do|Fr|Sa|So',
         'periodStart': '15.09.2019',
         'periodEnd': '12.12.2020',
@@ -159,7 +159,7 @@ def remove_param_from_url(url, to_remove):
     return left_part + '&' + right_part
 
 
-def load_route(url):
+def load_route(url, debug=False):
     url = url.split('?')[0]
     if not route_exist(url):
         traffic_day = None
@@ -171,6 +171,8 @@ def load_route(url):
                                           second="zebracol-1")
         extra_info_operator = tree.xpath('//*/strong[text() =$first]/../text()', first='Betreiber:')
         extra_info_traffic_day = tree.xpath('//*/strong[text() =$first]/../text()', first='Verkehrstage:')
+        if debug:
+            logging.debug(extra_info_traffic_day)
         extra_info_remarks = tree.xpath('//*/strong[text() =$first]/../text()', first='Bemerkungen:')
         new_agency = Agency()
         if extra_info_operator:
@@ -255,7 +257,7 @@ def load_route(url):
                 else:
                     year = '2020'
                 for day_index, day in enumerate(month):
-                    if day != 'x':
+                    if day == 'x':
                         day_exceptions.append((year, month_as_int, day_index + 1))
                 months_with_first_and_last_day.append((month_as_int, first_day_in_month, last_day_in_month))
             day = months_with_first_and_last_day[0][1]
@@ -278,18 +280,18 @@ def load_route(url):
             end_date = int(f'{year}{month}{day}')
             calendar.start_date = start_date
             calendar.end_date = end_date
-            calendar.monday = True
-            calendar.tuesday = True
-            calendar.wednesday = True
-            calendar.thursday = True
-            calendar.friday = True
-            calendar.saturday = True
-            calendar.sunday = True
+            calendar.monday = False
+            calendar.tuesday = False
+            calendar.wednesday = False
+            calendar.thursday = False
+            calendar.friday = False
+            calendar.saturday = False
+            calendar.sunday = False
             exceptions_calendar_date: [CalendarDate] = []
             calendar_data_as_string = ''
             for exception_index, exception in enumerate(day_exceptions):
                 exceptions_calendar_date.append(CalendarDate())
-                exceptions_calendar_date[-1].exception_type = 2
+                exceptions_calendar_date[-1].exception_type = 1
                 day = exception[2]
                 month = exception[1]
                 year = exception[0]
@@ -313,11 +315,19 @@ def load_route(url):
                     if i in splited_traffic_day:
                         weekdays.append([i, official_weekdays.index(i)])
                 weekdays.sort(key=lambda x: x[1])
-                if (len(weekdays) > 1 and (f'{weekdays[0][0]} - {weekdays[1][0]}' in traffic_day)) or len(
+                if len(weekdays) is 0:
+                    calendar.monday = True
+                    calendar.tuesday = True
+                    calendar.wednesday = True
+                    calendar.thursday = True
+                    calendar.friday = True
+                    calendar.saturday = True
+                    calendar.sunday = True
+                elif (len(weekdays) > 1 and (f'{weekdays[0][0]} - {weekdays[1][0]}' in traffic_day)) or len(
                         weekdays) is 0:
                     if len(weekdays) is 0:
                         weekdays[0][1] = 0
-                        weekdays[1][1] = 6  # TODO implementieren von Ausnahme Tagen
+                        weekdays[1][1] = 6
                     if weekdays[1][1] >= 0 >= weekdays[0][1]:
                         calendar.monday = True
                     else:
@@ -470,6 +480,13 @@ if __name__ == "__main__":
     try:
         if os.environ['export']:
             export_all_tables()
+            exit()
+    except KeyError:
+        pass
+    try:
+        url = os.environ['url']
+        if url:
+            load_route(url, True)
             exit()
     except KeyError:
         pass
