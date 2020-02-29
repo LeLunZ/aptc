@@ -22,6 +22,7 @@ except KeyError:
     DATABASE_URI = 'postgres+psycopg2://postgres:password@localhost:5432/postgres'
 
 from sqlalchemy import create_engine, and_, func, literal_column, Text
+from sqlalchemy.sql import functions
 from sqlalchemy.orm import sessionmaker, aliased
 
 engine = create_engine(DATABASE_URI)
@@ -76,31 +77,50 @@ def add_transport_name(route, url):
     except SQLAlchemyError:
         s.rollback()
 
-def add_stop_time_text(text1, text2, text3):
-    stop_time_text = StopTimeText(split_traffic_day=text1, traffic_day=text2, extra_info_traffic_day=text3)
+
+def add_stop_time_text(text1):
+    stop_time_text = StopTimeText(working_days=text1)
     try:
         s.add(stop_time_text)
         commit()
     except SQLAlchemyError:
         s.rollback()
 
+
 def add_calendar_dates(calendar_dates: [CalendarDate], only_dates_as_string: str, service: Calendar):
-    aggregate_function = func.string_agg(CalendarDate.date.cast(Text),
-                                         aggregate_order_by(literal_column("','"), CalendarDate.date))
-    all_calendar_dates_service_id = s.query(CalendarDate.service_id).group_by(CalendarDate.service_id).having(
-        aggregate_function == only_dates_as_string).first()
-    if all_calendar_dates_service_id is None:
-        s.add(service)
-        commit()
-        s.refresh(service)
-        for i in calendar_dates:
-            i.service_id = service.service_id
-            s.add(i)
+    if only_dates_as_string == '':
+        subquery = ~s.query(CalendarDate).filter(CalendarDate.service_id == Calendar.service_id).exists()
+        data = s.query(Calendar).filter(subquery).first()
+        if data is None:
+            s.add(service)
             commit()
-            s.refresh(i)
+            s.refresh(service)
+        else:
+            service = data
     else:
-        calendar = s.query(Calendar).filter(Calendar.service_id == all_calendar_dates_service_id).first()
-        service = calendar
+        aggregate_function = func.string_agg(
+            functions.concat(CalendarDate.date.cast(Text), CalendarDate.exception_type.cast(Text)),
+            aggregate_order_by(literal_column("','"), CalendarDate.date, CalendarDate.exception_type))
+        all_calendar_dates_service_query = s.query(CalendarDate.service_id).group_by(CalendarDate.service_id).having(
+            aggregate_function == only_dates_as_string)
+        calendar = s.query(Calendar).filter(
+            and_(Calendar.service_id.in_(all_calendar_dates_service_query), Calendar.start_date == service.start_date,
+                 Calendar.end_date == service.end_date,
+                 Calendar.monday == service.monday, Calendar.tuesday == service.tuesday,
+                 Calendar.wednesday == service.wednesday, Calendar.thursday == service.thursday,
+                 Calendar.friday == service.friday, Calendar.saturday == service.saturday,
+                 Calendar.sunday == service.sunday))
+        calendar = calendar.first()
+        if calendar is None:
+            s.add(service)
+            commit()
+            s.refresh(service)
+            for i in calendar_dates:
+                i.service_id = service.service_id
+            s.bulk_save_objects(calendar_dates)
+            commit()
+        else:
+            service = calendar
     return service
 
 
@@ -142,13 +162,23 @@ def add_transfer():
 
 
 def add_calendar(service: Calendar):
-    data: Calendar = s.query(Calendar).filter(
-        and_(Calendar.start_date == service.start_date, Calendar.end_date == service.end_date,
-             Calendar.monday == service.monday, Calendar.tuesday == service.tuesday,
-             Calendar.wednesday == service.wednesday, Calendar.thursday == service.thursday,
-             Calendar.friday == service.friday, Calendar.saturday == service.saturday,
-             Calendar.sunday == service.sunday)).first()
+    if service.service_id is not None:
+        data: Calendar = s.query(Calendar).filter(
+            and_(Calendar.service_id == service.service_id, Calendar.start_date == service.start_date,
+                 Calendar.end_date == service.end_date,
+                 Calendar.monday == service.monday, Calendar.tuesday == service.tuesday,
+                 Calendar.wednesday == service.wednesday, Calendar.thursday == service.thursday,
+                 Calendar.friday == service.friday, Calendar.saturday == service.saturday,
+                 Calendar.sunday == service.sunday)).first()
+    else:
+        data: Calendar = s.query(Calendar).filter(
+            and_(Calendar.start_date == service.start_date, Calendar.end_date == service.end_date,
+                 Calendar.monday == service.monday, Calendar.tuesday == service.tuesday,
+                 Calendar.wednesday == service.wednesday, Calendar.thursday == service.thursday,
+                 Calendar.friday == service.friday, Calendar.saturday == service.saturday,
+                 Calendar.sunday == service.sunday)).first()
     if data is None:
+        service.service_id = None
         s.add(service)
         commit()
         s.refresh(service)

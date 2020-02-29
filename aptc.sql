@@ -171,10 +171,7 @@ create unique index transport_type_image_name_uindex
 
 create table stop_time_text
 (
-    split_traffic_day      text,
-    traffic_day            text,
-    extra_info_traffic_day text not null
+    working_days text not null
         constraint stop_time_text_pk
             primary key
 );
-
