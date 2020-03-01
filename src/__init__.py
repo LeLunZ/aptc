@@ -698,6 +698,7 @@ def load_route(url, debug=False):
             raise Exception(f'no service_id {url}')
         trip: Trip = add_trip(new_trip)
         global stop_dict
+        headsign = None
         for i in range(len(all_stations)):
             all_times = list(map(lambda x: x.strip(),
                                  tree.xpath('//*/tr[@class=$first or @class=$second][$count]/td[@class=$third]/text()',
@@ -729,10 +730,12 @@ def load_route(url, debug=False):
                     stop_dict.pop(stop.stop_name)
             stop.location_type = 0
             stop.parent_station = None
+            if str(all_times[2]).strip() != '':
+                headsign = str(all_times[2]).strip()
             new_stop_time = StopTime(stop_id=stop.stop_id, trip_id=trip.trip_id,
                                      arrival_time=all_times[0] if all_times[0] == '' else all_times[0] + ':00',
                                      departure_time=all_times[1] if all_times[1] == '' else all_times[1] + ':00',
-                                     stop_sequence=i + 1, pickup_type=0, drop_off_type=0)
+                                     stop_sequence=i + 1, pickup_type=0, drop_off_type=0, stop_headsign=headsign)
             if new_stop_time.arrival_time == '':
                 new_stop_time.arrival_time = new_stop_time.departure_time
             elif new_stop_time.departure_time == '':
@@ -884,7 +887,7 @@ if __name__ == "__main__":
         csv_reader = csv.reader(csv_file, delimiter=',')
         get_std_date()
         load_allg_feiertage()
-        for row in skip_stop(csv_reader, 12, end):
+        for row in skip_stop(csv_reader, begin, end):
             try:
                 location_data = get_location_suggestion_from_string(row[0])
                 suggestion = location_data['suggestions']
