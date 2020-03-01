@@ -528,7 +528,7 @@ def extract_date_from_str(calendar: Calendar, date_str: str):
         exception_type = 2 if not exception.extend else 1
         if f'{int(exception)}' in exceptions:
             if exception_type == 1 and exceptions[f'{int(exception)}'].exception_type == 2:
-                weekday = datetime.datetime(int(exception.year), int(exception.month), int(exception.day)).weekday()
+                weekday = datetime.datetime(int(exception.year), int(service_months[exception.month]), int(exception.day)).weekday()
                 if weekday == 0 and not calendar.monday:
                     exceptions[f'{int(exception)}'].exception_type = 1
                 elif weekday == 1 and not calendar.tuesday:
