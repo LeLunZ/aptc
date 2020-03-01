@@ -175,7 +175,7 @@ class OebbDate:
 
     def __int__(self):
         day = str(self.day)
-        if len(day) is 1:
+        if len(day) == 1:
             day = f'0{self.day}'
         month = service_months[self.month]
         if month < 10:
@@ -588,7 +588,7 @@ def extract_dates_from_oebb_page(tree, calendar):
             month = month.replace(f'{short_month} ', '')
             last_day_in_month = month.rfind('x') + 1
             first_day_in_month = month.find('x') + 1
-            if index_month is 0 and month_as_int is 12 and len(extra_info_traffic_day) > 1:
+            if index_month == 0 and month_as_int == 12 and len(extra_info_traffic_day) > 1:
                 year = begin_date.year
             else:
                 year = end_date.year
@@ -655,7 +655,7 @@ def load_route(url, debug=False):
             operator = list(filter(lambda x: x.strip() != '', extra_info_operator))[0].strip()
             try:
                 agency = operator.split(', ')
-                if len(agency) is 1:
+                if len(agency) == 1:
                     agency_phone = None
                     agency_name = ','.join(agency[0].split(',')[:-1])
                 else:
@@ -777,7 +777,7 @@ def save_simple_stops(names, ids, main_station):
             name = tup[0]
             id = tup[1]
             stop_location_type = 0
-            if index is 0:
+            if index == 0:
                 main_station.location_type = 1
                 main_station.parent_station = None
                 continue
@@ -789,7 +789,7 @@ def save_simple_stops(names, ids, main_station):
 
 def skip_stop(seq, begin, end):
     for i, item in enumerate(seq):
-        if begin <= i <= end and item[-1] and item[-1] is not '':
+        if begin <= i <= end and item[-1] and item[-1] != '':
             yield item
 
 
@@ -904,7 +904,7 @@ if __name__ == "__main__":
             end = row_count - 1
         csv_file.seek(0)
         for count, i in enumerate(csv_reader):
-            if count is not 0:
+            if count != 0:
                 stop_dict[i[0]] = {'x': float(i[7]), 'y': float(i[8])}
         csv_file.seek(0)
         csv_reader = csv.reader(csv_file, delimiter=',')
