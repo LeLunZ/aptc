@@ -48,6 +48,8 @@ try:
 except:
     pass
 
+date = '03.03.2020'
+
 logging.basicConfig(filename='./aptc.log',
                     filemode='a',
                     format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
@@ -72,8 +74,7 @@ service_months = {
 
 def requests_retry_session(
         retries=5,
-        backoff_factor=0.3,
-        status_forcelist=(500, 502, 504),
+        backoff_factor=0.2,
         session=None,
 ):
     session = session or requests.Session()
@@ -81,8 +82,7 @@ def requests_retry_session(
         total=retries,
         read=retries,
         connect=retries,
-        backoff_factor=backoff_factor,
-        status_forcelist=status_forcelist,
+        backoff_factor=backoff_factor
     )
     adapter = HTTPAdapter(max_retries=retry)
     session.mount('http://', adapter)
@@ -117,12 +117,12 @@ def get_all_station_ids_from_station(station):
 
 
 def get_all_routes_from_station(station_id):
-    date = '03.03.2020'
     routes_of_station = requests_retry_session().get(
         'http://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_scotty.vs_liveticker&evaId=' + str(
             int(station_id)) + '&boardType=arr&time=00:00'
                                '&additionalTime=0&maxJourneys=100000&outputMode=tickerDataOnly&start=yes&selectDate'
-                               '=period&dateBegin=' + date + 'dateEnd=' + date + '&productsFilter=1011111111011')
+                               '=period&dateBegin=' + date + 'dateEnd=' + date + '&productsFilter=1011111111011',
+        timeout=3, verify=False)
     json_data = json.loads(routes_of_station.content.decode('iso-8859-1')[14:-1])
     return json_data
 
@@ -135,7 +135,7 @@ def get_all_routes_of_transport_and_station(transport_number, station):
         'stationname': station['value'],
         'REQ0JourneyStopsSID': station['id'],
         'selectDate': 'oneday',
-        'date': "Mo, 03.03.2020",
+        'date': "Di, 03.03.2020",
         'wDayExt0': 'Mo|Di|Mi|Do|Fr|Sa|So',
         'periodStart': '15.09.2019',
         'periodEnd': '12.12.2020',
@@ -144,7 +144,7 @@ def get_all_routes_of_transport_and_station(transport_number, station):
         'stationFilter': '81,01,02,03,04,05,06,07,08,09',
         'start': 'Suchen'
     }
-    response = requests_retry_session().post(url, data=payload, params=querystring)
+    response = requests_retry_session().post(url, data=payload, params=querystring, timeout=3, verify=False)
     tree = html.fromstring(response.content)
     all_routes = tree.xpath('//*/td[@class=$name]/a/@href', name='fcell')
     return all_routes
@@ -335,16 +335,16 @@ def extract_date_from_str(calendar: Calendar, date_str: str):
                         newDate.year = date.year
                         newDate.extend = False
                         not_working_calendar_date.append(newDate)
-                        datetime.datetime(date.year, service_months[date.month], date.day+1)
-                        date.day = date.day+1
+                        datetime.datetime(date.year, service_months[date.month], date.day + 1)
+                        date.day = date.day + 1
                     except:
                         try:
-                            datetime.datetime(date.year, service_months[date.month]+1, date.day)
-                            date.month = inv_map[service_months[date.month]+1]
+                            datetime.datetime(date.year, service_months[date.month] + 1, 1)
+                            date.month = inv_map[service_months[date.month] + 1]
                             date.day = 1
                         except:
                             try:
-                                datetime.datetime(date.year+1, service_months[date.month], date.day)
+                                datetime.datetime(date.year + 1, 1, 1)
                                 date.year = date.year + 1
                                 date.month = 'Jan'
                                 date.day = 1
@@ -447,16 +447,16 @@ def extract_date_from_str(calendar: Calendar, date_str: str):
                         newDate.year = date.year
                         newDate.extend = True
                         extended_working_dates.append(newDate)
-                        datetime.datetime(date.year, service_months[date.month], date.day+1)
-                        date.day = date.day+1
+                        datetime.datetime(date.year, service_months[date.month], date.day + 1)
+                        date.day = date.day + 1
                     except:
                         try:
-                            datetime.datetime(date.year, service_months[date.month]+1, date.day)
-                            date.month = inv_map[service_months[date.month]+1]
+                            datetime.datetime(date.year, service_months[date.month] + 1, 1)
+                            date.month = inv_map[service_months[date.month] + 1]
                             date.day = 1
                         except:
                             try:
-                                datetime.datetime(date.year+1, service_months[date.month], date.day)
+                                datetime.datetime(date.year + 1, 1, 1)
                                 date.year = date.year + 1
                                 date.month = 'Jan'
                                 date.day = 1
@@ -523,16 +523,37 @@ def extract_date_from_str(calendar: Calendar, date_str: str):
     all_working_dates.sort(key=lambda x: (int(x), int(x.extend)))
     exceptions_calendar_date: [CalendarDate] = []
     calendar_data_as_string = ''
-    test_set = set()
+    exceptions = {}
     for exception_index, exception in enumerate(all_working_dates):
-        if f'{int(exception)}{int(exception.extend)}' in test_set:
-            continue
+        exception_type = 2 if not exception.extend else 1
+        if f'{int(exception)}' in exceptions:
+            if exception_type == 1 and exceptions[f'{int(exception)}'].exception_type == 2:
+                weekday = datetime.datetime(int(exception.year), int(exception.month), int(exception.day)).weekday()
+                if weekday == 0 and not calendar.monday:
+                    exceptions[f'{int(exception)}'].exception_type = 1
+                elif weekday == 1 and not calendar.tuesday:
+                    exceptions[f'{int(exception)}'].exception_type = 1
+                elif weekday == 2 and not calendar.wednesday:
+                    exceptions[f'{int(exception)}'].exception_type = 1
+                elif weekday == 3 and not calendar.thursday:
+                    exceptions[f'{int(exception)}'].exception_type = 1
+                elif weekday == 4 and not calendar.friday:
+                    exceptions[f'{int(exception)}'].exception_type = 1
+                elif weekday == 5 and not calendar.saturday:
+                    exceptions[f'{int(exception)}'].exception_type = 1
+                elif weekday == 6 and not calendar.sunday:
+                    exceptions[f'{int(exception)}'].exception_type = 1
+                else:
+                    exceptions_calendar_date.remove(exceptions[f'{int(exception)}'])
+                continue
+            else:
+                continue
         exceptions_calendar_date.append(CalendarDate())
-        exceptions_calendar_date[-1].exception_type = int(exception.extend)
+        exceptions_calendar_date[-1].exception_type = exception_type
         date = int(exception)
         exceptions_calendar_date[-1].date = date
-        test_set.add(f'{date}{int(exception.extend)}')
-        calendar_data_as_string += f',{date}{int(exception.extend)}'
+        exceptions[f'{date}'] = exceptions_calendar_date[-1]
+        calendar_data_as_string += f',{date}{exception_type}'
     calendar_data_as_string = calendar_data_as_string[1:]
     calendar = add_calendar_dates(exceptions_calendar_date, calendar_data_as_string, calendar)
     return calendar
@@ -621,7 +642,7 @@ def load_route(url, debug=False):
     url = url.split('?')[0]
     if not route_exist(url):
         traffic_day = None
-        route_page = requests_retry_session().get(url)
+        route_page = requests_retry_session().get(url, timeout=3, verify=False)
         tree = html.fromstring(route_page.content)
         all_stations = tree.xpath('//*/tr[@class=$first or @class=$second]/*/a/text()', first='zebracol-2',
                                   second="zebracol-1")
@@ -682,6 +703,8 @@ def load_route(url, debug=False):
             route_type = 3
         elif route_info == '/img/vs_oebb/bus_pic.gif':
             route_type = 3
+        elif route_info == '/img/vs_oebb/str_pic.gif':
+            route_type = 0
         else:
             add_transport_name(route_info, url)
 
@@ -706,7 +729,7 @@ def load_route(url, debug=False):
                                             second="zebracol-1", third='center sepline', count=i + 1)))
             new_stop = Stop(stop_name=all_stations[i],
                             stop_url=remove_param_from_url(all_links_of_station[i], '&time='), location_type=0)
-            stop = add_stop(new_stop)  # TODO add name of stoptime
+            stop = add_stop(new_stop)
             if stop.stop_lat is None or stop.stop_lon is None:
                 if stop.stop_name in stop_dict:
                     coords = stop_dict.pop(stop.stop_name)
@@ -730,7 +753,7 @@ def load_route(url, debug=False):
                     stop_dict.pop(stop.stop_name)
             stop.location_type = 0
             stop.parent_station = None
-            if str(all_times[2]).strip() != '':
+            if str(all_times[2]).strip() != '' and str(all_times[2]).strip() != route_long_name.strip():
                 headsign = str(all_times[2]).strip()
             new_stop_time = StopTime(stop_id=stop.stop_id, trip_id=trip.trip_id,
                                      arrival_time=all_times[0] if all_times[0] == '' else all_times[0] + ':00',
