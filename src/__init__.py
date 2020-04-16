@@ -71,6 +71,47 @@ service_months = {
     'Dez': 12
 }
 
+route_types = {
+    '/img/vs_oebb/rex_pic.gif': 2,
+    '/img/vs_oebb/r_pic.gif': 2,
+    '/img/vs_oebb/s_pic.gif': 1,
+    '/img/vs_oebb/os_pic.gif': 2,
+    '/img/vs_oebb/ex_pic.gif': 2,
+    '/img/vs_oebb/hog_pic.gif': 3,
+    '/img/vs_oebb/nmg_pic.gif': 3,
+    '/img/vs_oebb/ntr_pic.gif': 0,
+    '/img/vs_oebb/hmp_pic.gif': 3,
+    '/img/vs_oebb/bus_pic.gif': 3,
+    '/img/vs_oebb/str_pic.gif': 0,
+    '/img/vs_oebb/er_pic.gif': 2,
+    '/img/vs_oebb/en_pic.gif': 2,
+    '/img/vs_oebb/atb_pic.gif': 115,
+    '/img/vs_oebb/arz_pic.gif': 115,
+    '/img/vs_oebb/ice_pic.gif': 101,
+    '/img/vs_oebb/d_pic.gif': 2,
+    '/img/vs_oebb/ast_pic.gif': 1500,
+    '/img/vs_oebb/rb_pic.gif': 2,
+    '/img/vs_oebb/bsv_pic.gif': 3,
+    '/img/vs_oebb/cat_pic.gif': 1,
+    '/img/vs_oebb/rj_pic.gif': 2,
+    '/img/vs_oebb/nj_pic.gif': 2,
+    '/img/vs_oebb/ec_pic.gif': 102,
+    '/img/vs_oebb/ic_pic.gif': 102,
+    '/img/vs_oebb/obu_pic.gif': 11,
+    '/img/vs_oebb/icb_pic.gif': 3,
+    '/img/vs_oebb/dps_pic.gif': 2,
+    '/img/vs_oebb/u_pic.gif': 1,
+    '/img/vs_oebb/wb_pic.gif': 2,
+    '/img/vs_oebb/rjx_pic.gif': 2,
+    '/img/vs_oebb/cjx_pic.gif': 2,
+    '/img/vs_oebb/t84_pic.gif': 1700,
+    '/img/vs_oebb/x70_pic.gif': 1700,
+    '/img/vs_oebb/u70_pic.gif': 1700,
+    '/img/vs_oebb/sb_pic.gif': 6,
+    '/img/vs_oebb/lkb_pic.gif': 0,
+    '/img/vs_oebb/rer_pic.gif': 109
+}
+
 
 def requests_retry_session(
         retries=5,
@@ -528,7 +569,8 @@ def extract_date_from_str(calendar: Calendar, date_str: str):
         exception_type = 2 if not exception.extend else 1
         if f'{int(exception)}' in exceptions:
             if exception_type == 1 and exceptions[f'{int(exception)}'].exception_type == 2:
-                weekday = datetime.datetime(int(exception.year), int(service_months[exception.month]), int(exception.day)).weekday()
+                weekday = datetime.datetime(int(exception.year), int(service_months[exception.month]),
+                                            int(exception.day)).weekday()
                 if weekday == 0 and not calendar.monday:
                     exceptions[f'{int(exception)}'].exception_type = 1
                 elif weekday == 1 and not calendar.tuesday:
@@ -640,185 +682,110 @@ def extract_dates_from_oebb_page(tree, calendar):
 
 def load_route(url, debug=False):
     url = url.split('?')[0]
-    if not route_exist(url):
-        traffic_day = None
-        route_page = requests_retry_session().get(url, timeout=3, verify=False)
-        tree = html.fromstring(route_page.content)
-        all_stations = tree.xpath('//*/tr[@class=$first or @class=$second]/*/a/text()', first='zebracol-2',
-                                  second="zebracol-1")
-        all_links_of_station = tree.xpath('//*/tr[@class=$first or @class=$second]/*/a/@href', first='zebracol-2',
-                                          second="zebracol-1")
-        extra_info_operator = tree.xpath('//*/strong[text() =$first]/../text()', first='Betreiber:')
-        extra_info_remarks = tree.xpath('//*/strong[text() =$first]/../text()', first='Bemerkungen:')
-        new_agency = Agency()
-        if extra_info_operator:
-            operator = list(filter(lambda x: x.strip() != '', extra_info_operator))[0].strip()
-            try:
-                agency = operator.split(', ')
-                if len(agency) == 1:
-                    agency_phone = None
-                    agency_name = ','.join(agency[0].split(',')[:-1])
-                else:
-                    agency_name = agency[0]
-                    agency_phone = agency[1]
-                new_agency.agency_lang = 'de'
-                new_agency.agency_timezone = 'Europe/Vienna'
-                new_agency.agency_url = 'https://www.google.com/search?q=' + agency_name
-                new_agency.agency_name = agency_name
-                new_agency.agency_phone = agency_phone
-                new_agency = add_agency(new_agency)
-            except:
-                pass
-        else:
-            new_agency = get_from_table_first(Agency)
-
-        if extra_info_remarks:
-            remarks = list(filter(lambda x: x != '', map(lambda x: x.strip(), extra_info_remarks)))
-            pass
-        route_short_name = \
-            tree.xpath('((//*/tr[@class=$first])[1]/td[@class=$second])[last()]/text()', first='zebracol-2',
-                       second='center sepline')[0].strip()
-        route_long_name = route_short_name
-        if ' ' in route_short_name:
-            route_short_name = route_short_name.split(' ')[1]
-        route_info = tree.xpath('//*/span[@class=$first]/img/@src', first='prodIcon')[0]
-        route_type = None
-        if route_info == '/img/vs_oebb/rex_pic.gif':
-            route_type = 2
-        elif route_info == '/img/vs_oebb/r_pic.gif':
-            route_type = 2
-        elif route_info == '/img/vs_oebb/s_pic.gif':
-            route_type = 1
-        elif route_info == '/img/vs_oebb/os_pic.gif':
-            route_type = 2
-        elif route_info == '/img/vs_oebb/ex_pic.gif':
-            route_type = 2
-        elif route_info == '/img/vs_oebb/hog_pic.gif':
-            route_type = 3
-        elif route_info == '/img/vs_oebb/nmg_pic.gif':
-            route_type = 3
-        elif route_info == '/img/vs_oebb/ntr_pic.gif':
-            route_type = 0
-        elif route_info == '/img/vs_oebb/hmp_pic.gif':
-            route_type = 3
-        elif route_info == '/img/vs_oebb/bus_pic.gif':
-            route_type = 3
-        elif route_info == '/img/vs_oebb/str_pic.gif':
-            route_type = 0
-        elif route_info == '/img/vs_oebb/er_pic.gif':
-            route_type = 2
-        elif route_info == '/img/vs_oebb/en_pic.gif':
-            route_type = 2
-        elif route_info == '/img/vs_oebb/atb_pic.gif':
-            route_type = 115
-        elif route_info == '/img/vs_oebb/ice_pic.gif':
-            route_type = 101
-        elif route_info == '/img/vs_oebb/arz_pic.gif':
-            route_type = 115
-        elif route_info == '/img/vs_oebb/d_pic.gif':
-            route_type = 2
-        elif route_info == '/img/vs_oebb/ast_pic.gif':
-            route_type = 1500
-        elif route_info == '/img/vs_oebb/rb_pic.gif':
-            route_type = 2
-        elif route_info == '/img/vs_oebb/bsv_pic.gif':
-            route_type = 3
-        elif route_info == '/img/vs_oebb/cat_pic.gif':
-            route_type = 1
-        elif route_info == '/img/vs_oebb/rj_pic.gif':
-            route_type = 2
-        elif route_info == '/img/vs_oebb/nj_pic.gif':
-            route_type = 2
-        elif route_info == '/img/vs_oebb/ec_pic.gif':
-            route_type = 102
-        elif route_info == '/img/vs_oebb/ic_pic.gif':
-            route_type = 102
-        elif route_info == '/img/vs_oebb/obu_pic.gif':
-            route_type = 11
-        elif route_info == '/img/vs_oebb/icb_pic.gif':
-            route_type = 3
-        elif route_info == '/img/vs_oebb/dps_pic.gif':
-            route_type = 2
-        elif route_info == '/img/vs_oebb/u_pic.gif':
-            route_type = 1
-        elif route_info == '/img/vs_oebb/wb_pic.gif':
-            route_type = 2
-        elif route_info == '/img/vs_oebb/rjx_pic.gif':
-            route_type = 2
-        elif route_info == '/img/vs_oebb/cjx_pic.gif':
-            route_type = 2
-        elif route_info == '/img/vs_oebb/t84_pic.gif':
-            route_type = 1700
-        elif route_info == '/img/vs_oebb/x70_pic.gif':
-            route_type = 1700
-        elif route_info == '/img/vs_oebb/u70_pic.gif':
-            route_type = 1700
-        elif route_info == '/img/vs_oebb/sb_pic.gif':
-            route_type = 6
-        elif route_info == '/img/vs_oebb/lkb_pic.gif':
-            route_type = 0
-        elif route_info == '/img/vs_oebb/rer_pic.gif':
-            route_type = 109
-        else:
-            add_transport_name(route_info, url)
-
-        new_route = Route(agency_id=new_agency.agency_id,
-                          route_short_name=route_short_name,
-                          route_long_name=route_long_name,
-                          route_type=route_type,
-                          route_url=url)
-        route = add_route(new_route)
-        calendar = Calendar()
-        calendar = extract_dates_from_oebb_page(tree, calendar)
-        new_trip = Trip(route_id=route.route_id, service_id=calendar.service_id, oebb_url=url)
-        if new_trip.service_id is None:
-            raise Exception(f'no service_id {url}')
-        trip: Trip = add_trip(new_trip)
-        global stop_dict
-        headsign = None
-        for i in range(len(all_stations)):
-            all_times = list(map(lambda x: x.strip(),
-                                 tree.xpath('//*/tr[@class=$first or @class=$second][$count]/td[@class=$third]/text()',
-                                            first='zebracol-2',
-                                            second="zebracol-1", third='center sepline', count=i + 1)))
-            new_stop = Stop(stop_name=all_stations[i],
-                            stop_url=remove_param_from_url(all_links_of_station[i], '&time='), location_type=0)
-            stop = add_stop(new_stop)
-            if stop.stop_lat is None or stop.stop_lon is None:
-                if stop.stop_name in stop_dict:
-                    coords = stop_dict.pop(stop.stop_name)
-                    stop.stop_lat = coords['y']
-                    stop.stop_lon = coords['x']
-                    commit()
-                else:
-                    try:
-                        stop_suggestions = get_location_suggestion_from_string(stop.stop_name)
-                        for stop_suggestion in stop_suggestions['suggestions']:
-                            stop_dict[stop_suggestion['value']] = {'y': str_to_geocord(stop_suggestion['ycoord']),
-                                                                   'x': str_to_geocord(stop_suggestion['xcoord'])}
-                        current_station_cord = stop_dict.pop(stop_suggestions['suggestions'][0]['value'])
-                        stop.stop_lat = current_station_cord['y']
-                        stop.stop_lon = current_station_cord['x']
-                        commit()
-                    except:
-                        pass
+    traffic_day = None
+    route_page = requests_retry_session().get(url, timeout=3, verify=False)
+    tree = html.fromstring(route_page.content)
+    all_stations = tree.xpath('//*/tr[@class=$first or @class=$second]/*/a/text()', first='zebracol-2',
+                              second="zebracol-1")
+    all_links_of_station = tree.xpath('//*/tr[@class=$first or @class=$second]/*/a/@href', first='zebracol-2',
+                                      second="zebracol-1")
+    extra_info_operator = tree.xpath('//*/strong[text() =$first]/../text()', first='Betreiber:')
+    extra_info_remarks = tree.xpath('//*/strong[text() =$first]/../text()', first='Bemerkungen:')
+    new_agency = Agency()
+    if extra_info_operator:
+        operator = list(filter(lambda x: x.strip() != '', extra_info_operator))[0].strip()
+        try:
+            agency = operator.split(', ')
+            if len(agency) == 1:
+                agency_phone = None
+                agency_name = ','.join(agency[0].split(',')[:-1])
             else:
-                if stop.stop_name in stop_dict:
-                    stop_dict.pop(stop.stop_name)
-            stop.location_type = 0
-            stop.parent_station = None
-            if str(all_times[2]).strip() != '' and str(all_times[2]).strip() != route_long_name.strip():
-                headsign = str(all_times[2]).strip()
-            new_stop_time = StopTime(stop_id=stop.stop_id, trip_id=trip.trip_id,
-                                     arrival_time=all_times[0] if all_times[0] == '' else all_times[0] + ':00',
-                                     departure_time=all_times[1] if all_times[1] == '' else all_times[1] + ':00',
-                                     stop_sequence=i + 1, pickup_type=0, drop_off_type=0, stop_headsign=headsign)
-            if new_stop_time.arrival_time == '':
-                new_stop_time.arrival_time = new_stop_time.departure_time
-            elif new_stop_time.departure_time == '':
-                new_stop_time.departure_time = new_stop_time.arrival_time
-            add_stop_time(new_stop_time)
+                agency_name = agency[0]
+                agency_phone = agency[1]
+            new_agency.agency_lang = 'de'
+            new_agency.agency_timezone = 'Europe/Vienna'
+            new_agency.agency_url = 'https://www.google.com/search?q=' + agency_name
+            new_agency.agency_name = agency_name
+            new_agency.agency_phone = agency_phone
+            new_agency = add_agency(new_agency)
+        except:
+            pass
+    else:
+        new_agency = get_from_table_first(Agency)
+
+    if extra_info_remarks:
+        remarks = list(filter(lambda x: x != '', map(lambda x: x.strip(), extra_info_remarks)))
         pass
+    route_short_name = \
+        tree.xpath('((//*/tr[@class=$first])[1]/td[@class=$second])[last()]/text()', first='zebracol-2',
+                   second='center sepline')[0].strip()
+    route_long_name = route_short_name
+    if ' ' in route_short_name:
+        route_short_name = route_short_name.split(' ')[1]
+    route_info = tree.xpath('//*/span[@class=$first]/img/@src', first='prodIcon')[0]
+    route_type = None
+    try:
+        route_type = route_types[route_info]
+    except KeyError:
+        add_transport_name(route_info, url)
+
+    new_route = Route(agency_id=new_agency.agency_id,
+                      route_short_name=route_short_name,
+                      route_long_name=route_long_name,
+                      route_type=route_type,
+                      route_url=url)
+    route = add_route(new_route)
+    calendar = Calendar()
+    calendar = extract_dates_from_oebb_page(tree, calendar)
+    new_trip = Trip(route_id=route.route_id, service_id=calendar.service_id, oebb_url=url)
+    if new_trip.service_id is None:
+        raise Exception(f'no service_id {url}')
+    trip: Trip = add_trip(new_trip)
+    global stop_dict
+    headsign = None
+    for i in range(len(all_stations)):
+        all_times = list(map(lambda x: x.strip(),
+                             tree.xpath('//*/tr[@class=$first or @class=$second][$count]/td[@class=$third]/text()',
+                                        first='zebracol-2',
+                                        second="zebracol-1", third='center sepline', count=i + 1)))
+        new_stop = Stop(stop_name=all_stations[i],
+                        stop_url=remove_param_from_url(all_links_of_station[i], '&time='), location_type=0)
+        stop = add_stop(new_stop)
+        if stop.stop_lat is None or stop.stop_lon is None:
+            if stop.stop_name in stop_dict:
+                coords = stop_dict.pop(stop.stop_name)
+                stop.stop_lat = coords['y']
+                stop.stop_lon = coords['x']
+                commit()
+            else:
+                try:
+                    stop_suggestions = get_location_suggestion_from_string(stop.stop_name)
+                    for stop_suggestion in stop_suggestions['suggestions']:
+                        stop_dict[stop_suggestion['value']] = {'y': str_to_geocord(stop_suggestion['ycoord']),
+                                                               'x': str_to_geocord(stop_suggestion['xcoord'])}
+                    current_station_cord = stop_dict.pop(stop_suggestions['suggestions'][0]['value'])
+                    stop.stop_lat = current_station_cord['y']
+                    stop.stop_lon = current_station_cord['x']
+                    commit()
+                except:
+                    pass
+        else:
+            if stop.stop_name in stop_dict:
+                stop_dict.pop(stop.stop_name)
+        stop.location_type = 0
+        stop.parent_station = None
+        if str(all_times[2]).strip() != '' and str(all_times[2]).strip() != route_long_name.strip():
+            headsign = str(all_times[2]).strip()
+        new_stop_time = StopTime(stop_id=stop.stop_id, trip_id=trip.trip_id,
+                                 arrival_time=all_times[0] if all_times[0] == '' else all_times[0] + ':00',
+                                 departure_time=all_times[1] if all_times[1] == '' else all_times[1] + ':00',
+                                 stop_sequence=i + 1, pickup_type=0, drop_off_type=0, stop_headsign=headsign)
+        if new_stop_time.arrival_time == '':
+            new_stop_time.arrival_time = new_stop_time.departure_time
+        elif new_stop_time.departure_time == '':
+            new_stop_time.departure_time = new_stop_time.arrival_time
+        add_stop_time(new_stop_time)
+    pass
 
 
 def str_to_geocord(cord: str):

@@ -73,20 +73,23 @@ def add_shape():
 
 def add_transport_name(route, url):
     transport_type_name = TransportTypeImage(name=route, oebb_url=url)
-    try:
+    data = s.query(TransportTypeImage).filter(TransportTypeImage.name == route).first()
+    if data is None:
         s.add(transport_type_name)
         commit()
-    except SQLAlchemyError:
-        s.rollback()
-
+    else:
+        pass
+    return
 
 def add_stop_time_text(text1):
     stop_time_text = StopTimeText(working_days=text1)
-    try:
+    data = s.query(StopTimeText).filter(StopTimeText.working_days == text1).first()
+    if data is None:
         s.add(stop_time_text)
         commit()
-    except SQLAlchemyError:
-        s.rollback()
+    else:
+        pass
+    return
 
 
 def add_calendar_dates(calendar_dates: [CalendarDate], only_dates_as_string: str, service: Calendar):
