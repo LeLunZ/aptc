@@ -798,11 +798,12 @@ def export_all_tables():
     file_names = []
     os.chdir('./db')
     for i in tables:
-        os.remove(f'./{i.__table__.name}.txt')
+        try:
+            os.remove(f'./{i.__table__.name}.txt')
+        except FileNotFoundError:
+            pass
     for i in tables:
         file_names.append(f'./{i.__table__.name}.txt')
-
-
         if i is StopTime:
             q = query_element(i)
             with open(f'./{i.__table__.name}.txt', 'a') as outfile:
