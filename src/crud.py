@@ -16,6 +16,8 @@ from Models.transport_type_image import TransportTypeImage
 from Models.stop_time_text import StopTimeText
 from sqlalchemy.exc import SQLAlchemyError
 
+import sqlalchemy
+
 try:
     DATABASE_URI = 'postgres+psycopg2://' + str(os.environ['postgres'])
 except KeyError:
