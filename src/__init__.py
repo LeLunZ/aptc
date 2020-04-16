@@ -772,8 +772,6 @@ def load_route(url, debug=False):
         else:
             if stop.stop_name in stop_dict:
                 stop_dict.pop(stop.stop_name)
-        stop.location_type = 0
-        stop.parent_station = None
         if str(all_times[2]).strip() != '' and str(all_times[2]).strip() != route_long_name.strip():
             headsign = str(all_times[2]).strip()
         new_stop_time = StopTime(stop_id=stop.stop_id, trip_id=trip.trip_id,

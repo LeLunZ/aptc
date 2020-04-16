@@ -81,6 +81,7 @@ def add_transport_name(route, url):
         pass
     return
 
+
 def add_stop_time_text(text1):
     stop_time_text = StopTimeText(working_days=text1)
     data = s.query(StopTimeText).filter(StopTimeText.working_days == text1).first()
@@ -142,6 +143,8 @@ def add_stop(stop):
         if data.stop_url is None and stop.stop_url is not None:
             data.stop_url = stop.stop_url
         if (data.location_type is None and stop.location_type is not None) or data.location_type == 1:
+            if stop.location_type == 0:
+                data.parent_station = None
             data.location_type = stop.location_type
         commit()
         stop = data
@@ -314,7 +317,7 @@ def windowed_query(q, column, windowsize):
     """"Break a Query into windows on a given column."""
 
     for whereclause in column_windows(
-                                        q.session,
-                                        column, windowsize):
+            q.session,
+            column, windowsize):
         for row in q.filter(whereclause).order_by(column):
             yield row
