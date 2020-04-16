@@ -705,6 +705,60 @@ def load_route(url, debug=False):
             route_type = 3
         elif route_info == '/img/vs_oebb/str_pic.gif':
             route_type = 0
+        elif route_info == '/img/vs_oebb/er_pic.gif':
+            route_type = 2
+        elif route_info == '/img/vs_oebb/en_pic.gif':
+            route_type = 2
+        elif route_info == '/img/vs_oebb/atb_pic.gif':
+            route_type = 115
+        elif route_info == '/img/vs_oebb/ice_pic.gif':
+            route_type = 101
+        elif route_info == '/img/vs_oebb/arz_pic.gif':
+            route_type = 115
+        elif route_info == '/img/vs_oebb/d_pic.gif':
+            route_type = 2
+        elif route_info == '/img/vs_oebb/ast_pic.gif':
+            route_type = 1500
+        elif route_info == '/img/vs_oebb/rb_pic.gif':
+            route_type = 2
+        elif route_info == '/img/vs_oebb/bsv_pic.gif':
+            route_type = 3
+        elif route_info == '/img/vs_oebb/cat_pic.gif':
+            route_type = 1
+        elif route_info == '/img/vs_oebb/rj_pic.gif':
+            route_type = 2
+        elif route_info == '/img/vs_oebb/nj_pic.gif':
+            route_type = 2
+        elif route_info == '/img/vs_oebb/ec_pic.gif':
+            route_type = 102
+        elif route_info == '/img/vs_oebb/ic_pic.gif':
+            route_type = 102
+        elif route_info == '/img/vs_oebb/obu_pic.gif':
+            route_type = 11
+        elif route_info == '/img/vs_oebb/icb_pic.gif':
+            route_type = 3
+        elif route_info == '/img/vs_oebb/dps_pic.gif':
+            route_type = 2
+        elif route_info == '/img/vs_oebb/u_pic.gif':
+            route_type = 1
+        elif route_info == '/img/vs_oebb/wb_pic.gif':
+            route_type = 2
+        elif route_info == '/img/vs_oebb/rjx_pic.gif':
+            route_type = 2
+        elif route_info == '/img/vs_oebb/cjx_pic.gif':
+            route_type = 2
+        elif route_info == '/img/vs_oebb/t84_pic.gif':
+            route_type = 1700
+        elif route_info == '/img/vs_oebb/x70_pic.gif':
+            route_type = 1700
+        elif route_info == '/img/vs_oebb/u70_pic.gif':
+            route_type = 1700
+        elif route_info == '/img/vs_oebb/sb_pic.gif':
+            route_type = 6
+        elif route_info == '/img/vs_oebb/lkb_pic.gif':
+            route_type = 0
+        elif route_info == '/img/vs_oebb/rer_pic.gif':
+            route_type = 109
         else:
             add_transport_name(route_info, url)
 
