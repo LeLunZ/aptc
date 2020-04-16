@@ -138,7 +138,7 @@ def add_stop(stop):
             data.stop_lon = stop.stop_lon
         if data.stop_url is None and stop.stop_url is not None:
             data.stop_url = stop.stop_url
-        if data.location_type is None and stop.location_type is not None:
+        if (data.location_type is None and stop.location_type is not None) or data.location_type == 1:
             data.location_type = stop.location_type
         commit()
         stop = data
