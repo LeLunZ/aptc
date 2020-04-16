@@ -798,12 +798,25 @@ def export_all_tables():
     file_names = []
     os.chdir('./db')
     for i in tables:
+        os.remove(f'./{i.__table__.name}.txt')
+    for i in tables:
         file_names.append(f'./{i.__table__.name}.txt')
-        with open(f'./{i.__table__.name}.txt', 'w') as outfile:
-            outcsv = csv.writer(outfile, delimiter=',')
-            records = get_from_table(i)
-            outcsv.writerow(i.firstline())
-            [outcsv.writerow(row.tocsv()) for row in records]
+
+
+        if i is StopTime:
+            q = query_element(i)
+            with open(f'./{i.__table__.name}.txt', 'a') as outfile:
+                outcsv = csv.writer(outfile, delimiter=',')
+                outcsv.writerow(i.firstline())
+                for dataset in windowed_query(q, StopTime.stop_times_id, 1000):
+                    outcsv.writerow(dataset.tocsv())
+        else:
+            with open(f'./{i.__table__.name}.txt', 'a') as outfile:
+                outcsv = csv.writer(outfile, delimiter=',')
+                outcsv.writerow(i.firstline())
+                records = get_from_table(i)
+                for row in records:
+                    outcsv.writerow(row.tocsv())
 
     with ZipFile('./Archiv.zip', 'w') as zip:
         for file in file_names:
