@@ -61,8 +61,9 @@ def add_route(route: Route):
     return route
 
 
-def route_exist(url):
-    data: Trip = s.query(Trip).filter(Trip.oebb_url == url).first()
+def route_exist(url, route_name):
+    data: Trip = s.query(Trip.route_id).filter(Trip.oebb_url == url)
+    data: Route = s.query(Route).filter(and_(Route.route_long_name == route_name, Route.route_id.in_(data))).first()
     return data is not None
 
 
