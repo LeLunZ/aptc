@@ -682,14 +682,15 @@ def extract_dates_from_oebb_page(tree, calendar):
 
 def load_route(url, debug=False):
     url = url.split('?')[0]
-    traffic_day = None
-    route_page = requests_retry_session().get(url, timeout=3, verify=False)
-    tree = html.fromstring(route_page.content)
-    route_short_name = \
-        tree.xpath('((//*/tr[@class=$first])[1]/td[@class=$second])[last()]/text()', first='zebracol-2',
-                   second='center sepline')[0].strip()
-    route_long_name = route_short_name
-    if not route_exist(url, route_long_name):
+    if not route_exist(url):
+        traffic_day = None
+        route_page = requests_retry_session().get(url, timeout=3, verify=False)
+        tree = html.fromstring(route_page.content)
+        route_short_name = \
+            tree.xpath('((//*/tr[@class=$first])[1]/td[@class=$second])[last()]/text()', first='zebracol-2',
+                       second='center sepline')[0].strip()
+        route_long_name = route_short_name
+
         all_stations = tree.xpath('//*/tr[@class=$first or @class=$second]/*/a/text()', first='zebracol-2',
                                   second="zebracol-1")
         all_links_of_station = tree.xpath('//*/tr[@class=$first or @class=$second]/*/a/@href', first='zebracol-2',
