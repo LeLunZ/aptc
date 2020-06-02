@@ -883,6 +883,7 @@ def load_allg_feiertage():
         add_allg_feiertage(f.text, end_date.year)
 
     driver.quit()
+    print("finished loading feiertage", flush=True)
 
 
 def get_std_date():

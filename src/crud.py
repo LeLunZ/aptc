@@ -29,9 +29,12 @@ from sqlalchemy.orm import sessionmaker, aliased
 
 engine = create_engine(DATABASE_URI)
 
+print("Database engine created", flush=True)
+
 Session = sessionmaker(bind=engine)
 
 s = Session(autoflush=False)
+
 
 
 def add_agency(agency):
