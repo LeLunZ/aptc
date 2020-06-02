@@ -48,7 +48,7 @@ try:
 except:
     pass
 
-date = '03.03.2020'
+date = '22.06.2020'
 
 logging.basicConfig(filename='./aptc.log',
                     filemode='a',
@@ -168,6 +168,16 @@ def get_all_routes_from_station(station_id):
     return json_data
 
 
+days_name = {
+    0: 'Mo',
+    1: 'Di',
+    2: 'Mi',
+    3: 'Do',
+    4: 'Fr',
+    5: 'Fr',
+    6: 'Fr',
+}
+
 def get_all_routes_of_transport_and_station(transport_number, station):
     url = "http://fahrplan.oebb.at/bin/trainsearch.exe/dn"
     querystring = {"ld": "2"}
@@ -176,7 +186,7 @@ def get_all_routes_of_transport_and_station(transport_number, station):
         'stationname': station['value'],
         'REQ0JourneyStopsSID': station['id'],
         'selectDate': 'oneday',
-        'date': "Di, 03.03.2020",
+        'date': "Mo, 22.06.2020",
         'wDayExt0': 'Mo|Di|Mi|Do|Fr|Sa|So',
         'periodStart': '15.09.2019',
         'periodEnd': '12.12.2020',
