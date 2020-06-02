@@ -35,6 +35,8 @@ Session = sessionmaker(bind=engine)
 
 s = Session(autoflush=False)
 
+print("Connected to " + str(DATABASE_URI), flush=True)
+
 
 
 def add_agency(agency):
