@@ -30,12 +30,10 @@ from sqlalchemy.orm import sessionmaker, aliased
 engine = create_engine(DATABASE_URI)
 
 print("Database engine created", flush=True)
-
+print(str(DATABASE_URI), flush=True)
 Session = sessionmaker(bind=engine)
 
 s = Session(autoflush=False)
-
-print("Connected to " + str(DATABASE_URI), flush=True)
 
 
 
