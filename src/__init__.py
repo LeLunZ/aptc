@@ -178,6 +178,7 @@ days_name = {
     6: 'Fr',
 }
 
+
 def get_all_routes_of_transport_and_station(transport_number, station):
     url = "http://fahrplan.oebb.at/bin/trainsearch.exe/dn"
     querystring = {"ld": "2"}
@@ -756,7 +757,6 @@ def load_route(url, debug=False):
         global stop_dict
         headsign = None
         stop_before_current = None
-        add_to_hours = 0
         for i in range(len(all_stations)):
             all_times = list(map(lambda x: x.strip(),
                                  tree.xpath('//*/tr[@class=$first or @class=$second][$count]/td[@class=$third]/text()',
@@ -797,11 +797,11 @@ def load_route(url, debug=False):
             elif new_stop_time.departure_time == '':
                 new_stop_time.departure_time = new_stop_time.arrival_time
             if int(new_stop_time.arrival_time[0:2]) > int(new_stop_time.departure_time[0:2]):
-                add_to_hours +=24
-                new_stop_time.departure_time = f'{int(new_stop_time.departure_time[0:2])+24}{new_stop_time.departure_time[2:]}'
-            if stop_before_current is not None and int(stop_before_current.departure_time[0:2]) > int(new_stop_time.arrival_time[0:2]):
-                new_stop_time.arrival_time = f'{int(new_stop_time.arrival_time[0:2])+24}{new_stop_time.arrival_time[2:]}'
-                new_stop_time.departure_time = f'{int(new_stop_time.arrival_time[0:2])+24}{new_stop_time.arrival_time[2:]}'
+                new_stop_time.departure_time = f'{int(new_stop_time.departure_time[0:2]) + 24}{new_stop_time.departure_time[2:]}'
+            if stop_before_current is not None and int(stop_before_current.departure_time[0:2]) > int(
+                    new_stop_time.arrival_time[0:2]):
+                new_stop_time.arrival_time = f'{int(new_stop_time.arrival_time[0:2]) + 24}{new_stop_time.arrival_time[2:]}'
+                new_stop_time.departure_time = f'{int(new_stop_time.arrival_time[0:2]) + 24}{new_stop_time.arrival_time[2:]}'
             stop_before_current = new_stop_time
             add_stop_time(new_stop_time)
         pass
