@@ -147,6 +147,7 @@ def add_stop(stop):
             if stop.location_type == 0:
                 data.parent_station = None
             data.location_type = stop.location_type
+        s.add(data)
         commit()
         stop = data
     return stop
