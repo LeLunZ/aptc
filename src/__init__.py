@@ -810,7 +810,7 @@ def load_route(url, debug=False):
 def str_to_geocord(cord: str):
     if len(cord) == 8:
         return float(cord[:2] + '.' + cord[2:])
-    return float(cord[:1] + '.' + cord[1:])
+    return float(cord[0] + '.' + cord[1:])
 
 
 def save_simple_stops(names, ids, main_station):
