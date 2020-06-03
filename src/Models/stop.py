@@ -11,7 +11,7 @@ class Stop(Base):
     stop_name = Column(Text, nullable=False)
     stop_desc = Column(Text, nullable=True)
     stop_lat = Column(Float, nullable=True)
-    stop_lon = Column(Float, nullable=True)  # TODO: Changeto False if needed
+    stop_lon = Column(Float, nullable=True)
     zone_id = Column(Text, nullable=True)
     stop_url = Column(Text, nullable=True)
     location_type = Column(Integer, nullable=True)
