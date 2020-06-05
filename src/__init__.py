@@ -165,7 +165,7 @@ def get_all_routes_from_station(station_id):
                 int(station_id)) + '&boardType=arr&time=00:00'
                                    '&additionalTime=0&maxJourneys=100000&outputMode=tickerDataOnly&start=yes&selectDate'
                                    '=period&dateBegin=' + date + 'dateEnd=' + date + '&productsFilter=1011111111011',
-            timeout=20, verify=False)
+            timeout=5, verify=False)
         json_data = json.loads(routes_of_station.content.decode('iso-8859-1')[14:-1])
     except:
         json_data = None
