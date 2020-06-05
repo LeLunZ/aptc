@@ -164,8 +164,7 @@ def get_all_routes_from_station(station_id):
             'http://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_scotty.vs_liveticker&evaId=' + str(
                 int(station_id)) + '&boardType=arr&time=00:00'
                                    '&additionalTime=0&maxJourneys=100000&outputMode=tickerDataOnly&start=yes&selectDate'
-                                   '=period&dateBegin=' + date + 'dateEnd=' + date + '&productsFilter=1011111111011',
-            timeout=5, verify=False)
+                                   '=period&dateBegin=' + date + 'dateEnd=' + date + '&productsFilter=1011111111011', verify=False)
         json_data = json.loads(routes_of_station.content.decode('iso-8859-1')[14:-1])
     except:
         json_data = None
@@ -994,7 +993,7 @@ if __name__ == "__main__":
                         while (json_data is None or json_data['maxJ'] is None) and count < 2:
                             json_data = get_all_routes_from_station(station_id)
                             count += 1
-                        if json_data['maxJ'] is not None:
+                        if json_data is not None and json_data['maxJ'] is not None:
                             public_transportation_journey.extend(
                                 list(map(lambda x: x, json_data['journey'])))
 
