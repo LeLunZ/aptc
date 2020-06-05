@@ -109,7 +109,8 @@ route_types = {
     '/img/vs_oebb/u70_pic.gif': 1700,
     '/img/vs_oebb/sb_pic.gif': 6,
     '/img/vs_oebb/lkb_pic.gif': 0,
-    '/img/vs_oebb/rer_pic.gif': 109
+    '/img/vs_oebb/rer_pic.gif': 109,
+    '/img/vs_oebb/sch_pic.gif': 3
 }
 
 
@@ -1017,7 +1018,6 @@ if __name__ == "__main__":
             logging.debug(f"finished {row}")
 
 exit(0)
-# TODO: Add request O notation
 
 # while True:
 #     re = requests.get("http://fahrplan.oebb.at/bin/stboard.exe/dn?ld=3&L=vs_postbus&")
