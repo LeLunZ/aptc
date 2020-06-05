@@ -16,6 +16,7 @@ class Calendar(Base):
     sunday = Column(Boolean, nullable=False)
     start_date = Column(Numeric, nullable=True)
     end_date = Column(Numeric, nullable=False)
+    calendar_dates_hash = Column(Text, nullable=True)
 
     def __repr__(self):
         return "<Calendar(id='{}', start='{}', end={})>" \

@@ -1,7 +1,7 @@
 import copy
 import json
 import logging
-
+import time
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
@@ -110,7 +110,9 @@ route_types = {
     '/img/vs_oebb/sb_pic.gif': 6,
     '/img/vs_oebb/lkb_pic.gif': 0,
     '/img/vs_oebb/rer_pic.gif': 109,
-    '/img/vs_oebb/sch_pic.gif': 3
+    '/img/vs_oebb/sch_pic.gif': 3,
+    '/img/vs_oebb/rgj_pic.gif': 2,
+    '/img/vs_oebb/val_pic.gif': 3
 }
 
 
@@ -199,7 +201,7 @@ def get_all_routes_of_transport_and_station(transport_number, station):
         'stationFilter': '81,01,02,03,04,05,06,07,08,09',
         'start': 'Suchen'
     }
-    response = requests_retry_session().post(url, data=payload, params=querystring, timeout=3, verify=False)
+    response = requests_retry_session().post(url, data=payload, params=querystring, verify=False)
     tree = html.fromstring(response.content)
     all_routes = tree.xpath('//*/td[@class=$name]/a/@href', name='fcell')
     return all_routes
@@ -292,10 +294,11 @@ def add_days_to_calendar(calendar: Calendar, begin: str, end: str):
 def extract_date_from_str(calendar: Calendar, date_str: str):
     official_weekdays = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
     date_str = date_str.replace(';', '')
-    add_stop_time_text(date_str)
     working_dates = date_str
     irregular_dates = None
     extended_dates = None
+    days_done = False
+    has_fixed_date = False
     if 'nicht' in date_str:
         working_dates = date_str.split('nicht')[0]
         irregular_dates = ' '.join(date_str.split('nicht')[1:])
@@ -317,6 +320,7 @@ def extract_date_from_str(calendar: Calendar, date_str: str):
         calendar.friday = True
         calendar.saturday = True
         calendar.sunday = True
+        days_done = True
 
     if 'fährt am' in working_dates:
         index_a = date_arr.index('am')
@@ -329,6 +333,7 @@ def extract_date_from_str(calendar: Calendar, date_str: str):
         else:
             start_date.year = end_date.year
             finish_date = start_date
+        has_fixed_date = True
         merge_date(date1=start_date, date2=finish_date)
     else:
         start_date = begin_date
@@ -337,6 +342,7 @@ def extract_date_from_str(calendar: Calendar, date_str: str):
     date_arr = list(map(lambda x: x.replace(',', ''), date_arr))
     for count, d in enumerate(date_arr):
         if d in official_weekdays:
+            days_done = True
             index = count
             if date_arr[index - 1] == '-':
                 pass
@@ -374,7 +380,7 @@ def extract_date_from_str(calendar: Calendar, date_str: str):
             if date is not None:
                 possible_1 = date_arr[index + 1].replace('.', '')
                 try:
-                    day = int(possible_1) if 0 < int(possible_1) < 30 else None
+                    day = int(possible_1) if 0 < int(possible_1) < 30 else None # leave it here. for exception
                     date2 = extract_date_from_date_arr(date_arr[index + 1:index + 4])
                     last_index = index + 4
                 except:
@@ -611,7 +617,15 @@ def extract_date_from_str(calendar: Calendar, date_str: str):
         exceptions[f'{date}'] = exceptions_calendar_date[-1]
         calendar_data_as_string += f',{date}{exception_type}'
     calendar_data_as_string = calendar_data_as_string[1:]
-    calendar = add_calendar_dates(exceptions_calendar_date, calendar_data_as_string, calendar)
+    if has_fixed_date and not days_done:
+        calendar.monday = True
+        calendar.tuesday = True
+        calendar.wednesday = True
+        calendar.thursday = True
+        calendar.friday = True
+        calendar.saturday = True
+        calendar.sunday = True
+    calendar = add_calendar_dates2(exceptions_calendar_date, calendar_data_as_string, calendar)
     return calendar
 
 
@@ -659,7 +673,7 @@ def extract_dates_from_oebb_page(tree, calendar):
             day = f'0{day}'
         if month < 10:
             month = f'0{month}'
-        if month is 12 and len(months_with_first_and_last_day) > 1:
+        if month == 12 and len(months_with_first_and_last_day) > 1:
             year = begin_date.year
         start_date = int(f'{year}{month}{day}')
         day = months_with_first_and_last_day[-1][2]
@@ -688,7 +702,7 @@ def extract_dates_from_oebb_page(tree, calendar):
             exceptions_calendar_date[-1].date = date
             calendar_data_as_string += f',{date}{1}'
         calendar_data_as_string = calendar_data_as_string[1:]
-        calendar = add_calendar_dates(exceptions_calendar_date, calendar_data_as_string, calendar)
+        calendar = add_calendar_dates2(exceptions_calendar_date, calendar_data_as_string, calendar)
     else:
         calendar = extract_date_from_str(calendar, traffic_day)
     return calendar

@@ -93,6 +93,7 @@ def add_stop_time_text(text1):
     return
 
 
+# deprecated
 def add_calendar_dates(calendar_dates: [CalendarDate], only_dates_as_string: str, service: Calendar):
     if only_dates_as_string == '':
         subquery = ~s.query(CalendarDate).filter(CalendarDate.service_id == Calendar.service_id).exists()
@@ -130,15 +131,55 @@ def add_calendar_dates(calendar_dates: [CalendarDate], only_dates_as_string: str
     return service
 
 
-def add_stop(stop):
+def add_calendar_dates2(calendar_dates: [CalendarDate], only_dates_as_string: str, service: Calendar):
+    if only_dates_as_string == '':
+        data = s.query(Calendar).filter(
+            and_(Calendar.calendar_dates_hash == None, Calendar.start_date == service.start_date,
+                 Calendar.end_date == service.end_date,
+                 Calendar.monday == service.monday, Calendar.tuesday == service.tuesday,
+                 Calendar.wednesday == service.wednesday, Calendar.thursday == service.thursday,
+                 Calendar.friday == service.friday, Calendar.saturday == service.saturday,
+                 Calendar.sunday == service.sunday)).first()
+        if data is None:
+            s.add(service)
+            commit()
+            s.refresh(service)
+        else:
+            service = data
+    else:
+        hash_value = str(hash(only_dates_as_string))
+        calendar = s.query(Calendar).filter(
+            and_(Calendar.calendar_dates_hash == hash_value, Calendar.start_date == service.start_date,
+                 Calendar.end_date == service.end_date,
+                 Calendar.monday == service.monday, Calendar.tuesday == service.tuesday,
+                 Calendar.wednesday == service.wednesday, Calendar.thursday == service.thursday,
+                 Calendar.friday == service.friday, Calendar.saturday == service.saturday,
+                 Calendar.sunday == service.sunday))
+        calendar = calendar.first()
+        if calendar is None:
+            service.calendar_dates_hash = hash_value
+            s.add(service)
+            commit()
+            s.refresh(service)
+            for i in calendar_dates:
+                i.service_id = service.service_id
+            s.bulk_save_objects(calendar_dates)
+            commit()
+        else:
+            service = calendar
+    return service
+
+
+def add_stop(stop: Stop):
     data: Stop = s.query(Stop).filter(Stop.stop_name == stop.stop_name).first()
     if data is None:
         s.add(stop)
         commit()
         s.refresh(stop)
-    elif stop.stop_lat is not None or stop.stop_url is not None or stop.location_type is not None:
+    elif stop.stop_lat is not None or stop.stop_url is not None or stop.stop_lon is not None or stop.location_type is not None:
         if data.stop_lat is None and stop.stop_lat is not None:
             data.stop_lat = stop.stop_lat
+        if data.stop_lon is None and stop.stop_lon is not None:
             data.stop_lon = stop.stop_lon
         if data.stop_url is None and stop.stop_url is not None:
             data.stop_url = stop.stop_url
