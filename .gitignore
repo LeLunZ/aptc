@@ -2,6 +2,5 @@ __pycache__
 venv
 stop_example
 .idea
-bus_stops.csv
 *log
 db
