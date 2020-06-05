@@ -24,7 +24,9 @@ class Stop(Base):
 
     @staticmethod
     def firstline():
-        return ['stop_id', 'stop_code', 'stop_name', 'stop_desc', 'stop_lat', 'stop_lon', 'zone_id', 'stop_url', 'location_type', 'parent_station', 'wheelchair_boarding']
+        return ['stop_id', 'stop_code', 'stop_name', 'stop_desc', 'stop_lat', 'stop_lon', 'zone_id', 'stop_url',
+                'location_type', 'parent_station', 'wheelchair_boarding']
 
     def tocsv(self):
-        return [self.stop_id, self.stop_code, self.stop_name, self.stop_desc, self.stop_lat, self.stop_lon, self.zone_id, self.stop_url, self.location_type, self.parent_station, self.wheelchair_boarding]
+        return [self.stop_id, self.stop_code, self.stop_name, self.stop_desc, self.stop_lat, self.stop_lon,
+                self.zone_id, self.stop_url, self.location_type, self.parent_station, self.wheelchair_boarding]
