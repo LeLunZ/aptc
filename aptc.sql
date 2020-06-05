@@ -1,11 +1,13 @@
-DROP DOMAIN IF EXISTS wgs84_lat CASCADE;
-CREATE DOMAIN wgs84_lat AS DOUBLE PRECISION CHECK(VALUE >= -90 AND VALUE <= 90);
+create domain wgs84_lat as double precision
+    constraint wgs84_lat_check check ((VALUE >= ('-90'::integer)::double precision) AND
+                                      (VALUE <= (90)::double precision));
 
-DROP DOMAIN IF EXISTS wgs84_lon CASCADE;
-CREATE DOMAIN wgs84_lon AS DOUBLE PRECISION CHECK(VALUE >= -180 AND VALUE <= 180);
+create domain wgs84_lon as double precision
+    constraint wgs84_lon_check check ((VALUE >= ('-180'::integer)::double precision) AND
+                                      (VALUE <= (180)::double precision));
 
-DROP DOMAIN IF EXISTS gtfstime CASCADE;
-CREATE DOMAIN gtfstime AS text CHECK(VALUE ~ '^[0-9]?[0-9]:[0-5][0-9]:[0-5][0-9]$');
+create domain gtfstime as text
+    constraint gtfstime_check check (VALUE ~ '^[0-9]?[0-9]:[0-5][0-9]:[0-5][0-9]$'::text);
 
 create table agency
 (
@@ -61,22 +63,26 @@ create table routes
 
 create table calendar
 (
-    service_id serial     not null
+    service_id          serial     not null
         constraint calendar_pkey
             primary key,
-    monday     boolean    not null,
-    tuesday    boolean    not null,
-    wednesday  boolean    not null,
-    thursday   boolean    not null,
-    friday     boolean    not null,
-    saturday   boolean    not null,
-    sunday     boolean    not null,
-    start_date numeric(8),
-    end_date   numeric(8) not null
+    monday              boolean    not null,
+    tuesday             boolean    not null,
+    wednesday           boolean    not null,
+    thursday            boolean    not null,
+    friday              boolean    not null,
+    saturday            boolean    not null,
+    sunday              boolean    not null,
+    start_date          numeric(8),
+    end_date            numeric(8) not null,
+    calendar_dates_hash text
 );
 
 create index calendar_end_date_start_date_monday_tuesday_wednesday_thursday_
     on calendar (end_date, start_date, monday, tuesday, wednesday, thursday, friday, saturday, sunday);
+
+create index calendar_dates_hash_
+    on calendar (calendar_dates_hash);
 
 create table shapes
 (
@@ -175,3 +181,4 @@ create table stop_time_text
         constraint stop_time_text_pk
             primary key
 );
+

@@ -137,7 +137,7 @@ def requests_retry_session(
 def get_location_suggestion_from_string(location: str):
     oebb_location = requests_retry_session().get(
         'http://fahrplan.oebb.at/bin/ajax-getstop.exe/dn?REQ0JourneyStopsS0A=1&REQ0JourneyStopsB=12&S=' + location + '?&js=false&',
-        timeout=3, verify=False)
+        verify=False)
     locations = oebb_location.content[8:-22]
     locations = json.loads(locations.decode('iso-8859-1'))
     return locations
@@ -712,7 +712,7 @@ def load_route(url, debug=False):
     url = url.split('?')[0]
     if not route_exist(url):
         traffic_day = None
-        route_page = requests_retry_session().get(url, timeout=3, verify=False)
+        route_page = requests_retry_session().get(url, timeout=5, verify=False)
         tree = html.fromstring(route_page.content)
         route_short_name = \
             tree.xpath('((//*/tr[@class=$first])[1]/td[@class=$second])[last()]/text()', first='zebracol-2',
@@ -774,6 +774,7 @@ def load_route(url, debug=False):
         global stop_dict
         headsign = None
         stop_before_current = None
+        global stop_dict
         for i in range(len(all_stations)):
             all_times = list(map(lambda x: x.strip(),
                                  tree.xpath('//*/tr[@class=$first or @class=$second][$count]/td[@class=$third]/text()',
@@ -837,6 +838,8 @@ def save_simple_stops(names, ids, main_station):
             if index == 0:
                 main_station.location_type = 1
                 main_station.parent_station = None
+                add_stop(main_station)
+                commit()
                 continue
             new_stop = Stop(stop_name=name, stop_lat=main_station.stop_lat, stop_lon=main_station.stop_lon,
                             location_type=stop_location_type,
@@ -905,14 +908,14 @@ def load_allg_feiertage():
     else:
         driver = webdriver.Chrome('./chromedriver')
     driver.get('https://www.timeanddate.de/feiertage/oesterreich/' + str(begin_date.year))
-    WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.XPATH, '//*/tbody')))
+    WebDriverWait(driver, 7).until(EC.presence_of_element_located((By.XPATH, '//*/tbody')))
     elements = driver.find_elements_by_xpath("//*/tbody/tr[@class='showrow']/th")
 
     for f in elements:
         add_allg_feiertage(f.text, begin_date.year)
 
     driver.get('https://www.timeanddate.de/feiertage/oesterreich/' + str(end_date.year))
-    WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.XPATH, '//*/tbody')))
+    WebDriverWait(driver, 7).until(EC.presence_of_element_located((By.XPATH, '//*/tbody')))
     elements = driver.find_elements_by_xpath("//*/tbody/tr[@class='showrow']/th")
     for f in elements:
         add_allg_feiertage(f.text, end_date.year)
