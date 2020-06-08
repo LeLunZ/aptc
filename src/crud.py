@@ -239,10 +239,15 @@ def add_calendar(service: Calendar):
     return service
 
 
-def add_trip(trip):
-    s.add(trip)
-    commit()
-    s.refresh(trip)
+def add_trip(trip, hash1):
+    data: Trip = s.query(Trip).filter(and_(Trip.service_id == trip.service_id, Trip.route_id==trip.route_id, trip.station_departure_time_hash==hash1)).first()
+    trip.station_departure_time_hash = hash1
+    if data is None:
+        s.add(trip)
+        commit()
+        s.refresh(trip)
+    else:
+        raise Exception('Trip already exists! noob.')
     return trip
 
 

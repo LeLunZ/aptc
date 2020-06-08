@@ -108,7 +108,8 @@ create table trips
     trip_id               serial  not null
         constraint trips_pkey
             primary key,
-    oebb_url              text
+    oebb_url              text,
+    station_departure_time_hash text
 );
 
 create table frequencies
