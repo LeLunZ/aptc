@@ -171,27 +171,36 @@ def add_calendar_dates2(calendar_dates: [CalendarDate], only_dates_as_string: st
 
 
 def add_stop(stop: Stop):
-    data: Stop = s.query(Stop).filter(Stop.stop_name == stop.stop_name).first()
-    if stop.stop_lon == 0 or data is not None and data.stop_lon == 0:
-        print("lol")
-    if data is None:
+    datas = s.query(Stop).filter(Stop.stop_name == stop.stop_name).all()
+    if datas is None or datas is []:
         s.add(stop)
         commit()
         s.refresh(stop)
-    elif stop.stop_lat is not None or stop.stop_url is not None or stop.stop_lon is not None or stop.location_type is not None:
-        if data.stop_lat is None and stop.stop_lat is not None:
-            data.stop_lat = stop.stop_lat
-        if data.stop_lon is None and stop.stop_lon is not None:
-            data.stop_lon = stop.stop_lon
-        if data.stop_url is None and stop.stop_url is not None:
-            data.stop_url = stop.stop_url
-        if (data.location_type is None and stop.location_type is not None) or data.location_type == 1:
-            if stop.location_type == 0:
-                data.parent_station = None
-            data.location_type = stop.location_type
-        s.add(data)
-        commit()
-        stop = data
+    else:
+        add_to_stops = True
+        for data in datas:
+            data: Stop = data
+            some_thing_changed = False
+            if stop.stop_lat is not None or stop.stop_url is not None or stop.stop_lon is not None:
+                if data.stop_lat is None and stop.stop_lat is not None:
+                    data.stop_lat = stop.stop_lat
+                    some_thing_changed = True
+                if data.stop_lon is None and stop.stop_lon is not None:
+                    data.stop_lon = stop.stop_lon
+                    some_thing_changed = True
+                if data.stop_url is None and stop.stop_url is not None:
+                    data.stop_url = stop.stop_url
+                    some_thing_changed = True
+                if data.location_type == stop.location_type:
+                    add_to_stops = False
+                    stop = data
+                if some_thing_changed:
+                    s.add(data)
+                    commit()
+        if add_to_stops:
+            s.add(stop)
+            commit()
+            s.refresh(stop)
     return stop
 
 
@@ -240,7 +249,8 @@ def add_calendar(service: Calendar):
 
 
 def add_trip(trip, hash1):
-    data: Trip = s.query(Trip).filter(and_(Trip.service_id == trip.service_id, Trip.route_id==trip.route_id, trip.station_departure_time_hash==hash1)).first()
+    data: Trip = s.query(Trip).filter(and_(Trip.service_id == trip.service_id, Trip.route_id == trip.route_id,
+                                           trip.station_departure_time_hash == hash1)).first()
     trip.station_departure_time_hash = hash1
     if data is None:
         s.add(trip)
