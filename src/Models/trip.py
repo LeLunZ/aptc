@@ -16,7 +16,7 @@ class Trip(Base):
     wheelchair_accessible = Column(Text, nullable=True)
     trip_id = Column(Integer, nullable=False, primary_key=True, autoincrement=True)
     oebb_url = Column(Text, nullable=True)
-    station_departure_time_hash = Column(Text, nullable=False)
+    #station_departure_time_hash = Column(Text, nullable=False)
 
     def __repr__(self):
         return "<Trip(name='{}', id={})>" \
