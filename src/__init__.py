@@ -862,7 +862,10 @@ def export_all_tables():
     tables = [Agency, Calendar, CalendarDate, Frequency, Route, Shape, Stop, StopTime, Transfer, Trip]
     file_names = []
     os.chdir('./db')
-    os.remove('./Archiv.zip')
+    try:
+        os.remove('./Archiv.zip')
+    except FileNotFoundError:
+        pass
     for i in tables:
         try:
             os.remove(f'./{i.__table__.name}.txt')
