@@ -887,6 +887,7 @@ def export_all_tables():
                 records = get_from_table(i)
                 for row in records:
                     outcsv.writerow(row.tocsv())
+        print(f'finished {i.__table__.name}', flush=True)
 
     with ZipFile('./Archiv.zip', 'w') as zip:
         for file in file_names:
