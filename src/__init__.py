@@ -710,7 +710,7 @@ def extract_dates_from_oebb_page(tree, calendar):
 
 def load_route(url, debug=False):
     url = url.split('?')[0]
-    if not route_exist(url):
+    if not route_exist(url): # TODO: route exists should be checked with hash(route_name+first stop+Abfahrtszeit)+service_id
         traffic_day = None
         route_page = requests_retry_session().get(url, timeout=5, verify=False)
         tree = html.fromstring(route_page.content)
