@@ -172,10 +172,14 @@ def add_calendar_dates2(calendar_dates: [CalendarDate], only_dates_as_string: st
 
 def add_stop(stop: Stop):
     datas = s.query(Stop).filter(Stop.stop_name == stop.stop_name).all()
-    if datas is None or datas is [] or stop.stop_id is not None:
+    if datas is None or datas is []:
         s.add(stop)
         commit()
         s.refresh(stop)
+    elif stop.stop_id is not None:
+        s.merge(stop)
+        commit()
+        s.refresh()
     else:
         add_to_stops = True
         for data in datas:
