@@ -47,7 +47,7 @@ create unique index stops_stop_name_uindex
 create table routes
 (
     agency_id        integer,
-    route_short_name text   not null,
+    route_short_name text,
     route_long_name  text,
     route_desc       text,
     route_type       integer,

@@ -8,7 +8,7 @@ class Route(Base):
     __tablename__ = 'routes'
     agency_id = Column(Integer, nullable=True)
     route_id = Column(Integer, primary_key=True, autoincrement=True)
-    route_short_name = Column(Text, nullable=False)
+    route_short_name = Column(Text, nullable=True)
     route_long_name = Column(Text, nullable=False)
     route_desc = Column(Text, nullable=True)
     route_type = Column(Integer, nullable=True)
