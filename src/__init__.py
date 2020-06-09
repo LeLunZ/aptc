@@ -844,6 +844,8 @@ def save_simple_stops(names, ids, main_station):
             new_stop = Stop(stop_name=name, stop_lat=main_station.stop_lat, stop_lon=main_station.stop_lon,
                             location_type=0)
             new_stop = add_stop(new_stop)
+    else:
+        main_station = add_stop(main_station)
 
 
 def skip_stop(seq, begin, end):
