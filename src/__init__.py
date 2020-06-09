@@ -5,7 +5,8 @@ import time
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-
+from requests_futures.sessions import FuturesSession
+from concurrent.futures import as_completed
 if __name__ == "__main__":
     from Models.agency import Agency
     from Models.route import Route
@@ -20,6 +21,7 @@ if __name__ == "__main__":
     from Models.transfers import Transfer
     from Models.calendar_date import CalendarDate
     from crud import *
+
 from itertools import islice
 from selenium import webdriver
 import requests
@@ -122,7 +124,25 @@ def requests_retry_session(
         backoff_factor=0.2,
         session=None,
 ):
-    session = session or requests.Session()
+    session = session or requests.session()
+    retry = Retry(
+        total=retries,
+        read=retries,
+        connect=retries,
+        backoff_factor=backoff_factor
+    )
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+    return session
+
+
+def requests_retry_session_async(
+        retries=5,
+        backoff_factor=0.2,
+        session=None,
+):
+    session = session or FuturesSession()
     retry = Retry(
         total=retries,
         read=retries,
@@ -710,9 +730,10 @@ def extract_dates_from_oebb_page(tree, calendar):
     return calendar
 
 
-def load_route(url, debug=False):
+def load_route(url, debug=False, route_page=None):
     traffic_day = None
-    route_page = requests_retry_session().get(url, timeout=5, verify=False)
+    if route_page is None:
+        route_page = requests_retry_session().get(url, timeout=5, verify=False)
     tree = html.fromstring(route_page.content)
     route_short_name = \
         tree.xpath('((//*/tr[@class=$first])[1]/td[@class=$second])[last()]/text()', first='zebracol-2',
@@ -1024,11 +1045,14 @@ if __name__ == "__main__":
                             except Exception as e:
                                 logging.error(
                                     f'get_all_routes_of_transport_and_station {route} {main_station} {str(e)}')
-                        for route in routes:
-                            try:
-                                load_route(route)
-                            except Exception as e:
-                                logging.error(f'load_route {route} {repr(e)}')
+                        with requests_retry_session_async(session=FuturesSession()) as future_session:
+                            futures = [future_session.get(route, timeout=5, verify=False) for route in routes]
+                            for route_future in as_completed(futures):
+                                body = route_future.result()
+                                try:
+                                    load_route(body.url, route_page=body)
+                                except Exception as e:
+                                    logging.error(f'load_route {body.url} {repr(e)}')
                     except Exception as e:
                         log_error(f'get_all_name_of_transport_distinct {public_transportation_journey} {str(e)}')
                 except Exception as e:
