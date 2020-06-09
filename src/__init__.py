@@ -711,7 +711,6 @@ def extract_dates_from_oebb_page(tree, calendar):
 
 
 def load_route(url, debug=False):
-    url = url.split('?')[0]
     traffic_day = None
     route_page = requests_retry_session().get(url, timeout=5, verify=False)
     tree = html.fromstring(route_page.content)
@@ -1016,12 +1015,12 @@ if __name__ == "__main__":
                         if json_data is not None and json_data['maxJ'] is not None:
                             public_transportation_journey.extend(
                                 list(map(lambda x: x, json_data['journey'])))
-                    routes = []
+                    routes = set()
                     try:
                         all_transport = get_all_name_of_transport_distinct(public_transportation_journey)
                         for route in all_transport:
                             try:
-                                routes.extend(get_all_routes_of_transport_and_station(route, main_station))
+                                routes.update([yx.split('?')[0] for yx in get_all_routes_of_transport_and_station(route, main_station)])
                             except Exception as e:
                                 logging.error(
                                     f'get_all_routes_of_transport_and_station {route} {main_station} {str(e)}')
