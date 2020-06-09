@@ -27,7 +27,7 @@ from sqlalchemy import create_engine, and_, func, literal_column, Text
 from sqlalchemy.sql import functions
 from sqlalchemy.orm import sessionmaker, aliased
 
-engine = create_engine(DATABASE_URI)
+engine = create_engine(DATABASE_URI, echo=True)
 
 Session = sessionmaker(bind=engine)
 
