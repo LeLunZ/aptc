@@ -2,6 +2,8 @@ import copy
 import json
 import logging
 import time
+from threading import Thread
+
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
@@ -57,6 +59,8 @@ logging.basicConfig(filename='./aptc.log',
                     format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
                     datefmt='%H:%M:%S',
                     level=logging.DEBUG)
+
+q = []
 
 service_months = {
     'Jan': 1,
@@ -731,6 +735,7 @@ def extract_dates_from_oebb_page(tree, calendar):
 
 
 def load_route(url, debug=False, route_page=None):
+    print("load route")
     traffic_day = None
     if route_page is None:
         route_page = requests_retry_session().get(url, timeout=5, verify=False)
@@ -966,6 +971,14 @@ def get_std_date():
     end_date.month = inv_map[int(date_end[1])]
     end_date.year = int(date_end[2])
 
+def load_data_async(routes):
+    future_session = requests_retry_session_async(session=FuturesSession())
+    futures = [future_session.get(route, timeout=5, verify=False) for route in routes]
+    for i in as_completed(futures):
+        response = i.result()
+        q.append(response)
+    exit(0)
+
 
 if __name__ == "__main__":
     try:
@@ -1045,14 +1058,18 @@ if __name__ == "__main__":
                             except Exception as e:
                                 logging.error(
                                     f'get_all_routes_of_transport_and_station {route} {main_station} {str(e)}')
-                        with requests_retry_session_async(session=FuturesSession()) as future_session:
-                            futures = [future_session.get(route, timeout=5, verify=False) for route in routes]
-                            for route_future in as_completed(futures):
-                                body = route_future.result()
-                                try:
-                                    load_route(body.url, route_page=body)
-                                except Exception as e:
-                                    logging.error(f'load_route {body.url} {repr(e)}')
+                        t = Thread(target=load_data_async, args=(routes,))
+                        t.daemon = True
+                        t.start()
+                        while t.is_alive() or (not t.is_alive() and len(q) > 0):
+                            if len(q) == 0:
+                                continue
+                            page = q.pop()
+                            try:
+                                load_route(page.url, route_page=page)
+                            except Exception as e:
+                                logging.error(f'load_route {page.url} {repr(e)}')
+                        print("finished batch", flush=True)
                     except Exception as e:
                         log_error(f'get_all_name_of_transport_distinct {public_transportation_journey} {str(e)}')
                 except Exception as e:
