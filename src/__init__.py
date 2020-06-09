@@ -837,19 +837,12 @@ def str_to_geocord(cord: str):
 
 def save_simple_stops(names, ids, main_station):
     if len(ids) > 1:
-        for index, tup in enumerate(zip(names, ids)):
-            name = tup[0]
-            id = tup[1]
-            stop_location_type = 0
+        for index, (name, id) in enumerate(zip(names, ids)):
             if index == 0:
-                main_station.location_type = 1
-                main_station.parent_station = None
-                add_stop(main_station)
-                commit()
+                main_station = add_stop(main_station)
                 continue
             new_stop = Stop(stop_name=name, stop_lat=main_station.stop_lat, stop_lon=main_station.stop_lon,
-                            location_type=stop_location_type,
-                            parent_station=main_station.stop_id)
+                            location_type=0)
             new_stop = add_stop(new_stop)
 
 
@@ -874,6 +867,7 @@ def export_all_tables():
             pass
     for i in tables:
         file_names.append(f'./{i.__table__.name}.txt')
+        new_session()
         if i is StopTime:
             q = query_element(i)
             with open(f'./{i.__table__.name}.txt', 'a') as outfile:
@@ -888,6 +882,7 @@ def export_all_tables():
                 records = get_from_table(i)
                 for row in records:
                     outcsv.writerow(row.tocsv())
+        end_session()
         print(f'finished {i.__table__.name}', flush=True)
 
     with ZipFile('./Archiv.zip', 'w') as zip:
@@ -1003,8 +998,7 @@ if __name__ == "__main__":
                 try:
                     new_stop = Stop(stop_name=main_station['value'],
                                     stop_lat=str_to_geocord(main_station['ycoord']),
-                                    stop_lon=str_to_geocord(main_station['xcoord']))
-                    new_stop = add_stop(new_stop)
+                                    stop_lon=str_to_geocord(main_station['xcoord']), location_type=0)
                     all_station_ids = get_all_station_ids_from_station(main_station)
                     all_station_names = None
                     if all_station_ids is None or not all_station_ids:
@@ -1023,7 +1017,6 @@ if __name__ == "__main__":
                         if json_data is not None and json_data['maxJ'] is not None:
                             public_transportation_journey.extend(
                                 list(map(lambda x: x, json_data['journey'])))
-
                     routes = []
                     try:
                         all_transport = get_all_name_of_transport_distinct(public_transportation_journey)
