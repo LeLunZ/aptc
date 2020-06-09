@@ -751,8 +751,6 @@ def load_route(url, debug=False):
         remarks = list(filter(lambda x: x != '', map(lambda x: x.strip(), extra_info_remarks)))
         pass
 
-    if ' ' in route_short_name:
-        route_short_name = ''.join(route_short_name.split(' ')[1:])
     route_info = tree.xpath('//*/span[@class=$first]/img/@src', first='prodIcon')[0]
     route_type = None
     try:
