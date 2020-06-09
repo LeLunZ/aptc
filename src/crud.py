@@ -31,11 +31,10 @@ engine = create_engine(DATABASE_URI)
 
 Session = sessionmaker(bind=engine)
 
-s = Session(autoflush=False)
+s = Session(autoflush=False, expire_on_commit=False)
 
 
 def add_agency(agency):
-    new_session()
     data = s.query(Agency).filter(Agency.agency_name == agency.agency_name).first()
     if data is None:
         s.add(agency)
@@ -43,7 +42,6 @@ def add_agency(agency):
         s.refresh(agency)
     else:
         agency = data
-    end_session()
     return agency
 
 
@@ -52,7 +50,6 @@ def add_frequency():
 
 
 def add_route(route: Route):
-    new_session()
     data: Route = s.query(Route).filter(
         and_(Route.route_long_name == route.route_long_name, Route.agency_id == route.agency_id)).first()
     if data is None:
@@ -61,14 +58,11 @@ def add_route(route: Route):
         s.refresh(route)
     else:
         route = data
-    end_session()
     return route
 
 
 def route_exist(url):
-    new_session()
     data: Trip = s.query(Trip).filter(Trip.oebb_url == url).first()
-    end_session()
     return data is not None
 
 
@@ -78,7 +72,6 @@ def add_shape():
 
 
 def add_transport_name(route, url):
-    new_session()
     transport_type_name = TransportTypeImage(name=route, oebb_url=url)
     data = s.query(TransportTypeImage).filter(TransportTypeImage.name == route).first()
     if data is None:
@@ -86,12 +79,10 @@ def add_transport_name(route, url):
         commit()
     else:
         pass
-    end_session()
     return
 
 
 def add_stop_time_text(text1):
-    new_session()
     stop_time_text = StopTimeText(working_days=text1)
     data = s.query(StopTimeText).filter(StopTimeText.working_days == text1).first()
     if data is None:
@@ -99,13 +90,11 @@ def add_stop_time_text(text1):
         commit()
     else:
         pass
-    end_session()
     return
 
 
 # deprecated
 def add_calendar_dates(calendar_dates: [CalendarDate], only_dates_as_string: str, service: Calendar):
-    new_session()
     if only_dates_as_string == '':
         subquery = ~s.query(CalendarDate).filter(CalendarDate.service_id == Calendar.service_id).exists()
         data = s.query(Calendar).filter(subquery).first()
@@ -139,12 +128,10 @@ def add_calendar_dates(calendar_dates: [CalendarDate], only_dates_as_string: str
             commit()
         else:
             service = calendar
-    end_session()
     return service
 
 
 def add_calendar_dates2(calendar_dates: [CalendarDate], only_dates_as_string: str, service: Calendar):
-    new_session()
     if only_dates_as_string == '':
         data = s.query(Calendar).filter(
             and_(Calendar.calendar_dates_hash == None, Calendar.start_date == service.start_date,
@@ -180,12 +167,10 @@ def add_calendar_dates2(calendar_dates: [CalendarDate], only_dates_as_string: st
             commit()
         else:
             service = calendar
-    end_session()
     return service
 
 
 def add_stop(stop: Stop):
-    new_session()
     data: Stop = s.query(Stop).filter(Stop.stop_name == stop.stop_name).first()
     if data is None:
         s.add(stop)
@@ -208,12 +193,10 @@ def add_stop(stop: Stop):
                 commit()
                 s.refresh(data)
         stop = data
-    end_session()
     return stop
 
 
 def add_stop_time(stoptime: StopTime):
-    new_session()
     data: StopTime = s.query(StopTime).filter(
         and_(StopTime.stop_id == stoptime.stop_id, StopTime.trip_id == stoptime.trip_id,
              StopTime.departure_time == stoptime.departure_time, StopTime.arrival_time == stoptime.arrival_time,
@@ -224,7 +207,6 @@ def add_stop_time(stoptime: StopTime):
         s.refresh(stoptime)
     else:
         stoptime = data
-    end_session()
     return stoptime
 
 
@@ -233,7 +215,6 @@ def add_transfer():
 
 
 def add_calendar(service: Calendar):
-    new_session()
     if service.service_id is not None:
         data: Calendar = s.query(Calendar).filter(
             and_(Calendar.service_id == service.service_id, Calendar.start_date == service.start_date,
@@ -256,12 +237,10 @@ def add_calendar(service: Calendar):
         s.refresh(service)
     else:
         service = data
-    end_session()
     return service
 
 
 def add_trip(trip, hash1):
-    new_session()
     data: Trip = s.query(Trip).filter(and_(Trip.service_id == trip.service_id, Trip.route_id == trip.route_id,
                                            trip.station_departure_time_hash == hash1)).first()
     trip.station_departure_time_hash = hash1
@@ -271,7 +250,6 @@ def add_trip(trip, hash1):
         s.refresh(trip)
     else:
         raise Exception('Trip already exists! noob.')
-    end_session()
     return trip
 
 
@@ -280,11 +258,7 @@ def get_from_table(t):
 
 
 def get_from_table_first(t):
-    new_session()
-    data = s.query(t).first()
-    end_session()
-    return data
-
+    return s.query(t).first()
 
 def new_session():
     global s

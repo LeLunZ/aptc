@@ -1031,7 +1031,6 @@ if __name__ == "__main__":
                                 load_route(route)
                             except Exception as e:
                                 logging.error(f'load_route {route} {repr(e)}')
-                        commit()
                     except Exception as e:
                         log_error(f'get_all_name_of_transport_distinct {public_transportation_journey} {str(e)}')
                 except Exception as e:
