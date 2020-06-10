@@ -1034,6 +1034,7 @@ if __name__ == "__main__":
         update_stops_thread.daemon = True
         update_stops_thread.start()
         for row in skip_stop(csv_reader, begin, end):
+            new_session()
             try:
                 location_data = get_location_suggestion_from_string(row[0])
                 suggestion = location_data['suggestions']
