@@ -2,6 +2,7 @@ import copy
 import json
 import logging
 import time
+from queue import Queue
 from threading import Thread
 
 from selenium.webdriver.support.wait import WebDriverWait
@@ -61,6 +62,7 @@ logging.basicConfig(filename='./aptc.log',
                     level=logging.DEBUG)
 
 q = []
+real_thread_safe_q = Queue()
 
 service_months = {
     'Jan': 1,
@@ -735,7 +737,6 @@ def extract_dates_from_oebb_page(tree, calendar):
 
 
 def load_route(url, debug=False, route_page=None):
-    print("load route")
     traffic_day = None
     if route_page is None:
         route_page = requests_retry_session().get(url, timeout=5, verify=False)
@@ -799,10 +800,8 @@ def load_route(url, debug=False, route_page=None):
     if new_trip.service_id is None:
         raise Exception(f'no service_id {url}')
     trip: Trip = add_trip(new_trip, hash(f'{first_station}{dep_time}'))
-    global stop_dict
     headsign = None
     stop_before_current = None
-    global stop_dict
     for i in range(len(all_stations)):
         all_times = list(map(lambda x: x.strip(),
                              tree.xpath('//*/tr[@class=$first or @class=$second][$count]/td[@class=$third]/text()',
@@ -812,26 +811,7 @@ def load_route(url, debug=False, route_page=None):
                         stop_url=remove_param_from_url(all_links_of_station[i], '&time='), location_type=0)
         stop = add_stop(new_stop)
         if stop.stop_lat is None or stop.stop_lon is None:
-            if stop.stop_name in stop_dict:
-                coords = stop_dict.pop(stop.stop_name)
-                stop.stop_lat = coords['y']
-                stop.stop_lon = coords['x']
-                commit()
-            else:
-                try:
-                    stop_suggestions = get_location_suggestion_from_string(stop.stop_name)
-                    for stop_suggestion in stop_suggestions['suggestions']:
-                        stop_dict[stop_suggestion['value']] = {'y': str_to_geocord(stop_suggestion['ycoord']),
-                                                               'x': str_to_geocord(stop_suggestion['xcoord'])}
-                    current_station_cord = stop_dict.pop(stop_suggestions['suggestions'][0]['value'])
-                    stop.stop_lat = current_station_cord['y']
-                    stop.stop_lon = current_station_cord['x']
-                    commit()
-                except:
-                    pass
-        else:
-            if stop.stop_name in stop_dict:
-                stop_dict.pop(stop.stop_name)
+            real_thread_safe_q.put(stop)
         if str(all_times[2]).strip() != '' and str(all_times[2]).strip() != route_long_name.strip():
             headsign = str(all_times[2]).strip()
         new_stop_time = StopTime(stop_id=stop.stop_id, trip_id=trip.trip_id,
@@ -959,17 +939,42 @@ def get_std_date():
     validity = tree.xpath('//*/span[@class=$validity]/text()', validity='timetable_validity')[0]
     end = validity.split('bis')[1].replace('.', ' ').strip()
     begin = validity.split(' bis ')[0].split(' vom ')[1].replace('.', ' ').strip()
-
     inv_map = {v: k for k, v in service_months.items()}
     date_begin = begin.split(' ')
     begin_date.day = int(date_begin[0])
     begin_date.month = inv_map[int(date_begin[1])]
     begin_date.year = int(date_begin[2])
-
     date_end = end.split(' ')
     end_date.day = int(date_end[0])
     end_date.month = inv_map[int(date_end[1])]
     end_date.year = int(date_end[2])
+
+def location_data_thread():
+    global stop_dict
+    already_done = set()
+    while True:
+        stop = real_thread_safe_q.get()
+        if stop.stop_name in stop_dict:
+            coords = stop_dict.pop(stop.stop_name)
+            update_location_of_stop(stop, coords['y'], coords['x'])
+        else:
+            try:
+                future_1 = requests_retry_session_async().get(
+                    'http://fahrplan.oebb.at/bin/ajax-getstop.exe/dn?REQ0JourneyStopsS0A=1&REQ0JourneyStopsB=12&S=' + stop.stop_name + '?&js=false&',
+                    verify=False)
+                oebb_location = future_1.result()
+                locations = oebb_location.content[8:-22]
+                stop_suggestions = json.loads(locations.decode('iso-8859-1'))
+                for index, stop_suggestion in enumerate(stop_suggestions['suggestions']):
+                    if stop_suggestion['value'] not in already_done or index == 0:
+                        stop_dict[stop_suggestion['value']] = {'y': str_to_geocord(stop_suggestion['ycoord']),
+                                                            'x': str_to_geocord(stop_suggestion['xcoord'])}
+                        already_done.add(stop_suggestion['value'])
+                current_station_cord = stop_dict.pop(stop_suggestions['suggestions'][0]['value'])
+                update_location_of_stop(stop, current_station_cord['y'], current_station_cord['x'])
+            except:
+                print(f'{stop.stop_name} failed')
+        real_thread_safe_q.task_done()
 
 def load_data_async(routes):
     future_session = requests_retry_session_async(session=FuturesSession())
@@ -990,19 +995,21 @@ if __name__ == "__main__":
     try:
         url = os.environ['url']
         if url:
+            update_stops_thread = Thread(target=location_data_thread)
+            update_stops_thread.daemon = True
+            update_stops_thread.start()
             load_route(url, True)
-            exit()
+            real_thread_safe_q.join()
+            commit()
+            exit(0)
     except KeyError:
         pass
 
     with open('bus_stops.csv') as csv_file:
         error = False
-
-
         def log_error(msg):
             if not error:
                 logging.error(msg)
-
 
         csv_reader = csv.reader(csv_file, delimiter=',')
         row_count = sum(1 for row in csv_reader)
@@ -1017,11 +1024,15 @@ if __name__ == "__main__":
         csv_file.seek(0)
         for count, i in enumerate(csv_reader):
             if count != 0:
-                stop_dict[i[0]] = {'x': float(i[7]), 'y': float(i[8])}
+               stop_dict[i[0]] = {'x': float(i[7]), 'y': float(i[8])}
         csv_file.seek(0)
         csv_reader = csv.reader(csv_file, delimiter=',')
         get_std_date()
         load_allg_feiertage()
+        commit()
+        update_stops_thread = Thread(target=location_data_thread)
+        update_stops_thread.daemon = True
+        update_stops_thread.start()
         for row in skip_stop(csv_reader, begin, end):
             try:
                 location_data = get_location_suggestion_from_string(row[0])
@@ -1061,8 +1072,10 @@ if __name__ == "__main__":
                         t = Thread(target=load_data_async, args=(routes,))
                         t.daemon = True
                         t.start()
+                        commit()
                         while t.is_alive() or (not t.is_alive() and len(q) > 0):
                             if len(q) == 0:
+                                time.sleep(0.1)
                                 continue
                             page = q.pop()
                             try:
@@ -1077,7 +1090,9 @@ if __name__ == "__main__":
             except Exception as e:
                 logging.error(f'get_location_suggestion_from_string {row} {str(e)}')
             logging.debug(f"finished {row}")
-
+            commit()
+        real_thread_safe_q.join()
+        commit()
 exit(0)
 
 # while True:

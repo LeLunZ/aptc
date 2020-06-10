@@ -27,19 +27,18 @@ from sqlalchemy import create_engine, and_, func, literal_column, Text
 from sqlalchemy.sql import functions
 from sqlalchemy.orm import sessionmaker, aliased
 
-engine = create_engine(DATABASE_URI, echo=True)
+engine = create_engine(DATABASE_URI)
 
-Session = sessionmaker(bind=engine)
+Session = sessionmaker(bind=engine, autoflush=False, autocommit=False, expire_on_commit=True)
 
-s = Session(autoflush=False, expire_on_commit=False)
+s = Session()
 
 
 def add_agency(agency):
     data = s.query(Agency).filter(Agency.agency_name == agency.agency_name).first()
     if data is None:
         s.add(agency)
-        commit()
-        s.refresh(agency)
+        s.flush()
     else:
         agency = data
     return agency
@@ -54,8 +53,8 @@ def add_route(route: Route):
         and_(Route.route_long_name == route.route_long_name, Route.agency_id == route.agency_id)).first()
     if data is None:
         s.add(route)
-        commit()
-        s.refresh(route)
+        s.flush()
+
     else:
         route = data
     return route
@@ -76,7 +75,7 @@ def add_transport_name(route, url):
     data = s.query(TransportTypeImage).filter(TransportTypeImage.name == route).first()
     if data is None:
         s.add(transport_type_name)
-        commit()
+        s.flush()
     else:
         pass
     return
@@ -87,7 +86,7 @@ def add_stop_time_text(text1):
     data = s.query(StopTimeText).filter(StopTimeText.working_days == text1).first()
     if data is None:
         s.add(stop_time_text)
-        commit()
+        s.flush()
     else:
         pass
     return
@@ -100,8 +99,8 @@ def add_calendar_dates(calendar_dates: [CalendarDate], only_dates_as_string: str
         data = s.query(Calendar).filter(subquery).first()
         if data is None:
             s.add(service)
-            commit()
-            s.refresh(service)
+            s.flush()
+
         else:
             service = data
     else:
@@ -120,12 +119,12 @@ def add_calendar_dates(calendar_dates: [CalendarDate], only_dates_as_string: str
         calendar = calendar.first()
         if calendar is None:
             s.add(service)
-            commit()
-            s.refresh(service)
+            s.flush()
+
             for i in calendar_dates:
                 i.service_id = service.service_id
             s.bulk_save_objects(calendar_dates)
-            commit()
+            s.flush()
         else:
             service = calendar
     return service
@@ -142,8 +141,8 @@ def add_calendar_dates2(calendar_dates: [CalendarDate], only_dates_as_string: st
                  Calendar.sunday == service.sunday)).first()
         if data is None:
             s.add(service)
-            commit()
-            s.refresh(service)
+            s.flush()
+
         else:
             service = data
     else:
@@ -159,12 +158,12 @@ def add_calendar_dates2(calendar_dates: [CalendarDate], only_dates_as_string: st
         if calendar is None:
             service.calendar_dates_hash = hash_value
             s.add(service)
-            commit()
-            s.refresh(service)
+            s.flush()
+
             for i in calendar_dates:
                 i.service_id = service.service_id
             s.bulk_save_objects(calendar_dates)
-            commit()
+            s.flush()
         else:
             service = calendar
     return service
@@ -174,27 +173,16 @@ def add_stop(stop: Stop):
     data: Stop = s.query(Stop).filter(Stop.stop_name == stop.stop_name).first()
     if data is None:
         s.add(stop)
-        commit()
-        s.refresh(stop)
+        s.flush()
     else:
-        some_thing_changed = False
-        if stop.stop_lat is not None or stop.stop_url is not None or stop.stop_lon is not None:
-            if data.stop_lat is None and stop.stop_lat is not None:
-                data.stop_lat = stop.stop_lat
-                some_thing_changed = True
-            if data.stop_lon is None and stop.stop_lon is not None:
-                data.stop_lon = stop.stop_lon
-                some_thing_changed = True
-            if data.stop_url is None and stop.stop_url is not None:
-                data.stop_url = stop.stop_url
-                some_thing_changed = True
-            if some_thing_changed:
-                s.merge(data)
-                commit()
-                s.refresh(data)
         stop = data
     return stop
 
+def update_location_of_stop(stop:Stop, lat, lng):
+    try:
+        s.query(Stop).filter(stop.stop_id == Stop.stop_id).update({Stop.stop_lat: lat, Stop.stop_lon: lng})
+    except:
+        pass
 
 def add_stop_time(stoptime: StopTime):
     data: StopTime = s.query(StopTime).filter(
@@ -203,8 +191,8 @@ def add_stop_time(stoptime: StopTime):
              StopTime.stop_sequence == stoptime.stop_sequence)).first()
     if data is None:
         s.add(stoptime)
-        commit()
-        s.refresh(stoptime)
+        s.flush()
+
     else:
         stoptime = data
     return stoptime
@@ -233,8 +221,8 @@ def add_calendar(service: Calendar):
     if data is None:
         service.service_id = None
         s.add(service)
-        commit()
-        s.refresh(service)
+        s.flush()
+
     else:
         service = data
     return service
@@ -246,8 +234,7 @@ def add_trip(trip, hash1):
     trip.station_departure_time_hash = hash1
     if data is None:
         s.add(trip)
-        commit()
-        s.refresh(trip)
+        s.flush()
     else:
         raise Exception('Trip already exists! noob.')
     return trip
