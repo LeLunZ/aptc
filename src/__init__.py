@@ -913,7 +913,7 @@ def load_allg_feiertage():
     chrome_options.add_argument('--disable-gpu')
     SECRET_KEY = os.environ.get('AM_I_IN_A_DOCKER_CONTAINER', False)
     if SECRET_KEY:
-        driver = webdriver.Chrome(chrome_options=chrome_options)
+        driver = webdriver.Chrome(options=chrome_options)
     else:
         driver = webdriver.Chrome('./chromedriver')
     driver.get('https://www.timeanddate.de/feiertage/oesterreich/' + str(begin_date.year))
@@ -956,7 +956,10 @@ def location_data_thread():
         stop = real_thread_safe_q.get()
         if stop.stop_name in stop_dict:
             coords = stop_dict.pop(stop.stop_name)
-            update_location_of_stop(stop, coords['y'], coords['x'])
+            try:
+                update_location_of_stop(stop, coords['y'], coords['x'])
+            except:
+                pass
         else:
             try:
                 future_1 = requests_retry_session_async().get(

@@ -181,8 +181,8 @@ def add_stop(stop: Stop):
 def update_location_of_stop(stop:Stop, lat, lng):
     try:
         s.query(Stop).filter(stop.stop_id == Stop.stop_id).update({Stop.stop_lat: lat, Stop.stop_lon: lng})
-    except:
-        pass
+    except :
+        new_session()
 
 def add_stop_time(stoptime: StopTime):
     data: StopTime = s.query(StopTime).filter(
