@@ -825,7 +825,7 @@ def load_route(url, debug=False, route_page=None):
         if stop_before_current is not None and int(stop_before_current.departure_time[0:2]) > int(
                 new_stop_time.arrival_time[0:2]):
             new_stop_time.arrival_time = f'{int(new_stop_time.arrival_time[0:2]) + 24}{new_stop_time.arrival_time[2:]}'
-            new_stop_time.departure_time = f'{int(new_stop_time.arrival_time[0:2]) + 24}{new_stop_time.arrival_time[2:]}'
+            new_stop_time.departure_time = f'{int(new_stop_time.departure_time[0:2])+24}{new_stop_time.departure_time[2:]}'
         elif int(new_stop_time.arrival_time[0:2]) > int(new_stop_time.departure_time[0:2]):
             new_stop_time.departure_time = f'{int(new_stop_time.departure_time[0:2]) + 24}{new_stop_time.departure_time[2:]}'
         stop_before_current = new_stop_time
