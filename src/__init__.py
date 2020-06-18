@@ -10,6 +10,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from requests_futures.sessions import FuturesSession
 from concurrent.futures import as_completed
+
 if __name__ == "__main__":
     from Models.agency import Agency
     from Models.route import Route
@@ -799,7 +800,7 @@ def load_route(url, debug=False, route_page=None):
     new_trip = Trip(route_id=route.route_id, service_id=calendar.service_id, oebb_url=url)
     if new_trip.service_id is None:
         raise Exception(f'no service_id {url}')
-    trip: Trip = add_trip(new_trip, hash(f'{first_station}{dep_time}'))
+    trip: Trip = add_trip(new_trip, str(hash(f'{first_station}{dep_time}')))
     headsign = None
     stop_before_current = None
     for i in range(len(all_stations)):
@@ -825,7 +826,7 @@ def load_route(url, debug=False, route_page=None):
         if stop_before_current is not None and int(stop_before_current.departure_time[0:2]) > int(
                 new_stop_time.arrival_time[0:2]):
             new_stop_time.arrival_time = f'{int(new_stop_time.arrival_time[0:2]) + 24}{new_stop_time.arrival_time[2:]}'
-            new_stop_time.departure_time = f'{int(new_stop_time.departure_time[0:2])+24}{new_stop_time.departure_time[2:]}'
+            new_stop_time.departure_time = f'{int(new_stop_time.departure_time[0:2]) + 24}{new_stop_time.departure_time[2:]}'
         elif int(new_stop_time.arrival_time[0:2]) > int(new_stop_time.departure_time[0:2]):
             new_stop_time.departure_time = f'{int(new_stop_time.departure_time[0:2]) + 24}{new_stop_time.departure_time[2:]}'
         stop_before_current = new_stop_time
@@ -949,6 +950,7 @@ def get_std_date():
     end_date.month = inv_map[int(date_end[1])]
     end_date.year = int(date_end[2])
 
+
 def location_data_thread():
     global stop_dict
     already_done = set()
@@ -971,13 +973,14 @@ def location_data_thread():
                 for index, stop_suggestion in enumerate(stop_suggestions['suggestions']):
                     if stop_suggestion['value'] not in already_done or index == 0:
                         stop_dict[stop_suggestion['value']] = {'y': str_to_geocord(stop_suggestion['ycoord']),
-                                                            'x': str_to_geocord(stop_suggestion['xcoord'])}
+                                                               'x': str_to_geocord(stop_suggestion['xcoord'])}
                         already_done.add(stop_suggestion['value'])
                 current_station_cord = stop_dict.pop(stop_suggestions['suggestions'][0]['value'])
                 update_location_of_stop(stop, current_station_cord['y'], current_station_cord['x'])
             except:
                 print(f'{stop.stop_name} failed')
         real_thread_safe_q.task_done()
+
 
 def load_data_async(routes):
     future_session = requests_retry_session_async(session=FuturesSession())
@@ -1010,9 +1013,12 @@ if __name__ == "__main__":
 
     with open('bus_stops.csv') as csv_file:
         error = False
+
+
         def log_error(msg):
             if not error:
                 logging.error(msg)
+
 
         csv_reader = csv.reader(csv_file, delimiter=',')
         row_count = sum(1 for row in csv_reader)
@@ -1027,7 +1033,7 @@ if __name__ == "__main__":
         csv_file.seek(0)
         for count, i in enumerate(csv_reader):
             if count != 0:
-               stop_dict[i[0]] = {'x': float(i[7]), 'y': float(i[8])}
+                stop_dict[i[0]] = {'x': float(i[7]), 'y': float(i[8])}
         csv_file.seek(0)
         csv_reader = csv.reader(csv_file, delimiter=',')
         get_std_date()
@@ -1069,7 +1075,8 @@ if __name__ == "__main__":
                         all_transport = get_all_name_of_transport_distinct(public_transportation_journey)
                         for route in all_transport:
                             try:
-                                routes.update([yx.split('?')[0] for yx in get_all_routes_of_transport_and_station(route, main_station)])
+                                routes.update([yx.split('?')[0] for yx in
+                                               get_all_routes_of_transport_and_station(route, main_station)])
                             except Exception as e:
                                 logging.error(
                                     f'get_all_routes_of_transport_and_station {route} {main_station} {str(e)}')
