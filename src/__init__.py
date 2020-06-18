@@ -2,8 +2,10 @@ import copy
 import json
 import logging
 import time
+from dataclasses import dataclass
 from queue import Queue
 from threading import Thread
+from typing import List, Tuple
 
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -320,7 +322,7 @@ def add_days_to_calendar(calendar: Calendar, begin: str, end: str):
         add_day_to_calendar(calendar, d)
 
 
-def extract_date_from_str(calendar: Calendar, date_str: str):
+def extract_date_from_str(calendar: Calendar, date_str: str, add=True):
     official_weekdays = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
     date_str = date_str.replace(';', '')
     working_dates = date_str
@@ -354,9 +356,9 @@ def extract_date_from_str(calendar: Calendar, date_str: str):
     if 'fährt am' in working_dates:
         index_a = date_arr.index('am')
         try:
-            int(date_arr[0].replace('.', ''))
+            int(date_arr[index_a+1:][0].replace('.', ''))
         except:
-            index_a = date_arr.index('am', index_a+1)
+            index_a = date_arr.index('am', index_a + 1)
         index_a = index_a + 1
         start_date = extract_date_from_date_arr(date_arr[index_a:])
         if 'bis' in working_dates:
@@ -658,11 +660,13 @@ def extract_date_from_str(calendar: Calendar, date_str: str):
         calendar.friday = True
         calendar.saturday = True
         calendar.sunday = True
+    if not add:
+        return exceptions_calendar_date, calendar_data_as_string, calendar
     calendar = add_calendar_dates2(exceptions_calendar_date, calendar_data_as_string, calendar)
     return calendar
 
 
-def extract_dates_from_oebb_page(tree, calendar):
+def extract_dates_from_oebb_page(tree, calendar, add=True):
     extra_info_traffic_day = tree.xpath('//*/strong[text() =$first]/../text()', first='Verkehrstage:')
     traffic_day = None
 
@@ -735,9 +739,14 @@ def extract_dates_from_oebb_page(tree, calendar):
             exceptions_calendar_date[-1].date = date
             calendar_data_as_string += f',{date}{1}'
         calendar_data_as_string = calendar_data_as_string[1:]
-        calendar = add_calendar_dates2(exceptions_calendar_date, calendar_data_as_string, calendar)
+        if add:
+            calendar = add_calendar_dates2(exceptions_calendar_date, calendar_data_as_string, calendar)
+        else:
+            return (exceptions_calendar_date, calendar_data_as_string, calendar)
     else:
-        calendar = extract_date_from_str(calendar, traffic_day)
+        calendar = extract_date_from_str(calendar, traffic_day, add)
+        if not add:
+            return calendar
     return calendar
 
 
@@ -933,7 +942,6 @@ def load_allg_feiertage():
     elements = driver.find_elements_by_xpath("//*/tbody/tr[@class='showrow']/th")
     for f in elements:
         add_allg_feiertage(f.text, end_date.year)
-
     driver.quit()
 
 
@@ -986,13 +994,130 @@ def location_data_thread():
         real_thread_safe_q.task_done()
 
 
+@dataclass
+class PageDTO:
+    agency: Agency
+    route: Route
+    calendar_data: Tuple
+    first_station: str
+    dep_time: str
+    all_stations: List
+    links_of_all_stations: List
+    page: str
+
+
+@dataclass
+class StopDTO:
+    stop_name: str
+    stop_url: str
+    location_type: int
+    stop_id: int
+
+def load_route_with_data(url, page: PageDTO):
+    tree = html.fromstring(page.page)
+    if page.agency is None:
+        new_agency:Agency = get_from_table_first(Agency)
+    else:
+        new_agency:Agency = add_agency(page.agency)
+    page.route.agency_id = new_agency.agency_id
+    route = add_route(page.route)
+    calendar = add_calendar_dates2(page.calendar_data[0], page.calendar_data[1], page.calendar_data[2])
+    new_trip = Trip(route_id=route.route_id, service_id=calendar.service_id, oebb_url=url)
+    if new_trip.service_id is None:
+        raise Exception(f'no service_id {url}')
+    trip: Trip = add_trip(new_trip, str(hash(f'{page.first_station}{page.dep_time}')))
+    headsign = None
+    stop_before_current = None
+    for i in range(len(page.all_stations)):
+        all_times = list(map(lambda x: x.strip(),
+                             tree.xpath('//*/tr[@class=$first or @class=$second][$count]/td[@class=$third]/text()',
+                                        first='zebracol-2',
+                                        second="zebracol-1", third='center sepline', count=i + 1)))
+        new_stop = Stop(stop_name=page.all_stations[i],
+                        stop_url=remove_param_from_url(page.links_of_all_stations[i], '&time='), location_type=0)
+        stop = add_stop(new_stop)
+        if stop.stop_lat is None or stop.stop_lon is None:
+            real_thread_safe_q.put(StopDTO(stop.stop_name, stop.stop_url, stop.location_type, stop.stop_id))
+        if str(all_times[2]).strip() != '' and str(all_times[2]).strip() != page.route.route_long_name.strip():
+            headsign = str(all_times[2]).strip()
+        new_stop_time = StopTime(stop_id=stop.stop_id, trip_id=trip.trip_id,
+                                 arrival_time=all_times[0] if all_times[0] == '' else all_times[0] + ':00',
+                                 departure_time=all_times[1] if all_times[1] == '' else all_times[1] + ':00',
+                                 stop_sequence=i + 1, pickup_type=0, drop_off_type=0, stop_headsign=headsign)
+        if new_stop_time.arrival_time == '':
+            new_stop_time.arrival_time = new_stop_time.departure_time
+        elif new_stop_time.departure_time == '':
+            new_stop_time.departure_time = new_stop_time.arrival_time
+        if stop_before_current is not None and int(stop_before_current.departure_time[0:2]) > int(
+                new_stop_time.arrival_time[0:2]):
+            new_stop_time.arrival_time = f'{int(new_stop_time.arrival_time[0:2]) + 24}{new_stop_time.arrival_time[2:]}'
+            new_stop_time.departure_time = f'{int(new_stop_time.departure_time[0:2]) + 24}{new_stop_time.departure_time[2:]}'
+        elif int(new_stop_time.arrival_time[0:2]) > int(new_stop_time.departure_time[0:2]):
+            new_stop_time.departure_time = f'{int(new_stop_time.departure_time[0:2]) + 24}{new_stop_time.departure_time[2:]}'
+        stop_before_current = new_stop_time
+        add_stop_time(new_stop_time)
+
+
 def request_processing_hook(resp, *args, **kwargs):
-    pass
+    route_page = resp
+    traffic_day = None
+    tree = html.fromstring(route_page.content)
+    route_long_name = \
+        tree.xpath('((//*/tr[@class=$first])[1]/td[@class=$second])[last()]/text()', first='zebracol-2',
+                   second='center sepline')[0].strip()
+    all_stations = tree.xpath('//*/tr[@class=$first or @class=$second]/*/a/text()', first='zebracol-2',
+                              second="zebracol-1")
+    all_links_of_station = tree.xpath('//*/tr[@class=$first or @class=$second]/*/a/@href', first='zebracol-2',
+                                      second="zebracol-1")
+    extra_info_operator = tree.xpath('//*/strong[text() =$first]/../text()', first='Betreiber:')
+    extra_info_remarks = tree.xpath('//*/strong[text() =$first]/../text()', first='Bemerkungen:')
+    new_agency = Agency()
+    if extra_info_operator:
+        operator = list(filter(lambda x: x.strip() != '', extra_info_operator))[0].strip()
+        try:
+            agency = operator.split(', ')
+            if len(agency) == 1:
+                agency_phone = None
+                agency_name = ','.join(agency[0].split(',')[:-1])
+            else:
+                agency_name = agency[0]
+                agency_phone = agency[1]
+            new_agency.agency_lang = 'de'
+            new_agency.agency_timezone = 'Europe/Vienna'
+            new_agency.agency_url = 'https://www.google.com/search?q=' + agency_name
+            new_agency.agency_name = agency_name
+            new_agency.agency_phone = agency_phone
+        except:
+            pass
+    else:
+        new_agency = None
+
+    route_info = tree.xpath('//*/span[@class=$first]/img/@src', first='prodIcon')[0]
+    route_type = None
+    url = resp.url
+    try:
+        route_type = route_types[route_info]
+    except KeyError:
+        add_transport_name(route_info, url)
+    new_route = Route(route_long_name=route_long_name,
+                      route_type=route_type,
+                      route_url=url)
+    calendar = Calendar()
+    calendar_data = extract_dates_from_oebb_page(tree, calendar, False)
+    all_times = list(map(lambda x: x.strip(),
+                         tree.xpath('//*/tr[@class=$first or @class=$second][$count]/td[@class=$third]/text()',
+                                    first='zebracol-2',
+                                    second="zebracol-1", third='center sepline', count=1)))
+    first_station = all_stations[0]
+    dep_time = all_times[1]
+    resp.data = PageDTO(new_agency, new_route, calendar_data, first_station, dep_time, all_stations,
+                        all_links_of_station, resp.content)
 
 
 def load_data_async(routes):
     future_session = requests_retry_session_async(session=FuturesSession())
-    futures = [future_session.get(route, timeout=5, verify=False) for route in routes]
+    futures = [future_session.get(route, timeout=5, verify=False, hooks={'response': request_processing_hook}) for route
+               in routes]
     for i in as_completed(futures):
         response = i.result()
         q.append(response)
@@ -1098,7 +1223,7 @@ if __name__ == "__main__":
                                 continue
                             page = q.pop()
                             try:
-                                load_route(page.url, route_page=page)
+                                load_route_with_data(page.url, page.data)
                             except Exception as e:
                                 logging.error(f'load_route {page.url} {repr(e)}')
                         print("finished batch", flush=True)

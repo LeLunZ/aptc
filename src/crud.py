@@ -1,4 +1,5 @@
 import os
+import threading
 
 from Models.agency import Agency
 from Models.route import Route
@@ -18,6 +19,8 @@ from sqlalchemy.exc import SQLAlchemyError
 
 import sqlalchemy
 
+lock = threading.Lock()
+
 try:
     DATABASE_URI = 'postgres+psycopg2://' + str(os.environ['postgres'])
 except KeyError:
@@ -29,7 +32,7 @@ from sqlalchemy.orm import sessionmaker, aliased, scoped_session
 
 engine = create_engine(DATABASE_URI)
 
-Session = scoped_session(sessionmaker(bind=engine, autoflush=False, autocommit=False, expire_on_commit=True))
+Session = sessionmaker(bind=engine, autoflush=False, autocommit=False, expire_on_commit=True)
 
 s = Session()
 
@@ -142,7 +145,6 @@ def add_calendar_dates2(calendar_dates: [CalendarDate], only_dates_as_string: st
         if data is None:
             s.add(service)
             s.flush()
-
         else:
             service = data
     else:
@@ -178,23 +180,15 @@ def add_stop(stop: Stop):
         stop = data
     return stop
 
-def update_location_of_stop(stop:Stop, lat, lng):
-    try:
-        s.query(Stop).filter(stop.stop_id == Stop.stop_id).update({Stop.stop_lat: lat, Stop.stop_lon: lng})
-    except:
-        new_session()
+def update_location_of_stop(stop, lat, lng):
+    with lock:
+        try:
+            s.query(Stop).filter(stop.stop_id == Stop.stop_id).update({Stop.stop_lat: lat, Stop.stop_lon: lng})
+        except:
+            print("fucked up. Object probably not in session", flush=True)
 
 def add_stop_time(stoptime: StopTime):
-    data: StopTime = s.query(StopTime).filter(
-        and_(StopTime.stop_id == stoptime.stop_id, StopTime.trip_id == stoptime.trip_id,
-             StopTime.departure_time == stoptime.departure_time, StopTime.arrival_time == stoptime.arrival_time,
-             StopTime.stop_sequence == stoptime.stop_sequence)).first()
-    if data is None:
-        s.add(stoptime)
-        s.flush()
-
-    else:
-        stoptime = data
+    s.add(stoptime)
     return stoptime
 
 
@@ -222,7 +216,6 @@ def add_calendar(service: Calendar):
         service.service_id = None
         s.add(service)
         s.flush()
-
     else:
         service = data
     return service
@@ -249,8 +242,9 @@ def get_from_table_first(t):
 
 def new_session():
     global s
-    end_session()
-    s = Session(autoflush=False)
+    with lock:
+        end_session()
+        s = Session(autoflush=False)
 
 
 def query_element(e):
