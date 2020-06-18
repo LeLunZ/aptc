@@ -25,11 +25,11 @@ except KeyError:
 
 from sqlalchemy import create_engine, and_, func, literal_column, Text
 from sqlalchemy.sql import functions
-from sqlalchemy.orm import sessionmaker, aliased
+from sqlalchemy.orm import sessionmaker, aliased, scoped_session
 
 engine = create_engine(DATABASE_URI)
 
-Session = sessionmaker(bind=engine, autoflush=False, autocommit=False, expire_on_commit=True)
+Session = scoped_session(sessionmaker(bind=engine, autoflush=False, autocommit=False, expire_on_commit=True))
 
 s = Session()
 
@@ -181,7 +181,7 @@ def add_stop(stop: Stop):
 def update_location_of_stop(stop:Stop, lat, lng):
     try:
         s.query(Stop).filter(stop.stop_id == Stop.stop_id).update({Stop.stop_lat: lat, Stop.stop_lon: lng})
-    except :
+    except:
         new_session()
 
 def add_stop_time(stoptime: StopTime):
