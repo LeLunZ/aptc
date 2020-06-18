@@ -353,6 +353,10 @@ def extract_date_from_str(calendar: Calendar, date_str: str):
 
     if 'fährt am' in working_dates:
         index_a = date_arr.index('am')
+        try:
+            int(date_arr[0].replace('.', ''))
+        except:
+            index_a = date_arr.index('am', index_a+1)
         index_a = index_a + 1
         start_date = extract_date_from_date_arr(date_arr[index_a:])
         if 'bis' in working_dates:
@@ -980,6 +984,10 @@ def location_data_thread():
             except:
                 print(f'{stop.stop_name} failed')
         real_thread_safe_q.task_done()
+
+
+def request_processing_hook(resp, *args, **kwargs):
+    pass
 
 
 def load_data_async(routes):
