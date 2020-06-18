@@ -1082,7 +1082,7 @@ def request_processing_hook(resp, *args, **kwargs):
             else:
                 agency_name = agency[0]
                 agency_phone = agency[1]
-            new_agency.agency_lang = 'de'
+            new_agency.agency_lang = 'DE'
             new_agency.agency_timezone = 'Europe/Vienna'
             new_agency.agency_url = 'https://www.google.com/search?q=' + agency_name
             new_agency.agency_name = agency_name
