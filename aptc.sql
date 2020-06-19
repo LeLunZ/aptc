@@ -78,11 +78,9 @@ create table calendar
     calendar_dates_hash text
 );
 
-create index calendar_end_date_start_date_monday_tuesday_wednesday_thursday_
-    on calendar (end_date, start_date, monday, tuesday, wednesday, thursday, friday, saturday, sunday);
-
-create index calendar_dates_hash_
-    on calendar (calendar_dates_hash);
+create unique index calendar_end_date_start_date_monday_tuesday_hash
+    on calendar (end_date, start_date, monday, tuesday, wednesday, thursday, friday, saturday, sunday,
+                 calendar_dates_hash);
 
 create table shapes
 (
@@ -97,20 +95,23 @@ create table shapes
 
 create table trips
 (
-    route_id              integer not null,
-    service_id            integer,
-    trip_short_name       text,
-    trip_headsign         text,
-    direction_id          boolean,
-    block_id              text,
-    shape_id              text,
-    wheelchair_accessible text,
-    trip_id               serial  not null
+    route_id                    integer not null,
+    service_id                  integer,
+    trip_short_name             text,
+    trip_headsign               text,
+    direction_id                boolean,
+    block_id                    text,
+    shape_id                    text,
+    wheelchair_accessible       text,
+    trip_id                     serial  not null
         constraint trips_pkey
             primary key,
-    oebb_url              text,
-    station_departure_time_hash text
+    oebb_url                    text,
+    station_departure_time_hash text    not null
 );
+
+create unique index trips_service_id_route_id_station_departure_time_hash_uindex
+    on trips (service_id, route_id, station_departure_time_hash);
 
 create table frequencies
 (
@@ -154,16 +155,10 @@ create table calendar_dates
 (
     service_id     integer not null,
     date           integer not null,
-    exception_type integer,
+    exception_type integer not null,
     constraint calendar_dates_pk
-        primary key (service_id, date)
+        primary key (service_id, date, exception_type)
 );
-
-create index calendar_dates_service_id_index
-    on calendar_dates (service_id);
-
-create index calendar_dates_date_index
-    on calendar_dates (date);
 
 create table transport_type_image
 (

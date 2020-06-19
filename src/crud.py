@@ -133,7 +133,6 @@ def add_calendar_dates(calendar_dates: [CalendarDate], only_dates_as_string: str
             service.calendar_dates_hash = hash_value
             s.add(service)
             s.flush()
-
             for i in calendar_dates:
                 i.service_id = service.service_id
             s.bulk_save_objects(calendar_dates)
@@ -168,31 +167,6 @@ def add_stop_time(stoptime: StopTime):
 
 def add_transfer():
     pass
-
-
-def add_calendar(service: Calendar):
-    if service.service_id is not None:
-        data: Calendar = s.query(Calendar).filter(
-            and_(Calendar.service_id == service.service_id, Calendar.start_date == service.start_date,
-                 Calendar.end_date == service.end_date,
-                 Calendar.monday == service.monday, Calendar.tuesday == service.tuesday,
-                 Calendar.wednesday == service.wednesday, Calendar.thursday == service.thursday,
-                 Calendar.friday == service.friday, Calendar.saturday == service.saturday,
-                 Calendar.sunday == service.sunday)).first()
-    else:
-        data: Calendar = s.query(Calendar).filter(
-            and_(Calendar.start_date == service.start_date, Calendar.end_date == service.end_date,
-                 Calendar.monday == service.monday, Calendar.tuesday == service.tuesday,
-                 Calendar.wednesday == service.wednesday, Calendar.thursday == service.thursday,
-                 Calendar.friday == service.friday, Calendar.saturday == service.saturday,
-                 Calendar.sunday == service.sunday)).first()
-    if data is None:
-        service.service_id = None
-        s.add(service)
-        s.flush()
-    else:
-        service = data
-    return service
 
 
 def add_trip(trip, hash1):
