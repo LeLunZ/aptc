@@ -663,7 +663,7 @@ def extract_date_from_str(calendar: Calendar, date_str: str, add=True):
         calendar.sunday = True
     if not add:
         return exceptions_calendar_date, calendar_data_as_string, calendar
-    calendar = add_calendar_dates2(exceptions_calendar_date, calendar_data_as_string, calendar)
+    calendar = add_calendar_dates(exceptions_calendar_date, calendar_data_as_string, calendar)
     return calendar
 
 
@@ -741,7 +741,7 @@ def extract_dates_from_oebb_page(tree, calendar, add=True):
             calendar_data_as_string += f',{date}{1}'
         calendar_data_as_string = calendar_data_as_string[1:]
         if add:
-            calendar = add_calendar_dates2(exceptions_calendar_date, calendar_data_as_string, calendar)
+            calendar = add_calendar_dates(exceptions_calendar_date, calendar_data_as_string, calendar)
         else:
             return (exceptions_calendar_date, calendar_data_as_string, calendar)
     else:
@@ -749,104 +749,6 @@ def extract_dates_from_oebb_page(tree, calendar, add=True):
         if not add:
             return calendar
     return calendar
-
-
-def load_route(url, debug=False, route_page=None):
-    traffic_day = None
-    if route_page is None:
-        route_page = requests_retry_session().get(url, timeout=5, verify=False)
-    tree = html.fromstring(route_page.content)
-    route_short_name = \
-        tree.xpath('((//*/tr[@class=$first])[1]/td[@class=$second])[last()]/text()', first='zebracol-2',
-                   second='center sepline')[0].strip()
-    route_long_name = route_short_name
-    all_stations = tree.xpath('//*/tr[@class=$first or @class=$second]/*/a/text()', first='zebracol-2',
-                              second="zebracol-1")
-    all_links_of_station = tree.xpath('//*/tr[@class=$first or @class=$second]/*/a/@href', first='zebracol-2',
-                                      second="zebracol-1")
-    extra_info_operator = tree.xpath('//*/strong[text() =$first]/../text()', first='Betreiber:')
-    extra_info_remarks = tree.xpath('//*/strong[text() =$first]/../text()', first='Bemerkungen:')
-    new_agency = Agency()
-    if extra_info_operator:
-        operator = list(filter(lambda x: x.strip() != '', extra_info_operator))[0].strip()
-        try:
-            agency = operator.split(', ')
-            if len(agency) == 1:
-                agency_phone = None
-                agency_name = ','.join(agency[0].split(',')[:-1])
-            else:
-                agency_name = agency[0]
-                agency_phone = agency[1]
-            new_agency.agency_lang = 'DE'
-            new_agency.agency_timezone = 'Europe/Vienna'
-            new_agency.agency_url = 'https://www.google.com/search?q=' + agency_name
-            new_agency.agency_name = agency_name
-            new_agency.agency_phone = agency_phone
-            new_agency = add_agency(new_agency)
-        except:
-            pass
-    else:
-        new_agency = get_from_table_first(Agency)
-
-    if extra_info_remarks:
-        remarks = list(filter(lambda x: x != '', map(lambda x: x.strip(), extra_info_remarks)))
-        pass
-
-    route_info = tree.xpath('//*/span[@class=$first]/img/@src', first='prodIcon')[0]
-    route_type = None
-    try:
-        route_type = route_types[route_info]
-    except KeyError:
-        add_transport_name(route_info, url)
-    new_route = Route(agency_id=new_agency.agency_id,
-                      route_long_name=route_long_name,
-                      route_type=route_type,
-                      route_url=url)
-    route = add_route(new_route)
-    calendar = Calendar()
-    calendar = extract_dates_from_oebb_page(tree, calendar)
-    all_times = list(map(lambda x: x.strip(),
-                         tree.xpath('//*/tr[@class=$first or @class=$second][$count]/td[@class=$third]/text()',
-                                    first='zebracol-2',
-                                    second="zebracol-1", third='center sepline', count=1)))
-    first_station = all_stations[0]
-    dep_time = all_times[1]
-    new_trip = Trip(route_id=route.route_id, service_id=calendar.service_id, oebb_url=url)
-    if new_trip.service_id is None:
-        raise Exception(f'no service_id {url}')
-    trip: Trip = add_trip(new_trip, str(hash(f'{first_station}{dep_time}')))
-    headsign = None
-    stop_before_current = None
-    for i in range(len(all_stations)):
-        all_times = list(map(lambda x: x.strip(),
-                             tree.xpath('//*/tr[@class=$first or @class=$second][$count]/td[@class=$third]/text()',
-                                        first='zebracol-2',
-                                        second="zebracol-1", third='center sepline', count=i + 1)))
-        new_stop = Stop(stop_name=all_stations[i],
-                        stop_url=remove_param_from_url(all_links_of_station[i], '&time='), location_type=0)
-        stop = add_stop(new_stop)
-        stop_dto = StopDTO(stop.stop_name, stop.stop_url, stop.location_type, stop.stop_id)
-        if stop.stop_lat is None or stop.stop_lon is None and stop_dto not in real_thread_safe_q.queue:
-            real_thread_safe_q.put(stop_dto)
-        if str(all_times[2]).strip() != '' and str(all_times[2]).strip() != route_long_name.strip():
-            headsign = str(all_times[2]).strip()
-        new_stop_time = StopTime(stop_id=stop.stop_id, trip_id=trip.trip_id,
-                                 arrival_time=all_times[0] if all_times[0] == '' else all_times[0] + ':00',
-                                 departure_time=all_times[1] if all_times[1] == '' else all_times[1] + ':00',
-                                 stop_sequence=i + 1, pickup_type=0, drop_off_type=0, stop_headsign=headsign)
-        if new_stop_time.arrival_time == '':
-            new_stop_time.arrival_time = new_stop_time.departure_time
-        elif new_stop_time.departure_time == '':
-            new_stop_time.departure_time = new_stop_time.arrival_time
-        if stop_before_current is not None and int(stop_before_current.departure_time[0:2]) > int(
-                new_stop_time.arrival_time[0:2]):
-            new_stop_time.arrival_time = f'{int(new_stop_time.arrival_time[0:2]) + 24}{new_stop_time.arrival_time[2:]}'
-            new_stop_time.departure_time = f'{int(new_stop_time.departure_time[0:2]) + 24}{new_stop_time.departure_time[2:]}'
-        elif int(new_stop_time.arrival_time[0:2]) > int(new_stop_time.departure_time[0:2]):
-            new_stop_time.departure_time = f'{int(new_stop_time.departure_time[0:2]) + 24}{new_stop_time.departure_time[2:]}'
-        stop_before_current = new_stop_time
-        add_stop_time(new_stop_time)
-    pass
 
 
 def str_to_geocord(cord: str):
@@ -1025,7 +927,10 @@ class StopDTO:
         return self.stop_id == other.stop_id
 
 
-def load_route_with_data(url, page: PageDTO):
+def process_page(url, page):
+    if page is None:
+        response = requests_retry_session().get(url, timeout=5, verify=False)
+        page = request_processing_hook(response, None, None) # TODO check if it is working
     if page.calendar_data is None:
         raise Exception(f'no calendar_data')
     tree = html.fromstring(page.page)
@@ -1035,7 +940,7 @@ def load_route_with_data(url, page: PageDTO):
         new_agency: Agency = add_agency(page.agency)
     page.route.agency_id = new_agency.agency_id
     route = add_route(page.route)
-    calendar = add_calendar_dates2(page.calendar_data[0], page.calendar_data[1], page.calendar_data[2])
+    calendar = add_calendar_dates(page.calendar_data[0], page.calendar_data[1], page.calendar_data[2])
     new_trip = Trip(route_id=route.route_id, service_id=calendar.service_id, oebb_url=url)
     if new_trip.service_id is None:
         raise Exception(f'no service_id {url}')
@@ -1155,7 +1060,7 @@ if __name__ == "__main__":
             update_stops_thread = Thread(target=location_data_thread)
             update_stops_thread.daemon = True
             update_stops_thread.start()
-            load_route(url, True)
+            process_page(url, None)
             real_thread_safe_q.join()
             commit()
             exit(0)
@@ -1242,7 +1147,7 @@ if __name__ == "__main__":
                                 continue
                             page = q.pop()
                             try:
-                                load_route_with_data(page.url, page.data)
+                                process_page(page.url, page.data)
                             except Exception as e:
                                 logging.error(f'load_route {page.url} {repr(e)}')
                         print("finished batch", flush=True)

@@ -42,6 +42,7 @@ Session = sessionmaker(bind=engine, autoflush=False, autocommit=False, expire_on
 
 s = Session()
 
+
 def lockF(lock):
     def wrap(func):
         def wrapped(*args):
@@ -53,8 +54,11 @@ def lockF(lock):
             finally:
                 lock.release()
             return ret
+
         return wrapped
+
     return wrap
+
 
 def add_agency(agency):
     data = s.query(Agency).filter(Agency.agency_name == agency.agency_name).first()
@@ -68,6 +72,7 @@ def add_agency(agency):
 
 def add_frequency():
     pass
+
 
 def add_route(route: Route):
     data: Route = s.query(Route).filter(
@@ -107,45 +112,7 @@ def add_stop_time_text(text1):
     return
 
 
-# deprecated
 def add_calendar_dates(calendar_dates: [CalendarDate], only_dates_as_string: str, service: Calendar):
-    if only_dates_as_string == '':
-        subquery = ~s.query(CalendarDate).filter(CalendarDate.service_id == Calendar.service_id).exists()
-        data = s.query(Calendar).filter(subquery).first()
-        if data is None:
-            s.add(service)
-            s.flush()
-
-        else:
-            service = data
-    else:
-        aggregate_function = func.string_agg(
-            functions.concat(CalendarDate.date.cast(Text), CalendarDate.exception_type.cast(Text)),
-            aggregate_order_by(literal_column("','"), CalendarDate.date, CalendarDate.exception_type))
-        all_calendar_dates_service_query = s.query(CalendarDate.service_id).group_by(CalendarDate.service_id).having(
-            aggregate_function == only_dates_as_string)
-        calendar = s.query(Calendar).filter(
-            and_(Calendar.service_id.in_(all_calendar_dates_service_query), Calendar.start_date == service.start_date,
-                 Calendar.end_date == service.end_date,
-                 Calendar.monday == service.monday, Calendar.tuesday == service.tuesday,
-                 Calendar.wednesday == service.wednesday, Calendar.thursday == service.thursday,
-                 Calendar.friday == service.friday, Calendar.saturday == service.saturday,
-                 Calendar.sunday == service.sunday))
-        calendar = calendar.first()
-        if calendar is None:
-            s.add(service)
-            s.flush()
-
-            for i in calendar_dates:
-                i.service_id = service.service_id
-            s.bulk_save_objects(calendar_dates)
-            s.flush()
-        else:
-            service = calendar
-    return service
-
-
-def add_calendar_dates2(calendar_dates: [CalendarDate], only_dates_as_string: str, service: Calendar):
     if only_dates_as_string == '':
         data = s.query(Calendar).filter(
             and_(Calendar.calendar_dates_hash == None, Calendar.start_date == service.start_date,
@@ -181,6 +148,7 @@ def add_calendar_dates2(calendar_dates: [CalendarDate], only_dates_as_string: st
         else:
             service = calendar
     return service
+
 
 def add_stop(stop: Stop):
     data: Stop = s.query(Stop).filter(Stop.stop_name == stop.stop_name).first()
@@ -233,6 +201,7 @@ def add_calendar(service: Calendar):
         service = data
     return service
 
+
 def add_trip(trip, hash1):
     data: Trip = s.query(Trip).filter(and_(Trip.service_id == trip.service_id, Trip.route_id == trip.route_id,
                                            Trip.station_departure_time_hash == hash1)).first()
@@ -274,6 +243,7 @@ def end_session():
         s.close()
     except:
         pass
+
 
 def column_windows(session, column, windowsize):
     """Return a series of WHERE clauses against
