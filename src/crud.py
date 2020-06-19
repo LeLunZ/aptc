@@ -21,20 +21,13 @@ import sqlalchemy
 
 lock = threading.Lock()
 
-agency_lock = threading.Lock()
-calendar_lock = threading.Lock()
-route_lock = threading.Lock()
-stop_lock = threading.Lock()
-trip_lock = threading.Lock()
-
 try:
     DATABASE_URI = 'postgres+psycopg2://' + str(os.environ['postgres'])
 except KeyError:
     DATABASE_URI = 'postgres+psycopg2://postgres:password@localhost:5432/postgres'
 
 from sqlalchemy import create_engine, and_, func, literal_column, Text
-from sqlalchemy.sql import functions
-from sqlalchemy.orm import sessionmaker, scoped_session
+from sqlalchemy.orm import sessionmaker
 
 engine = create_engine(DATABASE_URI)
 
@@ -76,7 +69,7 @@ def add_frequency():
 
 def add_route(route: Route):
     data: Route = s.query(Route).filter(
-        and_(Route.route_long_name == route.route_long_name, Route.agency_id == route.agency_id)).first()
+        and_(Route.route_type == route.route_type, Route.route_long_name == route.route_long_name, Route.agency_id == route.agency_id)).first()
     if data is None:
         s.add(route)
         s.flush()

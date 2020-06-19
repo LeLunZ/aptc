@@ -58,7 +58,7 @@ create table routes
         constraint routes_pkey
             primary key,
     constraint routes_sk
-        unique (agency_id, route_long_name)
+        unique (agency_id, route_long_name, route_type)
 );
 
 create table calendar

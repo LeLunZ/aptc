@@ -930,7 +930,7 @@ class StopDTO:
 def process_page(url, page):
     if page is None:
         response = requests_retry_session().get(url, timeout=5, verify=False)
-        page = request_processing_hook(response, None, None) # TODO check if it is working
+        page = request_processing_hook(response, None, None)  # TODO check if it is working
     if page.calendar_data is None:
         raise Exception(f'no calendar_data')
     tree = html.fromstring(page.page)
