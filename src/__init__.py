@@ -1160,7 +1160,7 @@ if __name__ == "__main__":
                 logging.error(f'get_location_suggestion_from_string {row} {str(e)}')
             logging.debug(f"finished {row}")
             commit()
-            print(f'{(time.time() - time_now) / 60} min.')
+            print(f'{(time.time() - time_now) / 60} min.', flush=True)
         real_thread_safe_q.join()
         commit()
 exit(0)
