@@ -252,14 +252,16 @@ def query_element(e):
 
 
 def commit():
-    s.commit()
+    with lock:
+        s.commit()
 
 
 def end_session():
-    try:
-        s.close()
-    except:
-        pass
+    with lock:
+        try:
+            s.close()
+        except:
+            pass
 
 
 def column_windows(session, column, windowsize):

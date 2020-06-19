@@ -824,8 +824,9 @@ def load_route(url, debug=False, route_page=None):
         new_stop = Stop(stop_name=all_stations[i],
                         stop_url=remove_param_from_url(all_links_of_station[i], '&time='), location_type=0)
         stop = add_stop(new_stop)
-        if stop.stop_lat is None or stop.stop_lon is None:
-            real_thread_safe_q.put(stop)
+        stop_dto = StopDTO(stop.stop_name, stop.stop_url, stop.location_type, stop.stop_id)
+        if stop.stop_lat is None or stop.stop_lon is None and stop_dto not in real_thread_safe_q.queue:
+            real_thread_safe_q.put(stop_dto)
         if str(all_times[2]).strip() != '' and str(all_times[2]).strip() != route_long_name.strip():
             headsign = str(all_times[2]).strip()
         new_stop_time = StopTime(stop_id=stop.stop_id, trip_id=trip.trip_id,
@@ -1013,6 +1014,9 @@ class StopDTO:
     location_type: int
     stop_id: int
 
+    def __eq__(self, other):
+        return self.stop_id == other.stop_id
+
 def load_route_with_data(url, page: PageDTO):
     tree = html.fromstring(page.page)
     if page.agency is None:
@@ -1036,8 +1040,9 @@ def load_route_with_data(url, page: PageDTO):
         new_stop = Stop(stop_name=page.all_stations[i],
                         stop_url=remove_param_from_url(page.links_of_all_stations[i], '&time='), location_type=0)
         stop = add_stop(new_stop)
-        if stop.stop_lat is None or stop.stop_lon is None:
-            real_thread_safe_q.put(StopDTO(stop.stop_name, stop.stop_url, stop.location_type, stop.stop_id))
+        stop_dto = StopDTO(stop.stop_name, stop.stop_url, stop.location_type, stop.stop_id)
+        if stop.stop_lat is None or stop.stop_lon is None and stop_dto not in real_thread_safe_q.queue:
+            real_thread_safe_q.put(stop_dto)
         if str(all_times[2]).strip() != '' and str(all_times[2]).strip() != page.route.route_long_name.strip():
             headsign = str(all_times[2]).strip()
         new_stop_time = StopTime(stop_id=stop.stop_id, trip_id=trip.trip_id,
