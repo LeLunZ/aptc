@@ -21,6 +21,12 @@ import sqlalchemy
 
 lock = threading.Lock()
 
+agency_lock = threading.Lock()
+calendar_lock = threading.Lock()
+route_lock = threading.Lock()
+stop_lock = threading.Lock()
+trip_lock = threading.Lock()
+
 try:
     DATABASE_URI = 'postgres+psycopg2://' + str(os.environ['postgres'])
 except KeyError:
@@ -37,6 +43,17 @@ Session = sessionmaker(bind=engine, autoflush=False, autocommit=False, expire_on
 s = Session()
 
 
+def lockF(lock):
+    def wrap(func):
+        def wrapped(*args):
+            with lock:
+                return func(*args)
+
+        return wrapped
+
+    return wrap
+
+@lockF(agency_lock)
 def add_agency(agency):
     data = s.query(Agency).filter(Agency.agency_name == agency.agency_name).first()
     if data is None:
@@ -50,7 +67,7 @@ def add_agency(agency):
 def add_frequency():
     pass
 
-
+@lockF(route_lock)
 def add_route(route: Route):
     data: Route = s.query(Route).filter(
         and_(Route.route_long_name == route.route_long_name, Route.agency_id == route.agency_id)).first()
@@ -61,11 +78,6 @@ def add_route(route: Route):
     else:
         route = data
     return route
-
-
-def route_exist(url):
-    data: Trip = s.query(Trip).filter(Trip.oebb_url == url).first()
-    return data is not None
 
 
 def add_shape():
@@ -133,6 +145,7 @@ def add_calendar_dates(calendar_dates: [CalendarDate], only_dates_as_string: str
     return service
 
 
+@lockF(calendar_lock)
 def add_calendar_dates2(calendar_dates: [CalendarDate], only_dates_as_string: str, service: Calendar):
     if only_dates_as_string == '':
         data = s.query(Calendar).filter(
@@ -170,7 +183,7 @@ def add_calendar_dates2(calendar_dates: [CalendarDate], only_dates_as_string: st
             service = calendar
     return service
 
-
+@lockF(stop_lock)
 def add_stop(stop: Stop):
     data: Stop = s.query(Stop).filter(Stop.stop_name == stop.stop_name).first()
     if data is None:
@@ -180,12 +193,14 @@ def add_stop(stop: Stop):
         stop = data
     return stop
 
+
 def update_location_of_stop(stop, lat, lng):
     with lock:
         try:
             s.query(Stop).filter(stop.stop_id == Stop.stop_id).update({Stop.stop_lat: lat, Stop.stop_lon: lng})
         except:
             print("fucked up. Object probably not in session", flush=True)
+
 
 def add_stop_time(stoptime: StopTime):
     s.add(stoptime)
@@ -195,7 +210,7 @@ def add_stop_time(stoptime: StopTime):
 def add_transfer():
     pass
 
-
+@lockF(calendar_lock)
 def add_calendar(service: Calendar):
     if service.service_id is not None:
         data: Calendar = s.query(Calendar).filter(
@@ -220,7 +235,7 @@ def add_calendar(service: Calendar):
         service = data
     return service
 
-
+@lockF(trip_lock)
 def add_trip(trip, hash1):
     data: Trip = s.query(Trip).filter(and_(Trip.service_id == trip.service_id, Trip.route_id == trip.route_id,
                                            Trip.station_departure_time_hash == hash1)).first()
@@ -240,6 +255,7 @@ def get_from_table(t):
 def get_from_table_first(t):
     return s.query(t).first()
 
+
 def new_session():
     global s
     with lock:
@@ -257,11 +273,10 @@ def commit():
 
 
 def end_session():
-    with lock:
-        try:
-            s.close()
-        except:
-            pass
+    try:
+        s.close()
+    except:
+        pass
 
 
 def column_windows(session, column, windowsize):

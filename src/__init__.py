@@ -11,7 +11,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from requests_futures.sessions import FuturesSession
-from concurrent.futures import as_completed
+from concurrent.futures import as_completed, ThreadPoolExecutor
 
 if __name__ == "__main__":
     from Models.agency import Agency
@@ -356,7 +356,7 @@ def extract_date_from_str(calendar: Calendar, date_str: str, add=True):
     if 'fährt am' in working_dates:
         index_a = date_arr.index('am')
         try:
-            int(date_arr[index_a+1:][0].replace('.', ''))
+            int(date_arr[index_a + 1:][0].replace('.', ''))
         except:
             index_a = date_arr.index('am', index_a + 1)
         index_a = index_a + 1
@@ -1017,12 +1017,15 @@ class StopDTO:
     def __eq__(self, other):
         return self.stop_id == other.stop_id
 
+
 def load_route_with_data(url, page: PageDTO):
+    if page.calendar_data is None:
+        raise Exception(f'no calendar_data')
     tree = html.fromstring(page.page)
     if page.agency is None:
-        new_agency:Agency = get_from_table_first(Agency)
+        new_agency: Agency = get_from_table_first(Agency)
     else:
-        new_agency:Agency = add_agency(page.agency)
+        new_agency: Agency = add_agency(page.agency)
     page.route.agency_id = new_agency.agency_id
     route = add_route(page.route)
     calendar = add_calendar_dates2(page.calendar_data[0], page.calendar_data[1], page.calendar_data[2])
@@ -1108,7 +1111,10 @@ def request_processing_hook(resp, *args, **kwargs):
                       route_type=route_type,
                       route_url=url)
     calendar = Calendar()
-    calendar_data = extract_dates_from_oebb_page(tree, calendar, False)
+    try:
+        calendar_data = extract_dates_from_oebb_page(tree, calendar, False)
+    except:
+        calendar_data = None
     all_times = list(map(lambda x: x.strip(),
                          tree.xpath('//*/tr[@class=$first or @class=$second][$count]/td[@class=$third]/text()',
                                     first='zebracol-2',
@@ -1127,6 +1133,29 @@ def load_data_async(routes):
         response = i.result()
         q.append(response)
     exit(0)
+
+
+page_lock = threading.Lock()
+
+
+@lockF(page_lock)
+def get_page_dto():
+    return q.pop()
+
+
+t = None
+
+
+def test_multiple_inserts_thread():
+    while t.is_alive() or (not t.is_alive() and len(q) > 0):
+        if len(q) == 0:
+            time.sleep(0.1)
+            continue
+        page = get_page_dto()
+        try:
+            load_route_with_data(page.url, page.data)
+        except Exception as e:
+            logging.error(f'load_route {page.url} {repr(e)}')
 
 
 if __name__ == "__main__":
@@ -1181,6 +1210,7 @@ if __name__ == "__main__":
         update_stops_thread.daemon = True
         update_stops_thread.start()
         for row in skip_stop(csv_reader, begin, end):
+            time_now = time.time()
             new_session()
             try:
                 location_data = get_location_suggestion_from_string(row[0])
@@ -1222,15 +1252,9 @@ if __name__ == "__main__":
                         t.daemon = True
                         t.start()
                         commit()
-                        while t.is_alive() or (not t.is_alive() and len(q) > 0):
-                            if len(q) == 0:
-                                time.sleep(0.1)
-                                continue
-                            page = q.pop()
-                            try:
-                                load_route_with_data(page.url, page.data)
-                            except Exception as e:
-                                logging.error(f'load_route {page.url} {repr(e)}')
+                        with ThreadPoolExecutor(max_workers=5) as executor:
+                            executor.map(test_multiple_inserts_thread)
+                            executor.shutdown(wait=True)
                         print("finished batch", flush=True)
                     except Exception as e:
                         log_error(f'get_all_name_of_transport_distinct {public_transportation_journey} {str(e)}')
@@ -1240,6 +1264,7 @@ if __name__ == "__main__":
                 logging.error(f'get_location_suggestion_from_string {row} {str(e)}')
             logging.debug(f"finished {row}")
             commit()
+            print(f'{(time.time() - time_now) / 60} min.')
         real_thread_safe_q.join()
         commit()
 exit(0)
