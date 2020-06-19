@@ -151,13 +151,12 @@ def add_stop(stop: Stop):
         stop = data
     return stop
 
-
+@lockF(lock)
 def update_location_of_stop(stop, lat, lng):
-    with lock:
-        try:
-            s.query(Stop).filter(stop.stop_id == Stop.stop_id).update({Stop.stop_lat: lat, Stop.stop_lon: lng})
-        except:
-            print("fucked up. Object probably not in session", flush=True)
+    try:
+        s.query(Stop).filter(stop.stop_id == Stop.stop_id).update({Stop.stop_lat: lat, Stop.stop_lon: lng})
+    except:
+        print("fucked up. Object probably not in session", flush=True)
 
 
 def add_stop_time(stoptime: StopTime):

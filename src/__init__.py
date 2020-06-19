@@ -878,6 +878,7 @@ def location_data_thread():
     already_done = set()
     while True:
         stop = real_thread_safe_q.get()
+        time.sleep(0.1)
         if stop.stop_name in stop_dict:
             coords = stop_dict.pop(stop.stop_name)
             try:
