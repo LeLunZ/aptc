@@ -57,7 +57,7 @@ try:
 except:
     pass
 
-date = '22.06.2020'
+date = '13.07.2020'
 
 logging.basicConfig(filename='./aptc.log',
                     filemode='a',
@@ -224,7 +224,7 @@ def get_all_routes_of_transport_and_station(transport_number, station):
         'stationname': station['value'],
         'REQ0JourneyStopsSID': station['id'],
         'selectDate': 'oneday',
-        'date': "Mo, 22.06.2020",
+        'date': "Mo, 13.07.2020",
         'wDayExt0': 'Mo|Di|Mi|Do|Fr|Sa|So',
         'periodStart': '15.09.2019',
         'periodEnd': '12.12.2020',
@@ -826,7 +826,7 @@ def add_allg_feiertage(feiertag, year):
 
 def load_allg_feiertage():
     try:
-        with open(f'./{begin_date.year}-{end_date.year}.pickle', 'rb') as f:
+        with open(f'{begin_date.year}-{begin_date.month}-{begin_date.day}-{end_date.year}-{end_date.month}-{end_date.day}.pickle', 'rb') as f:
             allg_feiertage.extend(pickle.load(f))
     except:
         chrome_options = webdriver.ChromeOptions()
@@ -857,7 +857,7 @@ def load_allg_feiertage():
 
 def get_std_date():
     global begin_date, end_date
-    website = requests.get('http://fahrplan.oebb.at/bin/query.exe/dn?')
+    website = requests_retry_session(retries=10).get('http://fahrplan.oebb.at/bin/query.exe/dn?')
     tree = html.fromstring(website.content)
     validity = tree.xpath('//*/span[@class=$validity]/text()', validity='timetable_validity')[0]
     end = validity.split('bis')[1].replace('.', ' ').strip()
