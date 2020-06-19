@@ -34,7 +34,7 @@ except KeyError:
 
 from sqlalchemy import create_engine, and_, func, literal_column, Text
 from sqlalchemy.sql import functions
-from sqlalchemy.orm import sessionmaker, aliased, scoped_session
+from sqlalchemy.orm import sessionmaker, scoped_session
 
 engine = create_engine(DATABASE_URI)
 
@@ -42,18 +42,20 @@ Session = sessionmaker(bind=engine, autoflush=False, autocommit=False, expire_on
 
 s = Session()
 
-
 def lockF(lock):
     def wrap(func):
         def wrapped(*args):
-            with lock:
-                return func(*args)
-
+            lock.acquire()
+            try:
+                ret = func(*args)
+            except Exception as e:
+                raise e
+            finally:
+                lock.release()
+            return ret
         return wrapped
-
     return wrap
 
-@lockF(agency_lock)
 def add_agency(agency):
     data = s.query(Agency).filter(Agency.agency_name == agency.agency_name).first()
     if data is None:
@@ -67,14 +69,12 @@ def add_agency(agency):
 def add_frequency():
     pass
 
-@lockF(route_lock)
 def add_route(route: Route):
     data: Route = s.query(Route).filter(
         and_(Route.route_long_name == route.route_long_name, Route.agency_id == route.agency_id)).first()
     if data is None:
         s.add(route)
         s.flush()
-
     else:
         route = data
     return route
@@ -145,7 +145,6 @@ def add_calendar_dates(calendar_dates: [CalendarDate], only_dates_as_string: str
     return service
 
 
-@lockF(calendar_lock)
 def add_calendar_dates2(calendar_dates: [CalendarDate], only_dates_as_string: str, service: Calendar):
     if only_dates_as_string == '':
         data = s.query(Calendar).filter(
@@ -183,7 +182,6 @@ def add_calendar_dates2(calendar_dates: [CalendarDate], only_dates_as_string: st
             service = calendar
     return service
 
-@lockF(stop_lock)
 def add_stop(stop: Stop):
     data: Stop = s.query(Stop).filter(Stop.stop_name == stop.stop_name).first()
     if data is None:
@@ -210,7 +208,7 @@ def add_stop_time(stoptime: StopTime):
 def add_transfer():
     pass
 
-@lockF(calendar_lock)
+
 def add_calendar(service: Calendar):
     if service.service_id is not None:
         data: Calendar = s.query(Calendar).filter(
@@ -235,7 +233,6 @@ def add_calendar(service: Calendar):
         service = data
     return service
 
-@lockF(trip_lock)
 def add_trip(trip, hash1):
     data: Trip = s.query(Trip).filter(and_(Trip.service_id == trip.service_id, Trip.route_id == trip.route_id,
                                            Trip.station_departure_time_hash == hash1)).first()
@@ -256,20 +253,20 @@ def get_from_table_first(t):
     return s.query(t).first()
 
 
+@lockF(lock)
 def new_session():
     global s
-    with lock:
-        end_session()
-        s = Session(autoflush=False)
+    end_session()
+    s = Session()
 
 
 def query_element(e):
     return s.query(e)
 
 
+@lockF(lock)
 def commit():
-    with lock:
-        s.commit()
+    s.commit()
 
 
 def end_session():
@@ -277,7 +274,6 @@ def end_session():
         s.close()
     except:
         pass
-
 
 def column_windows(session, column, windowsize):
     """Return a series of WHERE clauses against

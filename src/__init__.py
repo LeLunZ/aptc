@@ -1,6 +1,7 @@
 import copy
 import json
 import logging
+import pickle
 import time
 from dataclasses import dataclass
 from queue import Queue
@@ -922,28 +923,34 @@ def add_allg_feiertage(feiertag, year):
 
 
 def load_allg_feiertage():
-    chrome_options = webdriver.ChromeOptions()
-    chrome_options.add_argument('--no-sandbox')
-    chrome_options.add_argument('--headless')
-    chrome_options.add_argument('--disable-gpu')
-    SECRET_KEY = os.environ.get('AM_I_IN_A_DOCKER_CONTAINER', False)
-    if SECRET_KEY:
-        driver = webdriver.Chrome(options=chrome_options)
-    else:
-        driver = webdriver.Chrome('./chromedriver')
-    driver.get('https://www.timeanddate.de/feiertage/oesterreich/' + str(begin_date.year))
-    WebDriverWait(driver, 7).until(EC.presence_of_element_located((By.XPATH, '//*/tbody')))
-    elements = driver.find_elements_by_xpath("//*/tbody/tr[@class='showrow']/th")
+    try:
+        with open(f'./{begin_date.year}-{end_date.year}.pickle', 'rb') as f:
+            allg_feiertage.extend(pickle.load(f))
+    except:
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options.add_argument('--no-sandbox')
+        chrome_options.add_argument('--headless')
+        chrome_options.add_argument('--disable-gpu')
+        SECRET_KEY = os.environ.get('AM_I_IN_A_DOCKER_CONTAINER', False)
+        if SECRET_KEY:
+            driver = webdriver.Chrome(options=chrome_options)
+        else:
+            driver = webdriver.Chrome('./chromedriver')
+        driver.get('https://www.timeanddate.de/feiertage/oesterreich/' + str(begin_date.year))
+        WebDriverWait(driver, 7).until(EC.presence_of_element_located((By.XPATH, '//*/tbody')))
+        elements = driver.find_elements_by_xpath("//*/tbody/tr[@class='showrow']/th")
 
-    for f in elements:
-        add_allg_feiertage(f.text, begin_date.year)
+        for f in elements:
+            add_allg_feiertage(f.text, begin_date.year)
 
-    driver.get('https://www.timeanddate.de/feiertage/oesterreich/' + str(end_date.year))
-    WebDriverWait(driver, 7).until(EC.presence_of_element_located((By.XPATH, '//*/tbody')))
-    elements = driver.find_elements_by_xpath("//*/tbody/tr[@class='showrow']/th")
-    for f in elements:
-        add_allg_feiertage(f.text, end_date.year)
-    driver.quit()
+        driver.get('https://www.timeanddate.de/feiertage/oesterreich/' + str(end_date.year))
+        WebDriverWait(driver, 7).until(EC.presence_of_element_located((By.XPATH, '//*/tbody')))
+        elements = driver.find_elements_by_xpath("//*/tbody/tr[@class='showrow']/th")
+        for f in elements:
+            add_allg_feiertage(f.text, end_date.year)
+        driver.quit()
+        with open(f'./{begin_date.year}-{end_date.year}.pickle', 'wb') as f:
+            pickle.dump(allg_feiertage, f)
 
 
 def get_std_date():
@@ -1135,29 +1142,6 @@ def load_data_async(routes):
     exit(0)
 
 
-page_lock = threading.Lock()
-
-
-@lockF(page_lock)
-def get_page_dto():
-    return q.pop()
-
-
-t = None
-
-
-def test_multiple_inserts_thread():
-    while t.is_alive() or (not t.is_alive() and len(q) > 0):
-        if len(q) == 0:
-            time.sleep(0.1)
-            continue
-        page = get_page_dto()
-        try:
-            load_route_with_data(page.url, page.data)
-        except Exception as e:
-            logging.error(f'load_route {page.url} {repr(e)}')
-
-
 if __name__ == "__main__":
     try:
         if os.environ['export']:
@@ -1252,9 +1236,15 @@ if __name__ == "__main__":
                         t.daemon = True
                         t.start()
                         commit()
-                        with ThreadPoolExecutor(max_workers=5) as executor:
-                            executor.map(test_multiple_inserts_thread)
-                            executor.shutdown(wait=True)
+                        while t.is_alive() or (not t.is_alive() and len(q) > 0):
+                            if len(q) == 0:
+                                time.sleep(0.1)
+                                continue
+                            page = q.pop()
+                            try:
+                                load_route_with_data(page.url, page.data)
+                            except Exception as e:
+                                logging.error(f'load_route {page.url} {repr(e)}')
                         print("finished batch", flush=True)
                     except Exception as e:
                         log_error(f'get_all_name_of_transport_distinct {public_transportation_journey} {str(e)}')
