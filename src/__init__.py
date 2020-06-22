@@ -1048,6 +1048,14 @@ def load_data_async(routes):
     exit(0)
 
 
+def add_all_empty_to_queue():
+    all_stops = get_stops_without_location()
+    for stop in all_stops:
+        stop_dto = StopDTO(stop.stop_name, stop.stop_url, stop.location_type, stop.stop_id)
+        if stop.stop_lat is None or stop.stop_lon is None and stop_dto not in real_thread_safe_q.queue:
+            real_thread_safe_q.put(stop_dto)
+
+
 if __name__ == "__main__":
     try:
         if os.environ['export']:
@@ -1161,6 +1169,7 @@ if __name__ == "__main__":
             logging.debug(f"finished {row}")
             commit()
             print(f'{(time.time() - time_now) / 60} min.', flush=True)
+        add_all_empty_to_queue()
         real_thread_safe_q.join()
         commit()
 exit(0)

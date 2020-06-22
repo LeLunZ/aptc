@@ -26,7 +26,7 @@ try:
 except KeyError:
     DATABASE_URI = 'postgres+psycopg2://postgres:password@localhost:5432/postgres'
 
-from sqlalchemy import create_engine, and_, func, literal_column, Text
+from sqlalchemy import create_engine, and_, or_, func, literal_column, Text
 from sqlalchemy.orm import sessionmaker
 
 engine = create_engine(DATABASE_URI)
@@ -69,7 +69,8 @@ def add_frequency():
 
 def add_route(route: Route):
     data: Route = s.query(Route).filter(
-        and_(Route.route_type == route.route_type, Route.route_long_name == route.route_long_name, Route.agency_id == route.agency_id)).first()
+        and_(Route.route_type == route.route_type, Route.route_long_name == route.route_long_name,
+             Route.agency_id == route.agency_id)).first()
     if data is None:
         s.add(route)
         s.flush()
@@ -151,6 +152,7 @@ def add_stop(stop: Stop):
         stop = data
     return stop
 
+
 @lockF(lock)
 def update_location_of_stop(stop, lat, lng):
     try:
@@ -182,6 +184,10 @@ def add_trip(trip, hash1):
 
 def get_from_table(t):
     return s.query(t).all()
+
+
+def get_stops_without_location():
+    return s.query(Stop).filter(or_(Stop.stop_lon == None, Stop.stop_lat == None)).all()
 
 
 def get_from_table_first(t):
