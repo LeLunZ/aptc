@@ -125,7 +125,9 @@ route_types = {
     '/img/vs_oebb/sch_pic.gif': 3,
     '/img/vs_oebb/rgj_pic.gif': 2,
     '/img/vs_oebb/val_pic.gif': 3,
-    '/img/vs_oebb/rfb_pic.gif': 715
+    '/img/vs_oebb/rfb_pic.gif': 715,
+    '/img/vs_oebb/lil_pic.gif': 107,
+    '/img/vs_oebb/bmz_pic.gif': 107
 }
 
 
