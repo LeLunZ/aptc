@@ -1053,7 +1053,7 @@ def request_processing_hook(resp, *args, **kwargs):
 
 def load_data_async(routes):
     future_session = requests_retry_session_async(session=FuturesSession())
-    futures = [future_session.get(route, timeout=5, verify=False, hooks={'response': request_processing_hook}) for route
+    futures = [future_session.get(route, timeout=20, verify=False, hooks={'response': request_processing_hook}) for route
                in routes]
     for i in as_completed(futures):
         response = i.result()
