@@ -901,7 +901,7 @@ def location_data_thread():
                 pass
         else:
             try:
-                future_1 = requests_retry_session_async().get(
+                future_1 = session.get(
                     'http://fahrplan.oebb.at/bin/ajax-getstop.exe/dn?REQ0JourneyStopsS0A=1&REQ0JourneyStopsB=12&S=' + stop.stop_name + '?&js=false&',
                     verify=False)
                 oebb_location = future_1.result()
