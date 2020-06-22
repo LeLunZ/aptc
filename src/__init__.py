@@ -889,6 +889,7 @@ def get_std_date():
 def location_data_thread():
     global stop_dict
     already_done = set()
+    session = requests_retry_session_async(session=FuturesSession(max_workers=1))
     while True:
         stop = real_thread_safe_q.get()
         time.sleep(0.1)
