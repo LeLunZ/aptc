@@ -402,7 +402,7 @@ def extract_date_from_str(calendar: Calendar, date_str: str, add=True):
             date = None
             date2 = None
             try:
-                day = int(possible_1) if 0 < int(possible_1) < 30 else None
+                day = int(possible_1) if 0 < int(possible_1) < 32 else None
                 year = int(possible_1) if day is None else None
                 if year is None:
                     date = extract_date_from_date_arr(date_arr[index - 1:index])
@@ -418,7 +418,7 @@ def extract_date_from_str(calendar: Calendar, date_str: str, add=True):
             if date is not None:
                 possible_1 = date_arr[index + 1].replace('.', '')
                 try:
-                    day = int(possible_1) if 0 < int(possible_1) < 30 else None  # leave it here. for exception
+                    day = int(possible_1) if 0 < int(possible_1) < 32 else None  # leave it here. for exception
                     date2 = extract_date_from_date_arr(date_arr[index + 1:index + 4])
                     last_index = index + 4
                 except:
@@ -519,7 +519,7 @@ def extract_date_from_str(calendar: Calendar, date_str: str, add=True):
             date = None
             date2 = None
             try:
-                day = int(possible_1) if 0 < int(possible_1) < 30 else None
+                day = int(possible_1) if 0 < int(possible_1) < 32 else None
                 year = int(possible_1) if day is None else None
                 if year is None:
                     date = extract_date_from_date_arr(date_arr[index - 1:index])
@@ -535,7 +535,7 @@ def extract_date_from_str(calendar: Calendar, date_str: str, add=True):
             if date is not None:
                 possible_1 = date_arr[index + 1].replace('.', '')
                 try:
-                    day = int(possible_1) if 0 < int(possible_1) < 30 else None
+                    day = int(possible_1) if 0 < int(possible_1) < 32 else None
                     date2 = extract_date_from_date_arr(date_arr[index + 1:index + 3])
                     last_index = index + 3
                 except:
