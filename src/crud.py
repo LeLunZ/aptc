@@ -36,6 +36,10 @@ Session = sessionmaker(bind=engine, autoflush=False, autocommit=False, expire_on
 s = Session()
 
 
+class TripAlreadyPresentError(Exception):
+    pass
+
+
 def lockF(lock):
     def wrap(func):
         def wrapped(*args):
@@ -178,7 +182,7 @@ def add_trip(trip, hash1):
         s.add(trip)
         s.flush()
     else:
-        raise Exception('Trip already exists! noob.')
+        raise TripAlreadyPresentError()
     return trip
 
 

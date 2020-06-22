@@ -1158,6 +1158,8 @@ if __name__ == "__main__":
                             page = q.pop()
                             try:
                                 process_page(page.url, page.data)
+                            except TripAlreadyPresentError as e:
+                                pass
                             except Exception as e:
                                 logging.error(f'load_route {page.url} {repr(e)}')
                         print("finished batch", flush=True)
