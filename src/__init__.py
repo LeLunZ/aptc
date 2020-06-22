@@ -943,7 +943,7 @@ class StopDTO:
 
 def process_page(url, page):
     if page is None:
-        response = requests_retry_session().get(url, timeout=5, verify=False)
+        response = requests_retry_session().get(url, timeout=10, verify=False)
         page = request_processing_hook(response, None, None)  # TODO check if it is working
     if page.calendar_data is None:
         raise Exception(f'no calendar_data')
@@ -1053,7 +1053,7 @@ def request_processing_hook(resp, *args, **kwargs):
 
 def load_data_async(routes):
     future_session = requests_retry_session_async(session=FuturesSession())
-    futures = [future_session.get(route, timeout=60, verify=False, hooks={'response': request_processing_hook}) for route
+    futures = [future_session.get(route, timeout=300, verify=False, hooks={'response': request_processing_hook}) for route
                in routes]
     for i in as_completed(futures):
         response = i.result()
