@@ -1097,7 +1097,7 @@ if __name__ == "__main__":
             end = row_count - 1
         csv_file.seek(0)
         for count, i in enumerate(csv_reader):
-            if count != 0:
+            if count != 0 and i[7] != '' and i[8] != '':
                 stop_dict[i[0]] = {'x': float(i[7]), 'y': float(i[8])}
         csv_file.seek(0)
         csv_reader = csv.reader(csv_file, delimiter=',')
