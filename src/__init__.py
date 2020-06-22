@@ -1107,6 +1107,7 @@ if __name__ == "__main__":
         update_stops_thread = Thread(target=location_data_thread)
         update_stops_thread.daemon = True
         update_stops_thread.start()
+        print("started crawling", flush=True)
         for row in skip_stop(csv_reader, begin, end):
             time_now = time.time()
             new_session()
