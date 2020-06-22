@@ -1056,8 +1056,11 @@ def load_data_async(routes):
     futures = [future_session.get(route, timeout=300, verify=False, hooks={'response': request_processing_hook}) for route
                in routes]
     for i in as_completed(futures):
-        response = i.result()
-        q.append(response)
+        try:
+            response = i.result()
+            q.append(response)
+        except:
+            print(f'{i.url} connection timeout', flush=True)
     exit(0)
 
 
