@@ -458,39 +458,44 @@ def extract_date_from_str(calendar: Calendar, date_str: str, add=True):
                     not_working_calendar_date.append(newDate)
             for i in range(first_index, last_index):
                 date_arr.pop(first_index)
-
         date_arr.reverse()
         year = None
         month = None
         for count, d in enumerate(date_arr):
-            if year is not None and month is not None:
-                try:
-                    day = int(d)
-                    date = OebbDate()
-                    date.year = year
-                    date.month = month
-                    date.day = day
-                    date.extend = False
-                    not_working_calendar_date.append(date)
-                    continue
-                except:
-                    pass
-            if year is None and month is not None:
-                try:
-                    day = int(d)
-                    date = OebbDate()
-                    if service_months[month] > service_months[finish_date.month] or (
-                            service_months[month] is service_months[finish_date.month] and day > finish_date.day):
-                        date.year = begin_date.year
-                    else:
-                        date.year = finish_date.year
-                    date.month = month
-                    date.day = day
-                    date.extend = False
-                    not_working_calendar_date.append(date)
-                    continue
-                except:
-                    pass
+            try:
+                test_day = int(d)
+                if test_day > 31:
+                    raise Exception()
+                if year is not None and month is not None:
+                    try:
+                        day = int(d)
+                        date = OebbDate()
+                        date.year = year
+                        date.month = month
+                        date.day = day
+                        date.extend = False
+                        not_working_calendar_date.append(date)
+                        continue
+                    except:
+                        pass
+                if year is None and month is not None:
+                    try:
+                        day = int(d)
+                        date = OebbDate()
+                        if service_months[month] > service_months[finish_date.month] or (
+                                service_months[month] is service_months[finish_date.month] and day > finish_date.day):
+                            date.year = begin_date.year
+                        else:
+                            date.year = finish_date.year
+                        date.month = month
+                        date.day = day
+                        date.extend = False
+                        not_working_calendar_date.append(date)
+                        continue
+                    except:
+                        pass
+            except:
+                pass
             try:
                 year = int(d)
                 if year < finish_date.year or year > finish_date.year:
