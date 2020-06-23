@@ -6,19 +6,14 @@ from Models.route import Route
 from Models.stop import Stop
 from Models.stop_times import StopTime
 from Models.trip import Trip
-
 from Models.calendar import Calendar
-from sqlalchemy.dialects.postgresql import aggregate_order_by
-from Models.frequencies import Frequency
-from Models.shape import Shape
-from Models.transfers import Transfer
 from Models.calendar_date import CalendarDate
 from Models.transport_type_image import TransportTypeImage
 from Models.stop_time_text import StopTimeText
-from sqlalchemy.exc import SQLAlchemyError
-
 import sqlalchemy
+import pyhash
 
+hasher = pyhash.fnv1a_64()
 lock = threading.Lock()
 
 try:
@@ -125,7 +120,7 @@ def add_calendar_dates(calendar_dates: [CalendarDate], only_dates_as_string: str
         else:
             service = data
     else:
-        hash_value = str(hash(only_dates_as_string))
+        hash_value = hasher(only_dates_as_string)
         calendar = s.query(Calendar).filter(
             and_(Calendar.calendar_dates_hash == hash_value, Calendar.start_date == service.start_date,
                  Calendar.end_date == service.end_date,
@@ -175,9 +170,9 @@ def add_transfer():
 
 
 def add_trip(trip, hash1):
+    trip.station_departure_time = hash1
     data: Trip = s.query(Trip).filter(and_(Trip.service_id == trip.service_id, Trip.route_id == trip.route_id,
-                                           Trip.station_departure_time_hash == hash1)).first()
-    trip.station_departure_time_hash = hash1
+                                           Trip.station_departure_time == trip.station_departure_time)).first()
     if data is None:
         s.add(trip)
         s.flush()
@@ -228,7 +223,7 @@ def column_windows(session, column, windowsize):
     Result is an iterable of tuples, consisting of
     ((start, end), whereclause), where (start, end) are the ids.
 
-    Requires a database that supports window functions,
+    Requires a database that supports window Functions,
     i.e. Postgresql, SQL Server, Oracle.
 
     Enhance this yourself !  Add a "where" argument

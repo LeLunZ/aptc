@@ -5,5 +5,5 @@ services:
     build: .
     network_mode: "host"
     volumes:
-    - ./src/aptc.log:/app/aptc.log
+    - ./src/Data/:/app/Data/
     - ./db/:/app/db/

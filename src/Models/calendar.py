@@ -1,5 +1,5 @@
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, Date, Float, Text, Boolean, Numeric
+from sqlalchemy import Column, Integer, String, Date, Float, Text, Boolean, Numeric, BigInteger
 
 Base = declarative_base()
 
@@ -16,7 +16,7 @@ class Calendar(Base):
     sunday = Column(Boolean, nullable=False)
     start_date = Column(Numeric, nullable=True)
     end_date = Column(Numeric, nullable=False)
-    calendar_dates_hash = Column(Text, nullable=True)
+    calendar_dates_hash = Column(BigInteger, nullable=True)
 
     def __repr__(self):
         return "<Calendar(id='{}', start='{}', end={})>" \

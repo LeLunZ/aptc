@@ -75,7 +75,7 @@ create table calendar
     sunday              boolean    not null,
     start_date          numeric(8),
     end_date            numeric(8) not null,
-    calendar_dates_hash text
+    calendar_dates_hash BIGINT
 );
 
 create unique index calendar_end_date_start_date_monday_tuesday_hash
@@ -107,11 +107,11 @@ create table trips
         constraint trips_pkey
             primary key,
     oebb_url                    text,
-    station_departure_time_hash text    not null
+    station_departure_time text    not null
 );
 
-create unique index trips_service_id_route_id_station_departure_time_hash_uindex
-    on trips (service_id, route_id, station_departure_time_hash);
+create unique index trips_service_id_route_id_station_departure_time_uindex
+    on trips (service_id, route_id, station_departure_time);
 
 create table frequencies
 (

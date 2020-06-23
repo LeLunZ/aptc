@@ -4,3 +4,4 @@ stop_example
 .idea
 *log
 db
+bus_stops.csv

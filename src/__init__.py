@@ -3,16 +3,22 @@ import json
 import logging
 import pickle
 import time
-from dataclasses import dataclass
 from queue import Queue
 from threading import Thread
-from typing import List, Tuple
 
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from requests_futures.sessions import FuturesSession
-from concurrent.futures import as_completed, ThreadPoolExecutor
+from concurrent.futures import as_completed
+
+from Classes.DTOs import StopDTO, PageDTO
+from Functions.helper import add_day_to_calendar, extract_date_from_date_arr, merge_date, add_days_to_calendar, \
+    str_to_geocord, \
+    remove_param_from_url, skip_stop, get_all_name_of_transport_distinct, extract_date_objects_from_str
+from Classes.oebb_date import OebbDate, service_months, begin_date, end_date, get_std_date
+from Functions.oebb_requests import requests_retry_session, requests_retry_session_async, get_all_routes_from_station, \
+    get_location_suggestion_from_string, get_all_routes_of_transport_and_station, get_all_station_ids_from_station
 
 if __name__ == "__main__":
     from Models.agency import Agency
@@ -29,19 +35,13 @@ if __name__ == "__main__":
     from Models.calendar_date import CalendarDate
     from crud import *
 
-from itertools import islice
 from selenium import webdriver
-import requests
 import csv
 from lxml import html
-from requests.adapters import HTTPAdapter
-from urllib3 import Retry
+
 import os
 from zipfile import ZipFile
 import datetime
-
-import urllib.parse as urlparse
-from urllib.parse import parse_qs
 
 stop_dict = {}
 
@@ -57,9 +57,7 @@ try:
 except:
     pass
 
-date = '13.07.2020'
-
-logging.basicConfig(filename='./aptc.log',
+logging.basicConfig(filename='./Data/aptc.log',
                     filemode='a',
                     format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
                     datefmt='%H:%M:%S',
@@ -67,21 +65,6 @@ logging.basicConfig(filename='./aptc.log',
 
 q = []
 real_thread_safe_q = Queue()
-
-service_months = {
-    'Jan': 1,
-    'Feb': 2,
-    'Mär': 3,
-    'Apr': 4,
-    'Mai': 5,
-    'Jun': 6,
-    'Jul': 7,
-    'Aug': 8,
-    'Sep': 9,
-    'Okt': 10,
-    'Nov': 11,
-    'Dez': 12
-}
 
 route_types = {
     '/img/vs_oebb/rex_pic.gif': 2,
@@ -130,83 +113,6 @@ route_types = {
     '/img/vs_oebb/bmz_pic.gif': 107
 }
 
-
-def requests_retry_session(
-        retries=5,
-        backoff_factor=0.2,
-        session=None,
-):
-    session = session or requests.session()
-    retry = Retry(
-        total=retries,
-        read=retries,
-        connect=retries,
-        backoff_factor=backoff_factor
-    )
-    adapter = HTTPAdapter(max_retries=retry)
-    session.mount('http://', adapter)
-    session.mount('https://', adapter)
-    return session
-
-
-def requests_retry_session_async(
-        retries=5,
-        backoff_factor=0.2,
-        session=None,
-):
-    session = session or FuturesSession()
-    retry = Retry(
-        total=retries,
-        read=retries,
-        connect=retries,
-        backoff_factor=backoff_factor
-    )
-    adapter = HTTPAdapter(max_retries=retry)
-    session.mount('http://', adapter)
-    session.mount('https://', adapter)
-    return session
-
-
-def get_location_suggestion_from_string(location: str):
-    oebb_location = requests_retry_session().get(
-        'http://fahrplan.oebb.at/bin/ajax-getstop.exe/dn?REQ0JourneyStopsS0A=1&REQ0JourneyStopsB=12&S=' + location + '?&js=false&',
-        verify=False)
-    locations = oebb_location.content[8:-22]
-    locations = json.loads(locations.decode('iso-8859-1'))
-    return locations
-
-
-def get_all_station_ids_from_station(station):
-    querystring = {"ld": "3"}
-    payload = {
-        'sqView': '1&input=' + station[
-            'value'] + '&time=21:42&maxJourneys=50&dateBegin=&dateEnd=&selectDate=&productsFilter=0000111011&editStation=yes&dirInput=&',
-        'input': station['value'],
-        'inputRef': station['value'] + '#' + str(int(station['extId'])),
-        'sqView=1&start': 'Information aufrufen',
-        'productsFilter': '0000111011'
-    }
-    response = requests_retry_session().post("https://fahrplan.oebb.at/bin/stboard.exe/dn", data=payload,
-                                             params=querystring)
-    tree = html.fromstring(response.content)
-    all_stations = tree.xpath('//*/option/@value')
-    return all_stations
-
-
-def get_all_routes_from_station(station_id):
-    try:
-        routes_of_station = requests_retry_session().get(
-            'http://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_scotty.vs_liveticker&evaId=' + str(
-                int(station_id)) + '&boardType=arr&time=00:00'
-                                   '&additionalTime=0&maxJourneys=100000&outputMode=tickerDataOnly&start=yes&selectDate'
-                                   '=period&dateBegin=' + date + 'dateEnd=' + date + '&productsFilter=1011111111011',
-            verify=False)
-        json_data = json.loads(routes_of_station.content.decode('iso-8859-1')[14:-1])
-    except:
-        json_data = None
-    return json_data
-
-
 days_name = {
     0: 'Mo',
     1: 'Di',
@@ -216,113 +122,6 @@ days_name = {
     5: 'Fr',
     6: 'Fr',
 }
-
-
-def get_all_routes_of_transport_and_station(transport_number, station):
-    url = "http://fahrplan.oebb.at/bin/trainsearch.exe/dn"
-    querystring = {"ld": "2"}
-    payload = {
-        'trainname': transport_number,
-        'stationname': station['value'],
-        'REQ0JourneyStopsSID': station['id'],
-        'selectDate': 'oneday',
-        'date': "Mo, 13.07.2020",
-        'wDayExt0': 'Mo|Di|Mi|Do|Fr|Sa|So',
-        'periodStart': '15.09.2019',
-        'periodEnd': '12.12.2020',
-        'time': '',
-        'maxResults': 10000,
-        'stationFilter': '81,01,02,03,04,05,06,07,08,09',
-        'start': 'Suchen'
-    }
-    response = requests_retry_session().post(url, data=payload, params=querystring, verify=False)
-    tree = html.fromstring(response.content)
-    all_routes = tree.xpath('//*/td[@class=$name]/a/@href', name='fcell')
-    return all_routes
-
-
-def get_all_name_of_transport_distinct(list_of_transport):
-    all_transport = set()
-    for transport in list_of_transport:
-        if transport['pr'] not in all_transport:
-            all_transport.add(transport['pr'])
-    return list(all_transport)
-
-
-def remove_param_from_url(url, to_remove):
-    splitted_url = url.split(to_remove)
-    left_part = splitted_url[0]
-
-    right_part = '&'.join(list(filter(lambda x: x.strip() != '', splitted_url[1].split('&')[::-1][:-1])))
-    return left_part + '&' + right_part
-
-
-class OebbDate:
-    def __init__(self):
-        self.day = None
-        self.month = None
-        self.year = None
-        self.extend = None
-
-    def __int__(self):
-        day = str(self.day)
-        if len(day) == 1:
-            day = f'0{self.day}'
-        month = service_months[self.month]
-        if month < 10:
-            month = f'0{service_months[self.month]}'
-        return int(f'{self.year}{month}{day}')
-
-
-begin_date: OebbDate = OebbDate()
-end_date: OebbDate = OebbDate()
-
-
-def extract_date_from_date_arr(date_arr: [str]):
-    date = OebbDate()
-    date.day = int(date_arr[0].replace('.', ''))
-    date.month = None
-    date.year = None
-    if len(date_arr) > 1 and date_arr[1] in service_months:
-        date.month = date_arr[1]
-        try:
-            date.year = int(date_arr[2])
-        except:
-            pass
-    return date
-
-
-def merge_date(date1: OebbDate, date2: OebbDate):
-    if date1.month is None:
-        date1.month = date2.month
-    if date1.year is None and date2.year is None:
-        date1.year = end_date.year
-        date2.year = end_date.year
-    if date1.year is None and date2.year is not None:
-        date1.year = date2.year
-
-
-def add_day_to_calendar(calendar: Calendar, week_day: str):
-    if week_day == 'Mo':
-        calendar.monday = True
-    if week_day == 'Di':
-        calendar.tuesday = True
-    if week_day == 'Mi':
-        calendar.wednesday = True
-    if week_day == 'Do':
-        calendar.thursday = True
-    if week_day == 'Fr':
-        calendar.friday = True
-    if week_day == 'Sa':
-        calendar.saturday = True
-    if week_day == 'So':
-        calendar.sunday = True
-
-
-def add_days_to_calendar(calendar: Calendar, begin: str, end: str):
-    official_weekdays = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
-    for d in official_weekdays[official_weekdays.index(begin):official_weekdays.index(end) + 1]:
-        add_day_to_calendar(calendar, d)
 
 
 def extract_date_from_str(calendar: Calendar, date_str: str, add=True):
@@ -342,7 +141,6 @@ def extract_date_from_str(calendar: Calendar, date_str: str, add=True):
     elif 'auch' in date_str:
         working_dates = date_str.split('auch')[0]
         extended_dates = date_str.split('auch')[1]
-
     date_arr = working_dates.split(' ')
     start_date = OebbDate()
     finish_date = OebbDate()
@@ -389,243 +187,14 @@ def extract_date_from_str(calendar: Calendar, date_str: str, add=True):
             else:
                 add_day_to_calendar(calendar, date_arr[index])
     not_working_calendar_date = []
-    inv_map = {v: k for k, v in service_months.items()}
+
     if irregular_dates is not None:
         if 'allg. Feiertg' in irregular_dates:
             not_working_calendar_date.extend(copy.deepcopy(allg_feiertage))
-        date_arr = irregular_dates.replace('.', '').replace(',', '').split(' ')
-        while 'bis' in date_arr:
-            index = date_arr.index('bis')
-            possible_1 = date_arr[index - 1].replace('.', '')
-            first_index = None
-            last_index = None
-            date = None
-            date2 = None
-            try:
-                day = int(possible_1) if 0 < int(possible_1) < 32 else None
-                year = int(possible_1) if day is None else None
-                if year is None:
-                    date = extract_date_from_date_arr(date_arr[index - 1:index])
-                    first_index = index - 1
-                else:
-                    date = extract_date_from_date_arr(date_arr[index - 3:index])
-                    first_index = index - 3
-            except:
-                month = possible_1
-                if month in service_months:
-                    date = extract_date_from_date_arr(date_arr[index - 2:index])
-                    first_index = index - 2
-            if date is not None:
-                possible_1 = date_arr[index + 1].replace('.', '')
-                try:
-                    day = int(possible_1) if 0 < int(possible_1) < 32 else None  # leave it here. for exception
-                    date2 = extract_date_from_date_arr(date_arr[index + 1:index + 4])
-                    last_index = index + 4
-                except:
-                    date2 = None
-            if date is not None and date2 is not None:
-                merge_date(date, date2)
-                newDate = None
-                while not (date.day == date2.day and date.month == date2.month and date.year == date2.year):
-                    try:
-                        newDate = OebbDate()
-                        newDate.day = date.day
-                        newDate.month = date.month
-                        newDate.year = date.year
-                        newDate.extend = False
-                        not_working_calendar_date.append(newDate)
-                        datetime.datetime(date.year, service_months[date.month], date.day + 1)
-                        date.day = date.day + 1
-                    except:
-                        try:
-                            datetime.datetime(date.year, service_months[date.month] + 1, 1)
-                            date.month = inv_map[service_months[date.month] + 1]
-                            date.day = 1
-                        except:
-                            try:
-                                datetime.datetime(date.year + 1, 1, 1)
-                                date.year = date.year + 1
-                                date.month = 'Jan'
-                                date.day = 1
-                            except:
-                                pass
-                if newDate is not None:
-                    newDate = OebbDate()
-                    newDate.day = date.day
-                    newDate.month = date.month
-                    newDate.year = date.year
-                    newDate.extend = False
-                    not_working_calendar_date.append(newDate)
-            for i in range(first_index, last_index):
-                date_arr.pop(first_index)
-        date_arr.reverse()
-        year = None
-        month = None
-        for count, d in enumerate(date_arr):
-            try:
-                test_day = int(d)
-                if test_day > 31:
-                    raise Exception()
-                if year is not None and month is not None:
-                    try:
-                        day = int(d)
-                        date = OebbDate()
-                        date.year = year
-                        date.month = month
-                        date.day = day
-                        date.extend = False
-                        not_working_calendar_date.append(date)
-                        continue
-                    except:
-                        pass
-                if year is None and month is not None:
-                    try:
-                        day = int(d)
-                        date = OebbDate()
-                        if service_months[month] > service_months[finish_date.month] or (
-                                service_months[month] is service_months[finish_date.month] and day > finish_date.day):
-                            date.year = begin_date.year
-                        else:
-                            date.year = finish_date.year
-                        date.month = month
-                        date.day = day
-                        date.extend = False
-                        not_working_calendar_date.append(date)
-                        continue
-                    except:
-                        pass
-            except:
-                pass
-            try:
-                year = int(d)
-                if year < finish_date.year or year > finish_date.year:
-                    raise Exception()
-                continue
-            except:
-                year = None
-            if d in service_months:
-                month = d
-                continue
-            else:
-                month = None
+        extract_date_objects_from_str(not_working_calendar_date, irregular_dates, start_date, finish_date)
     extended_working_dates = []
     if extended_dates is not None:
-        date_arr = extended_dates.replace('.', '').replace(',', '').split(' ')
-        while 'bis' in date_arr:
-            index = date_arr.index('bis')
-            possible_1 = date_arr[index - 1].replace('.', '')
-            first_index = None
-            last_index = None
-            date = None
-            date2 = None
-            try:
-                day = int(possible_1) if 0 < int(possible_1) < 32 else None
-                year = int(possible_1) if day is None else None
-                if year is None:
-                    date = extract_date_from_date_arr(date_arr[index - 1:index])
-                    first_index = index - 1
-                else:
-                    date = extract_date_from_date_arr(date_arr[index - 3:index])
-                    first_index = index - 3
-            except:
-                month = possible_1
-                if month in service_months:
-                    date = extract_date_from_date_arr(date_arr[index - 2:index])
-                    first_index = index - 2
-            if date is not None:
-                possible_1 = date_arr[index + 1].replace('.', '')
-                try:
-                    day = int(possible_1) if 0 < int(possible_1) < 32 else None
-                    date2 = extract_date_from_date_arr(date_arr[index + 1:index + 3])
-                    last_index = index + 3
-                except:
-                    date2 = None
-            if date is not None and date2 is not None:
-                merge_date(date, date2)
-                newDate = None
-                while not (date.day == date2.day and date.month == date2.month and date.year == date2.year):
-                    try:
-                        newDate = OebbDate()
-                        newDate.day = date.day
-                        newDate.month = date.month
-                        newDate.year = date.year
-                        newDate.extend = True
-                        extended_working_dates.append(newDate)
-                        datetime.datetime(date.year, service_months[date.month], date.day + 1)
-                        date.day = date.day + 1
-                    except:
-                        try:
-                            datetime.datetime(date.year, service_months[date.month] + 1, 1)
-                            date.month = inv_map[service_months[date.month] + 1]
-                            date.day = 1
-                        except:
-                            try:
-                                datetime.datetime(date.year + 1, 1, 1)
-                                date.year = date.year + 1
-                                date.month = 'Jan'
-                                date.day = 1
-                            except:
-                                pass
-                if newDate is not None:
-                    newDate = OebbDate()
-                    newDate.day = date.day
-                    newDate.month = date.month
-                    newDate.year = date.year
-                    newDate.extend = False
-                    extended_working_dates.append(newDate)
-            for i in range(first_index, last_index + 1):
-                date_arr.pop(first_index)
-        date_arr.reverse()
-        year = None
-        month = None
-        for count, d in enumerate(date_arr):
-            try:
-                test_day = int(d)
-                if test_day > 31:
-                    raise Exception()
-                if year is not None and month is not None:
-                    try:
-                        day = int(d)
-                        date = OebbDate()
-                        date.year = year
-                        date.month = month
-                        date.day = day
-                        date.extend = True
-                        extended_working_dates.append(date)
-                        continue
-                    except:
-                        pass
-                if year is None and month is not None:
-                    try:
-                        day = int(d)
-                        date = OebbDate()
-                        if service_months[month] > service_months[finish_date.month] or (
-                                service_months[month] is service_months[finish_date.month] and day > finish_date.day):
-                            date.year = begin_date.year
-                        else:
-                            date.year = finish_date.year
-                        date.month = month
-                        date.day = day
-                        date.extend = True
-                        extended_working_dates.append(date)
-                        continue
-                    except:
-                        pass
-            except:
-                pass
-            try:
-                year = int(d)
-                if year < begin_date.year or year > finish_date.year:
-                    raise Exception()
-                continue
-            except:
-                year = None
-            if d in service_months:
-                month = d
-                continue
-            else:
-                month = None
-
+        extract_date_objects_from_str(extended_working_dates, extended_dates, start_date, finish_date)
     calendar.start_date = int(start_date)
     calendar.end_date = int(finish_date)
     all_working_dates = extended_working_dates
@@ -764,10 +333,6 @@ def extract_dates_from_oebb_page(tree, calendar, add=True):
     return calendar
 
 
-def str_to_geocord(cord: str):
-    return int(cord) / 1000000
-
-
 def save_simple_stops(names, ids, main_station):
     if len(ids) > 1:
         for index, (name, id) in enumerate(zip(names, ids)):
@@ -779,12 +344,6 @@ def save_simple_stops(names, ids, main_station):
             new_stop = add_stop(new_stop)
     else:
         main_station = add_stop(main_station)
-
-
-def skip_stop(seq, begin, end):
-    for i, item in enumerate(seq):
-        if begin <= i <= end and item[-1] and item[-1] != '':
-            yield item
 
 
 def export_all_tables():
@@ -825,7 +384,7 @@ def export_all_tables():
             zip.write(file)
 
 
-def add_allg_feiertage(feiertag, year):
+def add_date_to_allg_feiertage(feiertag, year):
     date = OebbDate()
     f_split = feiertag.split(' ')
     date.day = int(f_split[0].replace('.', ''))
@@ -839,7 +398,9 @@ def add_allg_feiertage(feiertag, year):
 
 def load_allg_feiertage():
     try:
-        with open(f'{begin_date.year}-{begin_date.month}-{begin_date.day}-{end_date.year}-{end_date.month}-{end_date.day}.pickle', 'rb') as f:
+        with open(
+                f'Data/{begin_date.year}-{begin_date.month}-{begin_date.day}-{end_date.year}-{end_date.month}-{end_date.day}.pickle',
+                'rb') as f:
             allg_feiertage.extend(pickle.load(f))
     except:
         chrome_options = webdriver.ChromeOptions()
@@ -856,34 +417,18 @@ def load_allg_feiertage():
         elements = driver.find_elements_by_xpath("//*/tbody/tr[@class='showrow']/th")
 
         for f in elements:
-            add_allg_feiertage(f.text, begin_date.year)
+            add_date_to_allg_feiertage(f.text, begin_date.year)
 
         driver.get('https://www.timeanddate.de/feiertage/oesterreich/' + str(end_date.year))
         WebDriverWait(driver, 7).until(EC.presence_of_element_located((By.XPATH, '//*/tbody')))
         elements = driver.find_elements_by_xpath("//*/tbody/tr[@class='showrow']/th")
         for f in elements:
-            add_allg_feiertage(f.text, end_date.year)
+            add_date_to_allg_feiertage(f.text, end_date.year)
         driver.quit()
-        with open(f'./{begin_date.year}-{end_date.year}.pickle', 'wb') as f:
+        with open(
+                f'Data/{begin_date.year}-{begin_date.month}-{begin_date.day}-{end_date.year}-{end_date.month}-{end_date.day}.pickle',
+                'wb') as f:
             pickle.dump(allg_feiertage, f)
-
-
-def get_std_date():
-    global begin_date, end_date
-    website = requests_retry_session(retries=10).get('http://fahrplan.oebb.at/bin/query.exe/dn?')
-    tree = html.fromstring(website.content)
-    validity = tree.xpath('//*/span[@class=$validity]/text()', validity='timetable_validity')[0]
-    end = validity.split('bis')[1].replace('.', ' ').strip()
-    begin = validity.split(' bis ')[0].split(' vom ')[1].replace('.', ' ').strip()
-    inv_map = {v: k for k, v in service_months.items()}
-    date_begin = begin.split(' ')
-    begin_date.day = int(date_begin[0])
-    begin_date.month = inv_map[int(date_begin[1])]
-    begin_date.year = int(date_begin[2])
-    date_end = end.split(' ')
-    end_date.day = int(date_end[0])
-    end_date.month = inv_map[int(date_end[1])]
-    end_date.year = int(date_end[2])
 
 
 def location_data_thread():
@@ -919,29 +464,6 @@ def location_data_thread():
         real_thread_safe_q.task_done()
 
 
-@dataclass
-class PageDTO:
-    agency: Agency
-    route: Route
-    calendar_data: Tuple
-    first_station: str
-    dep_time: str
-    all_stations: List
-    links_of_all_stations: List
-    page: str
-
-
-@dataclass
-class StopDTO:
-    stop_name: str
-    stop_url: str
-    location_type: int
-    stop_id: int
-
-    def __eq__(self, other):
-        return self.stop_id == other.stop_id
-
-
 def process_page(url, page):
     if page is None:
         response = requests_retry_session().get(url, timeout=10, verify=False)
@@ -959,9 +481,10 @@ def process_page(url, page):
     new_trip = Trip(route_id=route.route_id, service_id=calendar.service_id, oebb_url=url)
     if new_trip.service_id is None:
         raise Exception(f'no service_id {url}')
-    trip: Trip = add_trip(new_trip, str(hash(f'{page.first_station}{page.dep_time}')))
+    trip: Trip = add_trip(new_trip, f'{page.first_station}{page.dep_time}')
     headsign = None
     stop_before_current = None
+    # TODO query all Stops with name check which didnt return. => add all which didnt return. add stop_times in another thread
     for i in range(len(page.all_stations)):
         all_times = list(map(lambda x: x.strip(),
                              tree.xpath('//*/tr[@class=$first or @class=$second][$count]/td[@class=$third]/text()',
@@ -1054,7 +577,8 @@ def request_processing_hook(resp, *args, **kwargs):
 
 def load_data_async(routes):
     future_session = requests_retry_session_async(session=FuturesSession())
-    futures = [future_session.get(route, timeout=300, verify=False, hooks={'response': request_processing_hook}) for route
+    futures = [future_session.get(route, timeout=300, verify=False, hooks={'response': request_processing_hook}) for
+               route
                in routes]
     for i in as_completed(futures):
         try:
@@ -1093,7 +617,7 @@ if __name__ == "__main__":
     except KeyError:
         pass
 
-    with open('bus_stops.csv') as csv_file:
+    with open('Data/bus_stops.csv') as csv_file:
         error = False
 
 
