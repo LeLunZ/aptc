@@ -27,9 +27,3 @@ example:
 # Export
 
 `docker-compose run -e export=TRUE app`
-
-fährt täglich
-und Station/Stop_type
-http://fahrplan.oebb.at/bin/traininfo.exe/dn/795198/569564/392280/68926/181?date=13.01.2020&dcArrSt=M%C3%BCllendorf%20Bahnhof&trainname=REX%207624&stationname=M%FCllendorf%20Bahnhof&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
-
-http://fahrplan.oebb.at/bin/traininfo.exe/dn/795198/571906/392280/68927/181?date=13.01.2020&dcArrSt=Eisenstadt%20Finanzamt&trainname=REX%202615&stationname=Eisenstadt%20Finanzamt&stationFilter=81,01,02,03,04,05,06,07,08,09&backLink=ts&
