@@ -75,7 +75,7 @@ create table calendar
     sunday              boolean    not null,
     start_date          numeric(8),
     end_date            numeric(8) not null,
-    calendar_dates_hash BIGINT
+    calendar_dates_hash numeric(50)
 );
 
 create unique index calendar_end_date_start_date_monday_tuesday_hash
