@@ -1,3 +1,29 @@
+TRUNCATE calendar;
+TRUNCATE calendar_dates;
+TRUNCATE stop_time_text;
+TRUNCATE stop_times;
+TRUNCATE transport_type_image;
+TRUNCATE trips;
+TRUNCATE stops;
+TRUNCATE routes;
+TRUNCATE agency;
+
+DROP table if exists trips;
+DROP table if exists stops;
+DROP table if exists routes;
+DROP table if exists transport_type_image;
+DROP table if exists stop_times;
+DROP table if exists stop_time_text;
+DROP table if exists calendar_dates;
+DROP table if exists calendar;
+DROP table if exists agency;
+DROP table if exists frequencies;
+DROP table if exists shapes;
+DROP table if exists transfers;
+DROP domain  if exists gtfstime;
+DROP domain  if exists wgs84_lat;
+DROP domain  if exists wgs84_lon;
+
 create domain wgs84_lat as double precision
     constraint wgs84_lat_check check ((VALUE >= ('-90'::integer)::double precision) AND
                                       (VALUE <= (90)::double precision));
