@@ -1,5 +1,6 @@
 import os
 import threading
+from typing import List
 
 from Models.agency import Agency
 from Models.route import Route
@@ -24,7 +25,7 @@ except KeyError:
 from sqlalchemy import create_engine, and_, or_, func, literal_column, Text
 from sqlalchemy.orm import sessionmaker
 
-engine = create_engine(DATABASE_URI)
+engine = create_engine(DATABASE_URI, executemany_mode='values')
 
 Session = sessionmaker(bind=engine, autoflush=False, autocommit=False, expire_on_commit=True)
 
@@ -142,6 +143,17 @@ def add_calendar_dates(calendar_dates: [CalendarDate], only_dates_as_string: str
     return service
 
 
+def get_all_stops_in_list(stops):
+    data = s.query(Stop).filter(Stop.stop_name.in_(stops)).all()
+    return data
+
+
+def add_stop_without_check(stop: Stop):
+    s.add(stop)
+    s.flush()
+    return stop
+
+
 def add_stop(stop: Stop):
     data: Stop = s.query(Stop).filter(Stop.stop_name == stop.stop_name).first()
     if data is None:
@@ -163,6 +175,10 @@ def update_location_of_stop(stop, lat, lng):
 def add_stop_time(stoptime: StopTime):
     s.add(stoptime)
     return stoptime
+
+
+def add_stop_times(stoptime):
+    s.bulk_save_objects(stoptime)
 
 
 def add_transfer():

@@ -10,7 +10,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from requests_futures.sessions import FuturesSession
-from concurrent.futures import as_completed
+from concurrent.futures import as_completed, ThreadPoolExecutor
 
 from Classes.DTOs import StopDTO, PageDTO
 from Functions.helper import add_day_to_calendar, extract_date_from_date_arr, merge_date, add_days_to_calendar, \
@@ -122,6 +122,8 @@ days_name = {
     5: 'Fr',
     6: 'Fr',
 }
+
+stop_times_executor = None
 
 
 def extract_date_from_str(calendar: Calendar, date_str: str, add=True):
@@ -437,7 +439,6 @@ def location_data_thread():
     session = requests_retry_session_async(session=FuturesSession(max_workers=1))
     while True:
         stop = real_thread_safe_q.get()
-        time.sleep(0.1)
         if stop.stop_name in stop_dict:
             coords = stop_dict.pop(stop.stop_name)
             try:
@@ -464,7 +465,41 @@ def location_data_thread():
         real_thread_safe_q.task_done()
 
 
-def process_page(url, page):
+def add_stop_times_from_web_page(tree, page, current_stops_dict, trip):
+    headsign = None
+    stop_before_current = None
+    stop_time_list = []
+    for i in range(len(page.all_stations)):
+        all_times = list(map(lambda x: x.strip(),
+                             tree.xpath('//*/tr[@class=$first or @class=$second][$count]/td[@class=$third]/text()',
+                                        first='zebracol-2',
+                                        second="zebracol-1", third='center sepline', count=i + 1)))
+        if str(all_times[2]).strip() != '' and str(all_times[2]).strip() != page.route.route_long_name.strip():
+            headsign = str(all_times[2]).strip()
+        stop = current_stops_dict[page.all_stations[i]]
+        new_stop_time = StopTime(stop_id=stop.stop_id, trip_id=trip.trip_id,
+                                 arrival_time=all_times[0] if all_times[0] == '' else all_times[0] + ':00',
+                                 departure_time=all_times[1] if all_times[1] == '' else all_times[1] + ':00',
+                                 stop_sequence=i + 1, pickup_type=0, drop_off_type=0, stop_headsign=headsign)
+        if new_stop_time.arrival_time == '':
+            new_stop_time.arrival_time = new_stop_time.departure_time
+        elif new_stop_time.departure_time == '':
+            new_stop_time.departure_time = new_stop_time.arrival_time
+        if stop_before_current is not None and int(stop_before_current.departure_time[0:2]) > int(
+                new_stop_time.arrival_time[0:2]):
+            new_stop_time.arrival_time = f'{int(new_stop_time.arrival_time[0:2]) + 24}{new_stop_time.arrival_time[2:]}'
+            new_stop_time.departure_time = f'{int(new_stop_time.departure_time[0:2]) + 24}{new_stop_time.departure_time[2:]}'
+        elif int(new_stop_time.arrival_time[0:2]) > int(new_stop_time.departure_time[0:2]):
+            new_stop_time.departure_time = f'{int(new_stop_time.departure_time[0:2]) + 24}{new_stop_time.departure_time[2:]}'
+        stop_before_current = new_stop_time
+        stop_time_list.append(new_stop_time)
+    add_stop_times(stop_time_list)
+
+
+stop_times_to_add = []
+
+
+def process_page(url, page: PageDTO):
     if page is None:
         response = requests_retry_session().get(url, timeout=10, verify=False)
         page = request_processing_hook(response, None, None)  # TODO check if it is working
@@ -482,38 +517,19 @@ def process_page(url, page):
     if new_trip.service_id is None:
         raise Exception(f'no service_id {url}')
     trip: Trip = add_trip(new_trip, f'{page.first_station}{page.dep_time}')
-    headsign = None
-    stop_before_current = None
     # TODO query all Stops with name check which didnt return. => add all which didnt return. add stop_times in another thread
-    for i in range(len(page.all_stations)):
-        all_times = list(map(lambda x: x.strip(),
-                             tree.xpath('//*/tr[@class=$first or @class=$second][$count]/td[@class=$third]/text()',
-                                        first='zebracol-2',
-                                        second="zebracol-1", third='center sepline', count=i + 1)))
-        new_stop = Stop(stop_name=page.all_stations[i],
-                        stop_url=remove_param_from_url(page.links_of_all_stations[i], '&time='), location_type=0)
-        stop = add_stop(new_stop)
-        stop_dto = StopDTO(stop.stop_name, stop.stop_url, stop.location_type, stop.stop_id)
-        if stop.stop_lat is None or stop.stop_lon is None and stop_dto not in real_thread_safe_q.queue:
+    stops_on_db = get_all_stops_in_list(page.all_stations)
+    current_stops_dict = {i.stop_name: i for i in stops_on_db}
+    for i, stop in enumerate(page.all_stations):
+        if stop not in current_stops_dict:
+            new_stop = Stop(stop_name=stop,
+                            stop_url=remove_param_from_url(page.links_of_all_stations[i], '&time='), location_type=0)
+            new_stop = add_stop_without_check(new_stop)
+            stop_dto = StopDTO(new_stop.stop_name, new_stop.stop_url, new_stop.location_type, new_stop.stop_id)
+            # if stop_dto not in real_thread_safe_q.queue and (new_stop.stop_lat is None or new_stop.stop_lon is None): TODO Check if dont needed
             real_thread_safe_q.put(stop_dto)
-        if str(all_times[2]).strip() != '' and str(all_times[2]).strip() != page.route.route_long_name.strip():
-            headsign = str(all_times[2]).strip()
-        new_stop_time = StopTime(stop_id=stop.stop_id, trip_id=trip.trip_id,
-                                 arrival_time=all_times[0] if all_times[0] == '' else all_times[0] + ':00',
-                                 departure_time=all_times[1] if all_times[1] == '' else all_times[1] + ':00',
-                                 stop_sequence=i + 1, pickup_type=0, drop_off_type=0, stop_headsign=headsign)
-        if new_stop_time.arrival_time == '':
-            new_stop_time.arrival_time = new_stop_time.departure_time
-        elif new_stop_time.departure_time == '':
-            new_stop_time.departure_time = new_stop_time.arrival_time
-        if stop_before_current is not None and int(stop_before_current.departure_time[0:2]) > int(
-                new_stop_time.arrival_time[0:2]):
-            new_stop_time.arrival_time = f'{int(new_stop_time.arrival_time[0:2]) + 24}{new_stop_time.arrival_time[2:]}'
-            new_stop_time.departure_time = f'{int(new_stop_time.departure_time[0:2]) + 24}{new_stop_time.departure_time[2:]}'
-        elif int(new_stop_time.arrival_time[0:2]) > int(new_stop_time.departure_time[0:2]):
-            new_stop_time.departure_time = f'{int(new_stop_time.departure_time[0:2]) + 24}{new_stop_time.departure_time[2:]}'
-        stop_before_current = new_stop_time
-        add_stop_time(new_stop_time)
+            current_stops_dict[stop] = new_stop
+    stop_times_to_add.append((tree, page, current_stops_dict, trip))
 
 
 def request_processing_hook(resp, *args, **kwargs):
@@ -650,6 +666,7 @@ if __name__ == "__main__":
         update_stops_thread.start()
         print("started crawling", flush=True)
         for row in skip_stop(csv_reader, begin, end):
+            stop_times_to_add = []
             time_now = time.time()
             new_session()
             try:
@@ -694,7 +711,7 @@ if __name__ == "__main__":
                         commit()
                         while t.is_alive() or (not t.is_alive() and len(q) > 0):
                             if len(q) == 0:
-                                time.sleep(0.1)
+                                time.sleep(0.01)
                                 continue
                             page = q.pop()
                             try:
@@ -703,6 +720,10 @@ if __name__ == "__main__":
                                 pass
                             except Exception as e:
                                 logging.error(f'load_route {page.url} {repr(e)}')
+                        stop_times_executor = ThreadPoolExecutor()
+                        for tree, page, current_stops_dict, trip in stop_times_to_add:
+                            stop_times_executor.submit(add_stop_times_from_web_page, tree, page, current_stops_dict, trip)
+                        stop_times_executor.shutdown(wait=True)
                         print("finished batch", flush=True)
                     except Exception as e:
                         log_error(f'get_all_name_of_transport_distinct {public_transportation_journey} {str(e)}')
