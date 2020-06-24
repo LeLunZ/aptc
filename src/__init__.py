@@ -602,8 +602,8 @@ def load_data_async(routes):
         try:
             response = i.result()
             q.append(response)
-        except:
-            print(f'{i.url} connection timeout', flush=True)
+        except Exception as e:
+            print(f'{str(e)} connection timeout', flush=True)
     exit(0)
 
 
