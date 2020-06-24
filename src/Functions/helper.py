@@ -67,8 +67,10 @@ def add_days_to_calendar(calendar: Calendar, begin: str, end: str):
     for d in official_weekdays[official_weekdays.index(begin):official_weekdays.index(end) + 1]:
         add_day_to_calendar(calendar, d)
 
+
 def str_to_geocord(cord: str):
     return int(cord) / 1000000
+
 
 def skip_stop(seq, begin, end):
     for i, item in enumerate(seq):

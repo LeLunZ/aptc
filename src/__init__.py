@@ -466,7 +466,6 @@ def location_data_thread():
                 real_thread_safe_q.put(stop)
 
 
-
 def add_stop_times_from_web_page(tree, page, current_stops_dict, trip):
     headsign = None
     stop_before_current = None
@@ -611,7 +610,7 @@ def add_all_empty_to_queue():
     all_stops = get_stops_without_location()
     for stop in all_stops:
         stop_dto = StopDTO(stop.stop_name, stop.stop_url, stop.location_type, stop.stop_id)
-        if stop.stop_lat is None or stop.stop_lon is None and stop_dto not in real_thread_safe_q.queue:
+        if stop_dto not in real_thread_safe_q.queue and (stop.stop_lat is None or stop.stop_lon is None):
             real_thread_safe_q.put(stop_dto)
 
 
@@ -724,7 +723,8 @@ if __name__ == "__main__":
                                 logging.error(f'load_route {page.url} {repr(e)}')
                         stop_times_executor = ThreadPoolExecutor()
                         for tree, page, current_stops_dict, trip in stop_times_to_add:
-                            stop_times_executor.submit(add_stop_times_from_web_page, tree, page, current_stops_dict, trip)
+                            stop_times_executor.submit(add_stop_times_from_web_page, tree, page, current_stops_dict,
+                                                       trip)
                         stop_times_executor.shutdown(wait=True)
                         print("finished batch", flush=True)
                     except Exception as e:
@@ -740,37 +740,3 @@ if __name__ == "__main__":
         real_thread_safe_q.join()
         commit()
 exit(0)
-
-# while True:
-#     re = requests.get("http://fahrplan.oebb.at/bin/stboard.exe/dn?ld=3&L=vs_postbus&")
-#     if re.status_code != 200:
-#         print(re.status_code)
-#     print(re.status_code)
-
-# First Get request for stop
-# http://fahrplan.oebb.at/bin/ajax-getstop.exe/dn?REQ0JourneyStopsS0A=1&REQ0JourneyStopsB=12&S=Gallneukirchen%20Einsatz?&js=true&
-
-# With id from 1.
-# http://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_liveticker&evaId=491001&boardType=arr&time=00:00&additionalTime=0&
-# disableEquivs=yes&maxJourneys=500&outputMode=tickerDataOnly&start=yes&selectDate=today
-
-# Search for Öffi
-# http://fahrplan.oebb.at/bin/trainsearch.exe/dn?ld=2&
-# trainname=&stationname=Gallneukirchen+Rammesberg&REQ0JourneyStopsSID=A%3D1%40O%3DGallneukirchen+Rammesberg%40X%3D14414769%40Y%3D48362613%40U%3D181%40L%3D000416304%40B%3D1%40p%3D1573738453%40&selectDate=oneday&date=So%2C+17.11.2019&wDayExt0=Mo%7CDi%7CMi%7CDo%7CFr%7CSa%7CSo&periodStart=15.09.2019&periodEnd=12.12.2020&time=&maxResults=10&stationFilter=81%2C01%2C02%2C03%2C04%2C05%2C06%2C07%2C08%2C09&start=Suchen
-
-# Select Öffi and save
-
-# Search
-# http://fahrplan.oebb.at/bin/trainsearch.exe/dn?ld=21&L=vs_postbus&
-#  REQ0JourneyStopsSID=A=1@O=Gallneukirchen%20Einsatzzentrum@X=14412657@Y=48350945@U=181@L=000416096@B=1@p=1573738453@&
-#  date=Mo,%2018.11.19&maxResults=10&selectDate=oneday&start=Suchen&stationFilter=81,01,02,03,04,05,06,07,08,09&
-#  stationname=Gallneukirchen%20Einsatzzentrum&time=&trainname=
-
-# http://fahrplan.oebb.at/bin/stboard.exe/dn?ld=21&
-# sqView: 1&input=Gallneukirchen Rammesberg%23416304&time=20:27&maxJourneys=20&dateBegin=&dateEnd=&selectDate=&productsFilter=1011111111011&editStation=yes&dirInput=&
-# input: Gallneukirchen Marktplatz
-# REQ0JourneyStopsSID: A=1@O=Gallneukirchen Marktplatz@X=14415848@Y=48352905@U=181@L=000416064@B=1@p=1573738453@
-# inputRef: Gallneukirchen Rammesberg#416304
-# sqView=1&start: Information aufrufen
-# productsFilter: 1011111111011
-#

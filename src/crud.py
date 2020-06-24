@@ -16,7 +16,6 @@ import pyhash
 
 hasher = pyhash.fnv1a_64()
 lock = threading.Lock()
-
 try:
     DATABASE_URI = 'postgres+psycopg2://' + str(os.environ['postgres'])
 except KeyError:
