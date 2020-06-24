@@ -460,9 +460,11 @@ def location_data_thread():
                         already_done.add(stop_suggestion['value'])
                 current_station_cord = stop_dict.pop(stop_suggestions['suggestions'][0]['value'])
                 update_location_of_stop(stop, current_station_cord['y'], current_station_cord['x'])
+                real_thread_safe_q.task_done()
             except:
-                print(f'{stop.stop_name} failed')
-        real_thread_safe_q.task_done()
+                real_thread_safe_q.task_done()
+                real_thread_safe_q.put(stop)
+
 
 
 def add_stop_times_from_web_page(tree, page, current_stops_dict, trip):
