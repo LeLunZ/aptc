@@ -110,7 +110,9 @@ route_types = {
     '/img/vs_oebb/val_pic.gif': 3,
     '/img/vs_oebb/rfb_pic.gif': 715,
     '/img/vs_oebb/lil_pic.gif': 107,
-    '/img/vs_oebb/bmz_pic.gif': 107
+    '/img/vs_oebb/bmz_pic.gif': 107,
+    '/img/vs_oebb/ter_pic.gif': 106,
+    '/img/vs_oebb/dpn_pic.gif': 106
 }
 
 days_name = {
