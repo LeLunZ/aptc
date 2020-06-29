@@ -171,7 +171,8 @@ create table stop_times
     drop_off_type       integer
         constraint stop_times_drop_off_type_check
             check ((drop_off_type >= 0) AND (drop_off_type <= 3)),
-    shape_dist_traveled double precision
+    shape_dist_traveled double precision,
+    stop_times_id       SERIAL
 );
 
 create table calendar_dates

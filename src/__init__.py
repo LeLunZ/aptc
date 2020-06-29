@@ -518,7 +518,6 @@ def process_page(url, page: PageDTO):
     if new_trip.service_id is None:
         raise Exception(f'no service_id {url}')
     trip: Trip = add_trip(new_trip, f'{page.first_station}{page.dep_time}')
-    # TODO query all Stops with name check which didnt return. => add all which didnt return. add stop_times in another thread
     stops_on_db = get_all_stops_in_list(page.all_stations)
     current_stops_dict = {i.stop_name: i for i in stops_on_db}
     for i, stop in enumerate(page.all_stations):
