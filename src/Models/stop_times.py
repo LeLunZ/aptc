@@ -6,6 +6,7 @@ Base = declarative_base()
 
 class StopTime(Base):
     __tablename__ = 'stop_times'
+    stop_times_id = Column(Integer, nullable=True)
     trip_id = Column(Integer, nullable=False, primary_key=True)
     stop_sequence = Column(Integer, nullable=False, primary_key=True)
     stop_id = Column(Integer, nullable=False, primary_key=True)

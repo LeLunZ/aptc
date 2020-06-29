@@ -369,7 +369,7 @@ def export_all_tables():
             with open(f'./{i.__table__.name}.txt', 'a') as outfile:
                 outcsv = csv.writer(outfile, delimiter=',')
                 outcsv.writerow(i.firstline())
-                for dataset in windowed_query(q, StopTime, 1000):
+                for dataset in windowed_query(q, StopTime.stop_times_id, 1000):
                     outcsv.writerow(dataset.tocsv())
         else:
             with open(f'./{i.__table__.name}.txt', 'a') as outfile:
