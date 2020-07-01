@@ -17,6 +17,7 @@ class Stop(Base):
     location_type = Column(Integer, nullable=True)
     parent_station = Column(Text, nullable=True)
     wheelchair_boarding = Column(Text, nullable=True)
+    crawled = Column(Boolean, nullable=True)
 
     def __repr__(self):
         return "<Stop(name='{}', url='{}', id={})>" \

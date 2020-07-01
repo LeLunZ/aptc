@@ -2,6 +2,7 @@ import os
 import threading
 from typing import List
 
+from Functions.config import getConfig
 from Models.agency import Agency
 from Models.route import Route
 from Models.stop import Stop
@@ -17,7 +18,7 @@ import pyhash
 hasher = pyhash.fnv1a_64()
 lock = threading.Lock()
 try:
-    DATABASE_URI = 'postgres+psycopg2://' + str(os.environ['postgres'])
+    DATABASE_URI = 'postgres+psycopg2://' + str(getConfig('postgres'))
 except KeyError:
     DATABASE_URI = 'postgres+psycopg2://postgres:password@localhost:5432/postgres'
 
@@ -159,8 +160,17 @@ def add_stop(stop: Stop):
         s.add(stop)
         s.flush()
     else:
+        if stop.crawled is True and (data.crawled is False or data.crawled is None):
+            data.crawled = True
+            s.flush()
         stop = data
     return stop
+
+
+def load_all_uncrawled_stops(max_stops_to_crawl):
+    return s.query(Stop).filter(or_(Stop.crawled == None, Stop.crawled == False)).order_by(Stop.stop_lat,
+                                                                                           Stop.stop_lon).limit(
+        max_stops_to_crawl).all()
 
 
 @lockF(lock)

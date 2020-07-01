@@ -25,8 +25,8 @@ def requests_retry_session(
 
 
 def requests_retry_session_async(
-        retries=5,
-        backoff_factor=0.2,
+        retries=4,
+        backoff_factor=0.4,
         session=None,
 ):
     session = session or FuturesSession()
@@ -92,7 +92,7 @@ def get_all_routes_of_transport_and_station(transport_number, station):
         'selectDate': 'oneday',
         'date': "Mo, 13.07.2020",
         'wDayExt0': 'Mo|Di|Mi|Do|Fr|Sa|So',
-        'periodStart': '15.09.2019',
+        'periodStart': '20.04.2020',
         'periodEnd': '12.12.2020',
         'time': '',
         'maxResults': 10000,
@@ -102,4 +102,5 @@ def get_all_routes_of_transport_and_station(transport_number, station):
     response = requests_retry_session().post(url, data=payload, params=querystring, verify=False)
     tree = html.fromstring(response.content)
     all_routes = tree.xpath('//*/td[@class=$name]/a/@href', name='fcell')
+    all_routes = list(map(lambda l: l.split('?')[0], all_routes))
     return all_routes

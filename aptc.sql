@@ -64,7 +64,8 @@ create table stops
     stop_url            text,
     location_type       integer,
     parent_station      text,
-    wheelchair_boarding text
+    wheelchair_boarding text,
+    crawled             boolean
 );
 
 create unique index stops_stop_name_uindex
