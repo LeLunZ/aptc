@@ -820,6 +820,10 @@ def crawl():
     update_stops_thread = Thread(target=location_data_thread)
     update_stops_thread.daemon = True
     update_stops_thread.start()
+    for stop in get_from_table(Stop):
+        stop.crawled = False
+    commit()
+    new_session()
     print("started crawling", flush=True)
     while True:
         if len(stop_list) == 0:
