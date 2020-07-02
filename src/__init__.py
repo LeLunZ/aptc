@@ -19,8 +19,7 @@ from Functions.helper import add_day_to_calendar, extract_date_from_date_arr, me
     remove_param_from_url, skip_stop, get_all_name_of_transport_distinct, extract_date_objects_from_str
 from Classes.oebb_date import OebbDate, service_months, begin_date, end_date, get_std_date
 from Functions.config import getConfig
-from Functions.oebb_requests import requests_retry_session, requests_retry_session_async, get_all_routes_from_station, \
-    get_location_suggestion_from_string, get_all_routes_of_transport_and_station, get_all_station_ids_from_station, date
+from Functions.oebb_requests import requests_retry_session, requests_retry_session_async, date_w, set_date, weekday_name
 from urllib.parse import parse_qs, unquote
 
 finishUp = False
@@ -118,16 +117,6 @@ route_types = {
     '/img/vs_oebb/bmz_pic.gif': 107,
     '/img/vs_oebb/ter_pic.gif': 106,
     '/img/vs_oebb/dpn_pic.gif': 106
-}
-
-days_name = {
-    0: 'Mo',
-    1: 'Di',
-    2: 'Mi',
-    3: 'Do',
-    4: 'Fr',
-    5: 'Sa',
-    6: 'So',
 }
 
 stop_times_executor = None
@@ -455,6 +444,8 @@ def location_data_thread():
                     update_location_of_stop(stop, coords['y'], coords['x'])
                 except:
                     pass
+                finally:
+                    real_thread_safe_q.task_done()
             else:
                 try:
                     future_1 = session.get(
@@ -472,12 +463,13 @@ def location_data_thread():
                     update_location_of_stop(stop, current_station_cord['y'], current_station_cord['x'])
                     real_thread_safe_q.task_done()
                 except:
-                    real_thread_safe_q.task_done()
                     real_thread_safe_q.put(stop)
+                finally:
+                    real_thread_safe_q.task_done()
         except:
             time.sleep(30)
             if finishUp:
-                return
+                exit(0)
 
 
 def add_stop_times_from_web_page(tree, page, current_stops_dict, trip):
@@ -712,11 +704,14 @@ def load_all_stops_to_crawl(stop_names):
                 if si not in station_ids:
                     station_ids.add(si)
                     current_station_ids.append(si)
-                    re = 'http://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_scotty.vs_liveticker&evaId=' + str(
-                        int(
-                            si)) + '&boardType=arr&time=00:00' + '&additionalTime=0&maxJourneys=100000&outputMode=tickerDataOnly&start=yes&selectDate' + '=period&dateBegin=' + date + 'dateEnd=' + date + '&productsFilter=1011111111011'
-                    route_url_dict[re] = stop_name_dict[original_name][0]
-                    future_args.append(re)
+                    for date in date_arr:
+                        set_date(date)
+                        re = 'http://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_scotty.vs_liveticker&evaId=' + str(
+                            int(
+                                si)) + '&boardType=arr&time=00:00' + '&additionalTime=0&maxJourneys=100000&outputMode=tickerDataOnly&start=yes&selectDate' + '=period&dateBegin=' + \
+                             date_w[0] + 'dateEnd=' + date_w[0] + '&productsFilter=1011111111011'
+                        route_url_dict[re] = stop_name_dict[original_name][0]
+                        future_args.append(re)
             if len(current_station_ids) > 0:
                 station_id_list.append((stop_name_dict[original_name][0], current_station_ids))
                 save_simple_stops(all_station_names, all_station_ids, stop_name_dict[original_name][1])
@@ -756,23 +751,25 @@ def load_all_stops_to_crawl(stop_names):
                 try:
                     url = "http://fahrplan.oebb.at/bin/trainsearch.exe/dn"
                     querystring = {"ld": "2"}
-                    payload = {
-                        'trainname': route,
-                        'stationname': main_station['value'],
-                        'REQ0JourneyStopsSID': main_station['id'],
-                        'selectDate': 'oneday',
-                        'date': "Mo, 13.07.2020",
-                        'wDayExt0': 'Mo|Di|Mi|Do|Fr|Sa|So',
-                        'periodStart': '20.04.2020',
-                        'periodEnd': '12.12.2020',
-                        'time': '',
-                        'maxResults': 10000,
-                        'stationFilter': '81,01,02,03,04,05,06,07,08,09',
-                        'start': 'Suchen'
-                    }
-                    future_response = future_session_stops.post(url, data=payload, params=querystring, verify=False,
-                                                                hooks={'response': response_journey_hook})
-                    future_route_url.append(future_response)
+                    for date in date_arr:
+                        set_date(date)
+                        payload = {
+                            'trainname': route,
+                            'stationname': main_station['value'],
+                            'REQ0JourneyStopsSID': main_station['id'],
+                            'selectDate': 'oneday',
+                            'date': f'{weekday_name}, {date_w}'"Mo, 13.07.2020",
+                            'wDayExt0': 'Mo|Di|Mi|Do|Fr|Sa|So',
+                            'periodStart': str(begin_date),
+                            'periodEnd': str(end_date),
+                            'time': '',
+                            'maxResults': 10000,
+                            'stationFilter': '81,01,02,03,04,05,06,07,08,09',
+                            'start': 'Suchen'
+                        }
+                        future_response = future_session_stops.post(url, data=payload, params=querystring, verify=False,
+                                                                    hooks={'response': response_journey_hook})
+                        future_route_url.append(future_response)
                 except Exception as e:
                     logging.error(
                         f'get_all_routes_of_transport_and_station {route} {main_station} {str(e)}')
@@ -788,8 +785,11 @@ def load_all_stops_to_crawl(stop_names):
     return routes
 
 
+date_arr = []
+
+
 def crawl():
-    global stop_times_to_add, finishUp, update_stops_thread
+    global stop_times_to_add, finishUp, update_stops_thread, date_arr
     with open('Data/bus_stops.csv') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         row_count = sum(1 for row in csv_reader)
@@ -809,6 +809,10 @@ def crawl():
         max_stops_to_crawl = getConfig('batchSize')
     except:
         max_stops_to_crawl = 10
+    try:
+        date_arr = getConfig('dates')
+    except:
+        date_arr = [date_w]
     stop_list = list(stop_set)
     commit()
     get_std_date()
@@ -817,45 +821,52 @@ def crawl():
     update_stops_thread.daemon = True
     update_stops_thread.start()
     print("started crawling", flush=True)
-    while True:
-        if len(stop_list) == 0:
-            if not continuesCrawling:
-                break
-            stop_set = set()
-            for stop in (uncrawled := load_all_uncrawled_stops(max_stops_to_crawl)):
-                stop_set.add(stop.stop_name)
-                stop.crawled = True
-            commit()
-            if uncrawled is None or len(uncrawled) == 0:
-                break
-            to_crawl = list(stop_set)
-        else:
-            to_crawl = stop_list[:max_stops_to_crawl]
-            stop_list = stop_list[max_stops_to_crawl:]
-        routes = load_all_stops_to_crawl(to_crawl)
-        stop_times_to_add = []
-        t = Thread(target=load_data_async, args=(routes,))
-        t.daemon = True
-        t.start()
-        commit()
-        while t.is_alive() or (not t.is_alive() and len(q) > 0):
-            if len(q) == 0:
-                time.sleep(0.01)
-                continue
-            page = q.pop()
-            try:
-                process_page(page.url, page.data)
-            except TripAlreadyPresentError as e:
-                pass
-            except Exception as e:
-                logging.error(f'load_route {page.url} {repr(e)}')
-        stop_times_executor = ThreadPoolExecutor()
-        for tree, page, current_stops_dict, trip in stop_times_to_add:
-            stop_times_executor.submit(add_stop_times_from_web_page, tree, page, current_stops_dict,
-                                       trip)
-        stop_times_executor.shutdown(wait=True)
+    for date_str in date_arr:
+        set_date(date_str)
+        print(date_w, flush=True)
+        for db_stop in get_from_table(Stop):
+            db_stop.crawled = False
         commit()
         new_session()
+        while True:
+            if len(stop_list) == 0:
+                if not continuesCrawling:
+                    break
+                stop_set = set()
+                for stop in (uncrawled := load_all_uncrawled_stops(max_stops_to_crawl)):
+                    stop_set.add(stop.stop_name)
+                    stop.crawled = True
+                commit()
+                if uncrawled is None or len(uncrawled) == 0:
+                    break
+                to_crawl = list(stop_set)
+            else:
+                to_crawl = stop_list[:max_stops_to_crawl]
+                stop_list = stop_list[max_stops_to_crawl:]
+            routes = load_all_stops_to_crawl(to_crawl)
+            stop_times_to_add = []
+            t = Thread(target=load_data_async, args=(routes,))
+            t.daemon = True
+            t.start()
+            commit()
+            while t.is_alive() or (not t.is_alive() and len(q) > 0):
+                if len(q) == 0:
+                    time.sleep(0.01)
+                    continue
+                page = q.pop()
+                try:
+                    process_page(page.url, page.data)
+                except TripAlreadyPresentError as e:
+                    pass
+                except Exception as e:
+                    logging.error(f'load_route {page.url} {repr(e)}')
+            stop_times_executor = ThreadPoolExecutor()
+            for tree, page, current_stops_dict, trip in stop_times_to_add:
+                stop_times_executor.submit(add_stop_times_from_web_page, tree, page, current_stops_dict,
+                                           trip)
+            stop_times_executor.shutdown(wait=True)
+            commit()
+            new_session()
     add_all_empty_to_queue()
     finishUp = True
     real_thread_safe_q.join()

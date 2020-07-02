@@ -31,6 +31,7 @@ The top level key in the json object defines your config name. So you can add mu
 - `crawl` | boolean | crawls data.
 - `continues` | boolean | crawls not only data defined in the csv sheet. 
 - `batchSize` | int | Size of csv lines the crawler crawls at one time. somewhere between 10-50 is recommended.
+- `dates` | array | An array with all dates to crawl. Dateformat: "dd.mm.YYYY"
 - `csv` | object | sets options for the csv sheet.
 - `csv.begin` | int | sets the line in the csv where the crawler will beginn to crawl. If not specified it will start at the beginning and will skip one header line. 
 - `csv.end` | int | sets the line in the csv where the crawler will end to crawl. If not specified it will crawl to the end.

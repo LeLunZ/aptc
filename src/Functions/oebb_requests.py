@@ -4,8 +4,27 @@ from requests.adapters import HTTPAdapter
 from urllib3 import Retry
 import json
 from lxml import html
+from datetime import datetime
 
-date = '13.07.2020'
+date_w = ['13.07.2020']
+days_name = {
+    0: 'Mo',
+    1: 'Di',
+    2: 'Mi',
+    3: 'Do',
+    4: 'Fr',
+    5: 'Sa',
+    6: 'So',
+}
+weekday_name = [days_name[datetime.strptime(date_w[0], '%d.%m.%Y').weekday()]]
+
+
+def set_date(date_str):
+    global date_w, weekday_name
+    date_w[0] = date_str
+    weekday_name[0] = days_name[datetime.strptime(date_w[0], '%d.%m.%Y').weekday()]
+
+
 def requests_retry_session(
         retries=5,
         backoff_factor=0.2,
@@ -74,7 +93,7 @@ def get_all_routes_from_station(station_id):
             'http://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_scotty.vs_liveticker&evaId=' + str(
                 int(station_id)) + '&boardType=arr&time=00:00'
                                    '&additionalTime=0&maxJourneys=100000&outputMode=tickerDataOnly&start=yes&selectDate'
-                                   '=period&dateBegin=' + date + 'dateEnd=' + date + '&productsFilter=1011111111011',
+                                   '=period&dateBegin=' + date_w[0] + 'dateEnd=' + date_w[0] + '&productsFilter=1011111111011',
             verify=False)
         json_data = json.loads(routes_of_station.content.decode('iso-8859-1')[14:-1])
     except:

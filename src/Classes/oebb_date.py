@@ -17,6 +17,7 @@ service_months = {
     'Dez': 12
 }
 
+
 class OebbDate:
     def __init__(self):
         self.day = None
@@ -32,6 +33,15 @@ class OebbDate:
         if month < 10:
             month = f'0{service_months[self.month]}'
         return int(f'{self.year}{month}{day}')
+
+    def __str__(self):
+        day = str(self.day)
+        if len(day) == 1:
+            day = f'0{self.day}'
+        month = service_months[self.month]
+        if month < 10:
+            month = f'0{service_months[self.month]}'
+        return f'{day}{month}{self.year}'
 
 
 begin_date: OebbDate = OebbDate()
