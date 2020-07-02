@@ -461,7 +461,6 @@ def location_data_thread():
                             already_done.add(stop_suggestion['value'])
                     current_station_cord = stop_dict.pop(stop_suggestions['suggestions'][0]['value'])
                     update_location_of_stop(stop, current_station_cord['y'], current_station_cord['x'])
-                    real_thread_safe_q.task_done()
                 except:
                     real_thread_safe_q.put(stop)
                 finally:
