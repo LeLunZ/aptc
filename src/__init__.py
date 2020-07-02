@@ -821,52 +821,45 @@ def crawl():
     update_stops_thread.daemon = True
     update_stops_thread.start()
     print("started crawling", flush=True)
-    for date_str in date_arr:
-        set_date(date_str)
-        print(date_w, flush=True)
-        for db_stop in get_from_table(Stop):
-            db_stop.crawled = False
+    while True:
+        if len(stop_list) == 0:
+            if not continuesCrawling:
+                break
+            stop_set = set()
+            for stop in (uncrawled := load_all_uncrawled_stops(max_stops_to_crawl)):
+                stop_set.add(stop.stop_name)
+                stop.crawled = True
+            commit()
+            if uncrawled is None or len(uncrawled) == 0:
+                break
+            to_crawl = list(stop_set)
+        else:
+            to_crawl = stop_list[:max_stops_to_crawl]
+            stop_list = stop_list[max_stops_to_crawl:]
+        routes = load_all_stops_to_crawl(to_crawl)
+        stop_times_to_add = []
+        t = Thread(target=load_data_async, args=(routes,))
+        t.daemon = True
+        t.start()
+        commit()
+        while t.is_alive() or (not t.is_alive() and len(q) > 0):
+            if len(q) == 0:
+                time.sleep(0.01)
+                continue
+            page = q.pop()
+            try:
+                process_page(page.url, page.data)
+            except TripAlreadyPresentError as e:
+                pass
+            except Exception as e:
+                logging.error(f'load_route {page.url} {repr(e)}')
+        stop_times_executor = ThreadPoolExecutor()
+        for tree, page, current_stops_dict, trip in stop_times_to_add:
+            stop_times_executor.submit(add_stop_times_from_web_page, tree, page, current_stops_dict,
+                                       trip)
+        stop_times_executor.shutdown(wait=True)
         commit()
         new_session()
-        while True:
-            if len(stop_list) == 0:
-                if not continuesCrawling:
-                    break
-                stop_set = set()
-                for stop in (uncrawled := load_all_uncrawled_stops(max_stops_to_crawl)):
-                    stop_set.add(stop.stop_name)
-                    stop.crawled = True
-                commit()
-                if uncrawled is None or len(uncrawled) == 0:
-                    break
-                to_crawl = list(stop_set)
-            else:
-                to_crawl = stop_list[:max_stops_to_crawl]
-                stop_list = stop_list[max_stops_to_crawl:]
-            routes = load_all_stops_to_crawl(to_crawl)
-            stop_times_to_add = []
-            t = Thread(target=load_data_async, args=(routes,))
-            t.daemon = True
-            t.start()
-            commit()
-            while t.is_alive() or (not t.is_alive() and len(q) > 0):
-                if len(q) == 0:
-                    time.sleep(0.01)
-                    continue
-                page = q.pop()
-                try:
-                    process_page(page.url, page.data)
-                except TripAlreadyPresentError as e:
-                    pass
-                except Exception as e:
-                    logging.error(f'load_route {page.url} {repr(e)}')
-            stop_times_executor = ThreadPoolExecutor()
-            for tree, page, current_stops_dict, trip in stop_times_to_add:
-                stop_times_executor.submit(add_stop_times_from_web_page, tree, page, current_stops_dict,
-                                           trip)
-            stop_times_executor.shutdown(wait=True)
-            commit()
-            new_session()
     add_all_empty_to_queue()
     finishUp = True
     real_thread_safe_q.join()

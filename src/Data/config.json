@@ -3,7 +3,7 @@
     "crawl": true,
     "export": true,
     "continues": true,
-    "batchSize": 5,
+    "batchSize": 7,
     "crawlStopOptions": {
       "northLatBorder": 48.325,
       "southLatBorder": 48.115,
