@@ -109,7 +109,7 @@ def get_all_routes_of_transport_and_station(transport_number, station):
         'stationname': station['value'],
         'REQ0JourneyStopsSID': station['id'],
         'selectDate': 'oneday',
-        'date': "Mo, 13.07.2020",
+        'date': f'{weekday_name}, {date_w}',
         'wDayExt0': 'Mo|Di|Mi|Do|Fr|Sa|So',
         'periodStart': '20.04.2020',
         'periodEnd': '12.12.2020',

@@ -757,7 +757,7 @@ def load_all_stops_to_crawl(stop_names):
                             'stationname': main_station['value'],
                             'REQ0JourneyStopsSID': main_station['id'],
                             'selectDate': 'oneday',
-                            'date': f'{weekday_name}, {date_w}'"Mo, 13.07.2020",
+                            'date': f'{weekday_name}, {date_w}',
                             'wDayExt0': 'Mo|Di|Mi|Do|Fr|Sa|So',
                             'periodStart': str(begin_date),
                             'periodEnd': str(end_date),
