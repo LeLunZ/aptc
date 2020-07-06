@@ -171,7 +171,7 @@ def extract_date_from_str(calendar: Calendar, date_str: str, add=True):
         merge_date(date1=start_date, date2=finish_date)
     else:
         start_date = begin_date
-        finish_date = end_date
+        finish_date = end_date  # TODO change to None
 
     date_arr = list(map(lambda x: x.replace(',', ''), date_arr))
     for count, d in enumerate(date_arr):
@@ -185,6 +185,11 @@ def extract_date_from_str(calendar: Calendar, date_str: str, add=True):
             else:
                 add_day_to_calendar(calendar, date_arr[index])
     not_working_calendar_date = []
+
+    if start_date is None:
+        start_date_clone = begin_date  # TODO implement general date for crawling
+    else:
+        start_date_clone = begin_date
 
     if irregular_dates is not None:
         if 'allg. Feiertg' in irregular_dates:
