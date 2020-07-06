@@ -347,13 +347,17 @@ def save_simple_stops(names, ids, main_station):
 
 
 def export_all_tables():
-    tables = [Agency, Calendar, CalendarDate, Frequency, Route, Shape, Stop, StopTime, Transfer, Trip]
+    tables = [Agency, Calendar, CalendarDate, Frequency, Route, Trip, StopTime, Shape, Stop, Transfer]
     file_names = []
     os.chdir('./db')
     try:
         os.remove('./Archiv.zip')
     except FileNotFoundError:
         pass
+    try:
+        excluded_routes = getConfig('exportOptions.excludeRouteTypes')
+    except:
+        excluded_routes = None
     for i in tables:
         try:
             os.remove(f'./{i.__table__.name}.txt')
@@ -813,6 +817,7 @@ def crawl():
     except:
         date_arr = [date_w]
     stop_list = list(stop_set)
+    stop_list_deleted = False
     commit()
     get_std_date()
     load_allg_feiertage()
@@ -825,7 +830,10 @@ def crawl():
     new_session()
     print("started crawling", flush=True)
     while True:
-        if len(stop_list) == 0:
+        if stop_list_deleted or len(stop_list) == 0:
+            if not stop_list_deleted:
+                del stop_list
+                stop_list_deleted = True
             if not continuesCrawling:
                 break
             stop_set = set()

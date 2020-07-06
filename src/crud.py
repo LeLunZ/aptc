@@ -209,6 +209,8 @@ def add_trip(trip, hash1):
 def get_from_table(t):
     return s.query(t).all()
 
+def get_from_table_with_filter(t, f):
+    return s.query(t).filter(f).all()
 
 def get_stops_without_location():
     return s.query(Stop).filter(or_(Stop.stop_lon == None, Stop.stop_lat == None)).all()
