@@ -447,7 +447,7 @@ def location_data_thread():
     while True:
         try:
             stop = real_thread_safe_q.get(block=False)
-            if stop.stop_name in stop_dict:
+            if stop.stop_name.split('(')[0].strip() in stop_dict:
                 coords = stop_dict.pop(stop.stop_name)
                 try:
                     update_location_of_stop(stop, coords['y'], coords['x'])
@@ -458,7 +458,7 @@ def location_data_thread():
             else:
                 try:
                     future_1 = session.get(
-                        'http://fahrplan.oebb.at/bin/ajax-getstop.exe/dn?REQ0JourneyStopsS0A=1&REQ0JourneyStopsB=12&S=' + stop.stop_name + '?&js=false&',
+                        'http://fahrplan.oebb.at/bin/ajax-getstop.exe/dn?REQ0JourneyStopsS0A=1&REQ0JourneyStopsB=12&S=' + stop.stop_name.split('(')[0].strip() + '?&js=false&',
                         verify=False)
                     oebb_location = future_1.result()
                     locations = oebb_location.content[8:-22]
@@ -654,7 +654,8 @@ station_ids = set()
 def load_all_stops_to_crawl(stop_names):
     future_session_stops = requests_retry_session_async(session=FuturesSession())
     futures = [future_session_stops.get(
-        'http://fahrplan.oebb.at/bin/ajax-getstop.exe/dn?REQ0JourneyStopsS0A=1&REQ0JourneyStopsB=12&S=' + stop_name + '?&js=false&',
+        'http://fahrplan.oebb.at/bin/ajax-getstop.exe/dn?REQ0JourneyStopsS0A=1&REQ0JourneyStopsB=12&S=' +
+        stop_name.split('(')[0].strip() + '?&js=false&',
         verify=False, timeout=6, hooks={'response': request_stops_processing_hook}) for
         stop_name
         in stop_names]
