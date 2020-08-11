@@ -56,7 +56,7 @@ create table stops
         constraint stops_pkey
             primary key,
     stop_code           text,
-    stop_name           text   not null,
+    stop_name           text not null,
     stop_desc           text,
     stop_lat            double precision,
     stop_lon            double precision,
@@ -102,6 +102,7 @@ create table calendar
     sunday              boolean    not null,
     start_date          numeric(8),
     end_date            numeric(8) not null,
+    no_fix_date         boolean    DEFAULT FALSE,
     calendar_dates_hash numeric(50)
 );
 

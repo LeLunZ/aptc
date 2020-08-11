@@ -10,9 +10,16 @@
       "westLonBorder": 16.177,
       "eastLonBorder": 16.582
     },
-    "dates": ["14.07.2020", "17.07.2020", "18.07.2020", "19.07.2020"],
+    "dates": [
+      "18.07.2020",
+      "21.07.2020",
+      "22.07.2020",
+      "23.07.2020"
+    ],
     "exportOptions": {
-      "excludeRouteTypes": [1500]
+      "excludeRouteTypes": [
+        1500
+      ]
     }
   }
 }

@@ -187,7 +187,6 @@ def extract_date_from_str(calendar: Calendar, date_str: str, add=True):
                 add_day_to_calendar(calendar, date_arr[index])
     not_working_calendar_date = []
 
-
     if irregular_dates is not None:
         if 'allg. Feiertg' in irregular_dates:
             not_working_calendar_date.extend(copy.deepcopy(allg_feiertage))
@@ -385,6 +384,69 @@ def export_all_tables():
         end_session()
         print(f'finished {i.__table__.name}', flush=True)
 
+    if excluded_routes is not None:
+        print("removing routes")
+        all_routes = []
+        all_trips = []
+        all_stop_times = []
+        deleted_route_ids = []
+        deleted_trip_ids = []
+        with open(f'./{Route.__table__.name}.txt', 'r') as routes:
+            first_line_routes = routes.readline()
+            route_type_index = Route.firstline().index('route_type')
+            route_id_index = Route.firstline().index('route_id')
+            csv_reader = csv.reader(routes, delimiter=',')
+            for route in csv_reader:
+                if route[route_type_index] != '' and int(route[route_type_index]) in excluded_routes:
+                    deleted_route_ids.append(int(route[route_id_index]))
+                    continue
+                all_routes.append(route)
+
+        with open(f'./{Trip.__table__.name}.txt', 'r') as trips:
+            first_line_trips = trips.readline()
+            route_id_of_trip_index = Trip.firstline().index('route_id')
+            trip_id_index = Trip.firstline().index('trip_id')
+            csv_reader = csv.reader(trips, delimiter=',')
+            for trip in csv_reader:
+                if int(trip[route_id_of_trip_index]) in deleted_route_ids:
+                    deleted_trip_ids.append(int(trip[trip_id_index]))
+                    continue
+                all_trips.append(trip)
+
+        with open(f'./{StopTime.__table__.name}.txt', 'r') as stop_times:
+            first_line_stop_times = stop_times.readline()
+            trip_id_of_stop_time_index = StopTime.firstline().index("trip_id")
+            csv_reader = csv.reader(stop_times, delimiter=',')
+            for stop_time in csv_reader:
+                if int(stop_time[trip_id_of_stop_time_index]) in deleted_trip_ids:
+                    continue
+                all_stop_times.append(stop_time)
+
+        os.remove(f'./{Route.__table__.name}.txt')
+
+        with open(f'./{Route.__table__.name}.txt', 'a') as routes:
+            routes.writelines([first_line_routes])
+            outcsv = csv.writer(routes, delimiter=',')
+            for row in all_routes:
+                outcsv.writerow(row)
+
+        os.remove(f'./{Trip.__table__.name}.txt')
+
+        with open(f'./{Trip.__table__.name}.txt', 'a') as trips:
+            trips.writelines([first_line_trips])
+            outcsv = csv.writer(trips, delimiter=',')
+            for row in all_trips:
+                outcsv.writerow(row)
+
+        os.remove(f'./{StopTime.__table__.name}.txt')
+
+        with open(f'./{StopTime.__table__.name}.txt', 'a') as stop_times:
+            stop_times.writelines([first_line_stop_times])
+            outcsv = csv.writer(stop_times, delimiter=',')
+            for row in all_stop_times:
+                outcsv.writerow(row)
+        print(f"done removing routes with type {excluded_routes}")
+
     with ZipFile('./Archiv.zip', 'w') as zip:
         for file in file_names:
             zip.write(file)
@@ -455,7 +517,8 @@ def location_data_thread():
             else:
                 try:
                     future_1 = session.get(
-                        'http://fahrplan.oebb.at/bin/ajax-getstop.exe/dn?REQ0JourneyStopsS0A=1&REQ0JourneyStopsB=12&S=' + stop.stop_name.split('(')[0].strip() + '?&js=false&',
+                        'http://fahrplan.oebb.at/bin/ajax-getstop.exe/dn?REQ0JourneyStopsS0A=1&REQ0JourneyStopsB=12&S=' +
+                        stop.stop_name.split('(')[0].strip() + '?&js=false&',
                         verify=False)
                     oebb_location = future_1.result()
                     locations = oebb_location.content[8:-22]
