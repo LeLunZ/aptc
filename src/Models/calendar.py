@@ -16,6 +16,7 @@ class Calendar(Base):
     sunday = Column(Boolean, nullable=False)
     start_date = Column(Numeric, nullable=True)
     end_date = Column(Numeric, nullable=False)
+    no_fix_date = Column(Boolean, nullable=False, default=False)
     calendar_dates_hash = Column(Numeric, nullable=True)
 
     def __repr__(self):
