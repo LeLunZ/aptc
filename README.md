@@ -56,6 +56,6 @@ Careful: if you're running postgres locally on a mac, don't use localhost, but `
 
 # Export Data
 To get all the crawled data just run another docker container with the export statement:
-`docker-compose run -e export=TRUE app`
+`docker-compose run -e export=TRUE app
 
 All the Data will be in the `db` folder.

@@ -269,35 +269,57 @@ def extract_dates_from_oebb_page(tree, calendar, add=True):
         extra_info_traffic_day = tree.xpath('//*/strong[text() =$first]/../*/pre/text()', first='Verkehrstage:')[0]
         extra_info_traffic_day = extra_info_traffic_day.split('\n')[3:]
         extra_info_traffic_day = list(filter(lambda traffic_line: traffic_line.strip() != '', extra_info_traffic_day))
-        months_with_first_and_last_day = []
         day_exceptions = []
+        today = datetime.date.today()
+        current_day = today.day
+        current_month = today.month
+        current_year = today.year
+        first_month = service_months[extra_info_traffic_day[0][0:3]]
+        last_month = service_months[extra_info_traffic_day[-1][0:3]]
+        short_month = extra_info_traffic_day[0][0:3]
+        short_last_month = extra_info_traffic_day[-1][0:3]
+        month_as_int = service_months[short_month]
+        last_month_as_int = service_months[short_last_month]
+        month = extra_info_traffic_day[0].replace(f'{short_month} ', '')
+        last_month = extra_info_traffic_day[-1].replace(f'{short_last_month} ', '')
+        first_day_in_month = month.find('x') + 1
+        last_day_in_month = last_month.rfind('x') + 1
+        begin_year = begin_date.year
+        if first_month + len(extra_info_traffic_day) - 1 > 12:
+            begin_year = begin_date.year
+        else:
+            first_day_in_month = extra_info_traffic_day[0].find('x') + 1
+            if first_day_in_month >= begin_date.day and service_months[
+                begin_date.month] <= month_as_int:
+                if last_day_in_month <= end_date.day and service_months[
+                    end_date.month] >= last_month_as_int and last_month_as_int >= current_month >= month_as_int:
+                    begin_year = current_year
+                else:
+                    begin_year = begin_date.year
+            else:
+                begin_year = end_date.year
+
         for index_month, month in enumerate(extra_info_traffic_day):
             short_month = month[0:3]
             month_as_int = service_months[short_month]
             month = month.replace(f'{short_month} ', '')
-            last_day_in_month = month.rfind('x') + 1
-            first_day_in_month = month.find('x') + 1
-            if index_month == 0 and month_as_int == 12 and len(extra_info_traffic_day) > 1:
-                year = begin_date.year
-            else:
-                year = end_date.year
+            year = begin_year
+            if month_as_int == 12:
+                begin_year += 1
             for day_index, day in enumerate(month):
                 if day == 'x':
                     day_exceptions.append((year, month_as_int, day_index + 1))
-            months_with_first_and_last_day.append((month_as_int, first_day_in_month, last_day_in_month))
-        day = months_with_first_and_last_day[0][1]
-        month = months_with_first_and_last_day[0][0]
-        year = end_date.year
+        day = day_exceptions[0][2]
+        month = day_exceptions[0][1]
+        year = day_exceptions[0][0]
         if day < 10:
             day = f'0{day}'
         if month < 10:
             month = f'0{month}'
-        if month == 12 and len(months_with_first_and_last_day) > 1:
-            year = begin_date.year
         start_date = int(f'{year}{month}{day}')
-        day = months_with_first_and_last_day[-1][2]
-        month = months_with_first_and_last_day[-1][0]
-        year = end_date.year
+        day = day_exceptions[-1][2]
+        month = day_exceptions[-1][1]
+        year = day_exceptions[-1][0]
         if day < 10:
             day = f'0{day}'
         if month < 10:
