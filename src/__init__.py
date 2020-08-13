@@ -602,7 +602,6 @@ def process_page(url, page: PageDTO):
         page = request_processing_hook(response, None, None)  # TODO check if it is working
     if page.calendar_data is None:
         raise Exception(f'no calendar_data')
-    tree = html.fromstring(page.page)
     if page.agency is None:
         new_agency: Agency = get_from_table_first(Agency)
     else:
@@ -625,6 +624,7 @@ def process_page(url, page: PageDTO):
             # if stop_dto not in real_thread_safe_q.queue and (new_stop.stop_lat is None or new_stop.stop_lon is None): TODO Check if dont needed
             real_thread_safe_q.put(stop_dto)
             current_stops_dict[stop] = new_stop
+    tree = html.fromstring(page.page)
     stop_times_to_add.append((tree, page, current_stops_dict, trip))
 
 
