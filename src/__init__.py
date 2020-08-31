@@ -51,21 +51,26 @@ stop_dict = {}
 
 allg_feiertage = []
 
-try:
-    logging.getLogger("requests").setLevel(logging.FATAL)
-except:
-    pass
-
-try:
-    logging.getLogger("urllib3").setLevel(logging.FATAL)
-except:
-    pass
-
 logging.basicConfig(filename='./Data/aptc.log',
                     filemode='a',
                     format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
                     datefmt='%H:%M:%S',
                     level=logging.DEBUG)
+
+try:
+    logging.getLogger("requests").setLevel(logging.CRITICAL)
+except:
+    pass
+
+try:
+    logging.getLogger("urllib3").setLevel(logging.CRITICAL)
+except:
+    pass
+
+try:
+    logging.getLogger("selenium").setLevel(logging.CRITICAL)
+except:
+    pass
 
 q = []
 real_thread_safe_q = Queue()
