@@ -171,7 +171,6 @@ def add_stop(stop: Stop):
     else:
         if stop.crawled is True and (data.crawled is False or data.crawled is None):
             data.crawled = True
-            s.flush()
         stop = data
     return stop
 
