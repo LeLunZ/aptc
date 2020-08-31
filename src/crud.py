@@ -1,3 +1,4 @@
+import logging
 import os
 import threading
 from typing import List
@@ -14,6 +15,9 @@ from Models.transport_type_image import TransportTypeImage
 from Models.stop_time_text import StopTimeText
 import sqlalchemy
 import pyhash
+
+
+logger = logging.getLogger(__name__)
 
 hasher = pyhash.fnv1a_64()
 lock = threading.Lock()
@@ -110,7 +114,8 @@ def add_calendar_dates(calendar_dates: [CalendarDate], only_dates_as_string: str
     if only_dates_as_string == '':
         data = s.query(Calendar).filter(
             and_(Calendar.calendar_dates_hash == None, or_(and_(Calendar.start_date == service.start_date,
-                 Calendar.end_date == service.end_date), Calendar.no_fix_date == service.no_fix_date),
+                                                                Calendar.end_date == service.end_date),
+                                                           Calendar.no_fix_date == service.no_fix_date),
                  Calendar.monday == service.monday, Calendar.tuesday == service.tuesday,
                  Calendar.wednesday == service.wednesday, Calendar.thursday == service.thursday,
                  Calendar.friday == service.friday, Calendar.saturday == service.saturday,
@@ -213,8 +218,10 @@ def add_trip(trip, hash1):
 def get_from_table(t):
     return s.query(t).all()
 
+
 def get_from_table_with_filter(t, f):
     return s.query(t).filter(f).all()
+
 
 def get_stops_without_location():
     return s.query(Stop).filter(or_(Stop.stop_lon == None, Stop.stop_lat == None)).all()
@@ -237,7 +244,17 @@ def query_element(e):
 
 @lockF(lock)
 def commit():
-    s.commit()
+    try:
+        s.commit()
+    except Exception as e:
+        logger.exception(e)
+        s.rollback()
+        def new_session_nested():
+            global s
+            end_session()
+            s = Session()
+
+        new_session_nested()
 
 
 def end_session():
