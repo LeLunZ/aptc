@@ -534,8 +534,8 @@ def location_data_thread():
         try:
             stop = real_thread_safe_q.get(block=False)
             if stop.stop_name.split('(')[0].strip() in stop_dict:
-                coords = stop_dict.pop(stop.stop_name)
                 try:
+                    coords = stop_dict[stop.stop_name.split('(')[0].strip()]
                     update_location_of_stop(stop, coords['y'], coords['x'])
                 except:
                     pass
@@ -550,13 +550,16 @@ def location_data_thread():
                     oebb_location = future_1.result()
                     locations = oebb_location.content[8:-22]
                     stop_suggestions = json.loads(locations.decode('iso-8859-1'))
-                    for index, stop_suggestion in enumerate(stop_suggestions['suggestions']):
-                        if stop_suggestion['value'] not in already_done or index == 0:
+                    for stop_suggestion in stop_suggestions['suggestions']:
+                        if stop_suggestion['value'] not in already_done:
                             stop_dict[stop_suggestion['value']] = {'y': str_to_geocord(stop_suggestion['ycoord']),
                                                                    'x': str_to_geocord(stop_suggestion['xcoord'])}
                             already_done.add(stop_suggestion['value'])
-                    current_station_cord = stop_dict.pop(stop_suggestions['suggestions'][0]['value'])
-                    update_location_of_stop(stop, current_station_cord['y'], current_station_cord['x'])
+                    if stop.stop_name.split('(')[0].strip() in stop_dict:
+                        current_station_cord = stop_dict.pop(stop.stop_name.split('(')[0].strip())
+                        update_location_of_stop(stop, current_station_cord['y'], current_station_cord['x'])
+                    else:
+                        real_thread_safe_q.put(stop)
                 except:
                     real_thread_safe_q.put(stop)
                 finally:
@@ -964,9 +967,13 @@ def crawl():
         stop_times_executor.shutdown(wait=True)
         commit()
         new_session()
+    logging.debug("finished crawling")
+    logging.debug("adding all other stops")
     add_all_empty_to_queue()
     finishUp = True
+    logging.debug("waiting to finish now")
     real_thread_safe_q.join()
+    logging.debug("stops finished now")
     commit()
 
 
