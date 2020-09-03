@@ -907,7 +907,7 @@ def crawl():
     try:
         max_stops_to_crawl = getConfig('batchSize')
     except:
-        max_stops_to_crawl = 10
+        max_stops_to_crawl = 3
     try:
         date_arr = getConfig('dates')
     except:
@@ -925,9 +925,11 @@ def crawl():
     commit()
     new_session()
     print("started crawling", flush=True)
+    count12 = 0
     while True:
         if stop_list_deleted or len(stop_list) == 0:
             if not stop_list_deleted:
+                logging.debug(f'deleting stop_list starting with database crawl')
                 del stop_list
                 stop_list_deleted = True
             if not continuesCrawling:
@@ -967,6 +969,8 @@ def crawl():
         stop_times_executor.shutdown(wait=True)
         commit()
         new_session()
+        count12 = count12 + 1
+        logging.debug(f'finished batch {count12*max_stops_to_crawl}')
     logging.debug("finished crawling")
     logging.debug("adding all other stops")
     add_all_empty_to_queue()
