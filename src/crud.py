@@ -16,7 +16,6 @@ from Models.stop_time_text import StopTimeText
 import sqlalchemy
 import pyhash
 
-
 logger = logging.getLogger(__name__)
 
 hasher = pyhash.fnv1a_64()
@@ -171,8 +170,25 @@ def add_stop(stop: Stop):
     else:
         if stop.crawled is True and (data.crawled is False or data.crawled is None):
             data.crawled = True
+        if stop.parent_station is not None and data.parent_station is None:
+            data.parent_station = stop.parent_station
         stop = data
     return stop
+
+
+def get_stops_with_parent():
+    return s.query(Stop).filter(Stop.parent_station != None).all()
+
+
+def get_stop_with_id(parent_id):
+    return s.query(Stop).filter(Stop.stop_id == parent_id).first()
+
+@lockF(lock)
+def remove_parent_from_all():
+    try:
+        s.query(Stop).filter(Stop.parent_station != None).update({Stop.parent_station: None})
+    except:
+        pass
 
 
 def load_all_uncrawled_stops(max_stops_to_crawl):
@@ -248,6 +264,7 @@ def commit():
     except Exception as e:
         logger.exception(e)
         s.rollback()
+
         def new_session_nested():
             global s
             end_session()

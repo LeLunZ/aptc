@@ -366,7 +366,7 @@ def save_simple_stops(names, ids, main_station):
                 main_station.crawled = True
                 main_station = add_stop(main_station)
                 continue
-            new_stop = Stop(stop_name=name, stop_lat=main_station.stop_lat, stop_lon=main_station.stop_lon,
+            new_stop = Stop(stop_name=name,parent_station=main_station.stop_id, stop_lat=main_station.stop_lat, stop_lon=main_station.stop_lon,
                             location_type=0, crawled=True)
             new_stop = add_stop(new_stop)
     else:
@@ -559,7 +559,7 @@ def location_data_thread():
                         current_station_cord = stop_dict.pop(stop.stop_name.split('(')[0].strip())
                         update_location_of_stop(stop, current_station_cord['y'], current_station_cord['x'])
                     else:
-                        real_thread_safe_q.put(stop)
+                        pass # dont do anything
                 except:
                     real_thread_safe_q.put(stop)
                 finally:
@@ -568,6 +568,22 @@ def location_data_thread():
             time.sleep(30)
             if finishUp:
                 exit(0)
+
+
+def match_station_with_parents():
+    all_stops = get_stops_with_parent()
+    parent_id_stop_dict = {}
+    for stop in all_stops:
+        if stop.parent_station not in parent_id_stop_dict:
+            parent_id_stop_dict[stop.parent_station] = [stop]
+        else:
+            parent_id_stop_dict[stop.parent_station].append(stop)
+    for id in parent_id_stop_dict:
+        parent_stop = get_stop_with_id(id)
+        childs = parent_id_stop_dict[id]
+        for child in childs:
+            update_location_of_stop(child, parent_stop.stop_lat, parent_stop.stop_lon)
+    remove_parent_from_all()
 
 
 def add_stop_times_from_web_page(tree, page, current_stops_dict, trip):
@@ -978,6 +994,8 @@ def crawl():
     logging.debug("waiting to finish now")
     real_thread_safe_q.join()
     logging.debug("stops finished now")
+    commit()
+    match_station_with_parents()
     commit()
 
 
