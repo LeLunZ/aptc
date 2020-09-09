@@ -528,7 +528,6 @@ def load_allg_feiertage():
 
 def location_data_thread():
     global stop_dict
-    already_done = set()
     session = requests_retry_session_async(session=FuturesSession(max_workers=1))
     while True:
         try:
@@ -551,10 +550,8 @@ def location_data_thread():
                     locations = oebb_location.content[8:-22]
                     stop_suggestions = json.loads(locations.decode('iso-8859-1'))
                     for stop_suggestion in stop_suggestions['suggestions']:
-                        if stop_suggestion['value'] not in already_done:
                             stop_dict[stop_suggestion['value']] = {'y': str_to_geocord(stop_suggestion['ycoord']),
                                                                    'x': str_to_geocord(stop_suggestion['xcoord'])}
-                            already_done.add(stop_suggestion['value'])
                     if stop.stop_name.split('(')[0].strip() in stop_dict:
                         current_station_cord = stop_dict.pop(stop.stop_name.split('(')[0].strip())
                         update_location_of_stop(stop, current_station_cord['y'], current_station_cord['x'])
@@ -825,7 +822,7 @@ def load_all_stops_to_crawl(stop_names):
                         re = 'http://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_scotty.vs_liveticker&evaId=' + str(
                             int(
                                 si)) + '&boardType=arr&time=00:00' + '&additionalTime=0&maxJourneys=100000&outputMode=tickerDataOnly&start=yes&selectDate' + '=period&dateBegin=' + \
-                             date_w[0] + 'dateEnd=' + date_w[0] + '&productsFilter=1011111111011'
+                             date_w[0] + '&dateEnd=' + date_w[0] + '&productsFilter=1011111111011'
                         route_url_dict[re] = stop_name_dict[original_name][0]
                         future_args.append(re)
             if len(current_station_ids) > 0:
@@ -834,7 +831,7 @@ def load_all_stops_to_crawl(stop_names):
         except Exception as e:
             logging.error("Skipped one station")
 
-    future_routes = [future_session_stops.get(url, timeout=6, verify=False) for url in future_args]
+    future_routes = [future_session_stops.get(url, timeout=20, verify=False) for url in future_args]
     main_station_journey_dict = {}
     for f in as_completed(future_routes):
         try:
@@ -847,8 +844,8 @@ def load_all_stops_to_crawl(stop_names):
             if json_data is not None and json_data['maxJ'] is not None:
                 main_station_journey_dict[main_station['id']].extend(
                     list(map(lambda x: x, json_data['journey'])))
-        except:
-            pass
+        except Exception as e:
+            print(str(e), flush=True)
 
     routes = set()
     future_route_url = []
