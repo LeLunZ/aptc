@@ -561,7 +561,7 @@ def location_data_thread():
                     else:
                         pass # dont do anything
                 except:
-                    real_thread_safe_q.put(stop)
+                    pass
                 finally:
                     real_thread_safe_q.task_done()
         except:
