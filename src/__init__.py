@@ -584,6 +584,7 @@ def match_station_with_parents():
         for child in childs:
             update_location_of_stop(child, parent_stop.stop_lat, parent_stop.stop_lon)
     remove_parent_from_all()
+    commit()
 
 
 def add_stop_times_from_web_page(tree, page, current_stops_dict, trip):
@@ -995,8 +996,6 @@ def crawl():
     real_thread_safe_q.join()
     logging.debug("stops finished now")
     commit()
-    match_station_with_parents()
-    commit()
 
 
 if __name__ == "__main__":
@@ -1026,6 +1025,11 @@ if __name__ == "__main__":
     try:
         if getConfig('crawl'):
             crawl()
+    except KeyError as e:
+        pass
+    try:
+        if getConfig('matchWithParent'):
+            match_station_with_parents()
     except KeyError as e:
         pass
     try:

@@ -3,6 +3,7 @@
     "crawl": true,
     "export": true,
     "continues": true,
+    "matchWithParent": true,
     "batchSize": 3,
     "crawlStopOptions": {
       "northLatBorder": 48.325,
