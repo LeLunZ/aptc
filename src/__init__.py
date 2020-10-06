@@ -990,7 +990,10 @@ def crawl():
     add_all_empty_to_queue()
     finishUp = True
     logging.debug("waiting to finish now")
-    real_thread_safe_q.join()
+    while len(real_thread_safe_q.queue) > 0:
+        print(f'sleeping ten seconds')
+        time.sleep(10)
+        print(f'{real_thread_safe_q.queue} more stops to crawl')
     logging.debug("stops finished now")
     commit()
 
