@@ -562,9 +562,10 @@ def location_data_thread():
                 finally:
                     real_thread_safe_q.task_done()
         except:
-            time.sleep(30)
             if finishUp:
+                print("finished stop thread")
                 exit(0)
+            time.sleep(30)
 
 
 def match_station_with_parents():
