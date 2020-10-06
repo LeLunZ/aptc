@@ -993,7 +993,7 @@ def crawl():
     while len(real_thread_safe_q.queue) > 0:
         print(f'sleeping ten seconds')
         time.sleep(10)
-        print(f'{real_thread_safe_q.queue} more stops to crawl')
+        print(f'{len(real_thread_safe_q.queue)} more stops to crawl')
     logging.debug("stops finished now")
     commit()
 
