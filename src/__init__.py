@@ -774,8 +774,6 @@ def load_all_stops_to_crawl(stop_names):
     stop_name_dict = {}
     count = 0
     for i in as_completed(futures):
-        count += 1
-        print(count, flush=True)
         try:
             response = i.result()
             r = response.data
@@ -1020,7 +1018,7 @@ if __name__ == "__main__":
             shapefile = getConfig('crawlStopOptions.shapefile')
             fiona_shape = fiona.open(shapefile)
             fiona_iteration = iter(fiona_shape)
-            fiona_geometry = next(fiona_iteration)['geometry']
+            fiona_geometry = shape(next(fiona_iteration)['geometry'])
             del fiona_shape
             del fiona_iteration
         except KeyError:
