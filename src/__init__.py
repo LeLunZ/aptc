@@ -531,7 +531,7 @@ def load_allg_feiertage():
 
 
 def location_data_thread():
-    global stop_dict
+    global stop_dict, finishUp
     session = requests_retry_session_async(session=FuturesSession(max_workers=1))
     while True:
         try:
@@ -569,6 +569,7 @@ def location_data_thread():
             if finishUp:
                 print("finished stop thread")
                 exit(0)
+            print("sleeping 30 seconds")
             time.sleep(30)
 
 
