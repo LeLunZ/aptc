@@ -8,7 +8,7 @@ from threading import Thread
 
 import fiona
 from shapely.geometry import shape, mapping, Point, Polygon, MultiPolygon
-
+import googlemaps
 from requests import Response
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -1006,6 +1006,26 @@ def crawl():
     commit()
 
 
+def match_station_with_google_maps():
+    key = getConfig('googleMapsKey')
+    gmaps = googlemaps.Client(key=key)
+    all_stops = get_stops_without_location()
+    googlemaps.client.geocode
+    for stop in all_stops:
+        geocoding = gmaps.geocode(stop.stop_name)
+        if geocoding is None or len(geocoding) is 0:
+            print(f'couldnt find {stop.stop_name} on google maps')
+        else:
+            location = geocoding[0]['geometry']['location']
+            lat = location['lat']
+            lng = location['lng']
+            stop.stop_lat = lat
+            stop.stop_lon = lng
+    commit()
+
+
+
+
 if __name__ == "__main__":
     try:
         continuesCrawling = getConfig('continues')
@@ -1054,6 +1074,11 @@ if __name__ == "__main__":
         if getConfig('matchWithParent'):
             match_station_with_parents()
     except KeyError as e:
+        pass
+    try:
+        if getConfig('useGoogleMaps'):
+            match_station_with_google_maps()
+    except KeyError:
         pass
     try:
         if getConfig('export'):
