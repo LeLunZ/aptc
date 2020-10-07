@@ -1024,8 +1024,6 @@ def match_station_with_google_maps():
     commit()
 
 
-
-
 if __name__ == "__main__":
     try:
         continuesCrawling = getConfig('continues')
