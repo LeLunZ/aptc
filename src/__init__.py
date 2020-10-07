@@ -6,6 +6,9 @@ import time
 from queue import Queue
 from threading import Thread
 
+import fiona
+from shapely.geometry import shape, mapping, Point, Polygon, MultiPolygon
+
 from requests import Response
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -366,7 +369,8 @@ def save_simple_stops(names, ids, main_station):
                 main_station.crawled = True
                 main_station = add_stop(main_station)
                 continue
-            new_stop = Stop(stop_name=name,parent_station=main_station.stop_id, stop_lat=main_station.stop_lat, stop_lon=main_station.stop_lon,
+            new_stop = Stop(stop_name=name, parent_station=main_station.stop_id, stop_lat=main_station.stop_lat,
+                            stop_lon=main_station.stop_lon,
                             location_type=0, crawled=True)
             new_stop = add_stop(new_stop)
     else:
@@ -550,13 +554,13 @@ def location_data_thread():
                     locations = oebb_location.content[8:-22]
                     stop_suggestions = json.loads(locations.decode('iso-8859-1'))
                     for stop_suggestion in stop_suggestions['suggestions']:
-                            stop_dict[stop_suggestion['value']] = {'y': str_to_geocord(stop_suggestion['ycoord']),
-                                                                   'x': str_to_geocord(stop_suggestion['xcoord'])}
+                        stop_dict[stop_suggestion['value']] = {'y': str_to_geocord(stop_suggestion['ycoord']),
+                                                               'x': str_to_geocord(stop_suggestion['xcoord'])}
                     if stop.stop_name.split('(')[0].strip() in stop_dict:
                         current_station_cord = stop_dict.pop(stop.stop_name.split('(')[0].strip())
                         update_location_of_stop(stop, current_station_cord['y'], current_station_cord['x'])
                     else:
-                        pass # dont do anything
+                        pass  # dont do anything
                 except:
                     pass
                 finally:
@@ -784,7 +788,11 @@ def load_all_stops_to_crawl(stop_names):
                 'productsFilter': '0000111011'
             }
             stop_to_crawl: Stop = r[1]
-            if not crawlStopOptions or southLatBorder < stop_to_crawl.stop_lat < northLatBorder and westLonBorder < stop_to_crawl.stop_lon < eastLonBorder:
+            fiona_geometry_is_avaible = fiona_geometry is not None and fiona_geometry is not False
+            point = shape({'type': 'Point', 'coordinates': [stop_to_crawl.stop_lon, stop_to_crawl.stop_lat]})
+            if (fiona_geometry_is_avaible and point.within(fiona_geometry)) or (
+                    not fiona_geometry_is_avaible and not crawlStopOptions) or (
+                    crawlStopOptions and southLatBorder < stop_to_crawl.stop_lat < northLatBorder and westLonBorder < stop_to_crawl.stop_lon < eastLonBorder):
                 stop_name_dict[r[1].stop_name] = (r[0], r[1])
                 futures_stops_args.append(("https://fahrplan.oebb.at/bin/stboard.exe/dn", payload, querystring))
         except Exception as e:
@@ -985,7 +993,7 @@ def crawl():
         commit()
         new_session()
         count12 = count12 + 1
-        logging.debug(f'finished batch {count12*max_stops_to_crawl}')
+        logging.debug(f'finished batch {count12 * max_stops_to_crawl}')
     logging.debug("finished crawling")
     logging.debug("adding all other stops")
     add_all_empty_to_queue()
@@ -1005,7 +1013,22 @@ if __name__ == "__main__":
     except KeyError as e:
         continuesCrawling = False
     try:
+        fiona_geometry = False
         crawlStopOptions = 'crawlStopOptions' in getConfig()
+        try:
+            shapefile = getConfig('crawlStopOptions.shapefile')
+            fiona_shape = fiona.open(shapefile)
+            fiona_iteration = iter(fiona_shape)
+            fiona_geometry = next(fiona_iteration)['geometry']
+            del fiona_shape
+            del fiona_iteration
+        except KeyError:
+            pass
+        except FileNotFoundError:
+            pass
+        except:
+            pass
+
         if crawlStopOptions:
             northLatBorder = getConfig('crawlStopOptions.northLatBorder')
             southLatBorder = getConfig('crawlStopOptions.southLatBorder')

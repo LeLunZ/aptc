@@ -59,3 +59,8 @@ To get all the crawled data just run another docker container with the export st
 `docker-compose run -e export=TRUE app
 
 All the Data will be in the `db` folder.
+
+
+# Future Stuff
+
+while using shapefiles currently we only check if coordinates are in the first shape.

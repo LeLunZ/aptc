@@ -6,10 +6,7 @@
     "matchWithParent": true,
     "batchSize": 3,
     "crawlStopOptions": {
-      "northLatBorder": 48.325,
-      "southLatBorder": 48.115,
-      "westLonBorder": 16.177,
-      "eastLonBorder": 16.582
+      "shapefile": "./somepath"
     },
     "dates": [
       "18.08.2020",
