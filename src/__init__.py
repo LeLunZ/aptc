@@ -1010,7 +1010,6 @@ def match_station_with_google_maps():
     key = getConfig('googleMapsKey')
     gmaps = googlemaps.Client(key=key)
     all_stops = get_stops_without_location()
-    googlemaps.client.geocode
     for stop in all_stops:
         geocoding = gmaps.geocode(stop.stop_name)
         if geocoding is None or len(geocoding) is 0:
