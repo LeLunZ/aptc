@@ -2,6 +2,8 @@ certifi==2020.4.5.1
 cffi==1.14.0
 chardet==3.0.4
 cryptography==2.9.2
+Fiona==1.8.17
+Shapely==1.7.1
 idna==2.9
 lxml==4.5.1
 ndg-httpsclient==0.5.1
