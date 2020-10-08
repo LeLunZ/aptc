@@ -510,7 +510,7 @@ def load_allg_feiertage():
         if SECRET_KEY:
             driver = webdriver.Chrome(options=chrome_options)
         else:
-            driver = webdriver.Chrome('./chromedriver')
+            driver = webdriver.Chrome('chromedriver')
         driver.get('https://www.timeanddate.de/feiertage/oesterreich/' + str(begin_date.year))
         WebDriverWait(driver, 7).until(EC.presence_of_element_located((By.XPATH, '//*/tbody')))
         elements = driver.find_elements_by_xpath("//*/tbody/tr[@class='showrow']/th")
