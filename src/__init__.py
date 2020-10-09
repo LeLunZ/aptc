@@ -510,7 +510,7 @@ def load_allg_feiertage():
         if SECRET_KEY:
             driver = webdriver.Chrome(options=chrome_options)
         else:
-            driver = webdriver.Chrome('chromedriver')
+            driver = webdriver.Chrome('./chromedriver')
         driver.get('https://www.timeanddate.de/feiertage/oesterreich/' + str(begin_date.year))
         WebDriverWait(driver, 7).until(EC.presence_of_element_located((By.XPATH, '//*/tbody')))
         elements = driver.find_elements_by_xpath("//*/tbody/tr[@class='showrow']/th")
@@ -779,14 +779,14 @@ def load_all_stops_to_crawl(stop_names):
             r = response.data
             querystring = {"ld": "3"}
             payload = {
-                'sqView': '1&input=' + r[0][
+                'sqView': '1&input=' + r[0][  # Linz
                     'value'] + '&time=21:42&maxJourneys=50&dateBegin=&dateEnd=&selectDate=&productsFilter=0000111011&editStation=yes&dirInput=&',
                 'input': r[0]['value'],
                 'inputRef': r[0]['value'] + '#' + str(int(r[0]['extId'])),
                 'sqView=1&start': 'Information aufrufen',
                 'productsFilter': '0000111011'
             }
-            stop_to_crawl: Stop = r[1]
+            stop_to_crawl: Stop = r[1]  # take second stop because first one is already crawled Wien
             fiona_geometry_is_avaible = fiona_geometry is not None and fiona_geometry is not False
             point = shape({'type': 'Point', 'coordinates': [stop_to_crawl.stop_lon, stop_to_crawl.stop_lat]})
             if (fiona_geometry_is_avaible and point.within(fiona_geometry)) or (
@@ -942,8 +942,12 @@ def crawl():
     update_stops_thread = Thread(target=location_data_thread)
     update_stops_thread.daemon = True
     update_stops_thread.start()
-    for stop in get_from_table(Stop):
-        stop.crawled = False
+    try:
+        if getConfig('resetDBstatus'):
+            for stop in get_from_table(Stop):
+                stop.crawled = False
+    except:
+        pass
     commit()
     new_session()
     print("started crawling", flush=True)
@@ -1012,7 +1016,7 @@ def match_station_with_google_maps():
     all_stops = get_stops_without_location()
     for stop in all_stops:
         geocoding = gmaps.geocode(stop.stop_name)
-        if geocoding is None or len(geocoding) is 0:
+        if geocoding is None or len(geocoding) == 0:
             print(f'couldnt find {stop.stop_name} on google maps')
         else:
             location = geocoding[0]['geometry']['location']

@@ -259,6 +259,7 @@ def query_element(e):
 
 @lockF(lock)
 def commit():
+    global s
     try:
         s.commit()
     except Exception as e:
