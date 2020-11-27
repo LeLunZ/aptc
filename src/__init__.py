@@ -787,9 +787,15 @@ def load_all_stops_to_crawl(stop_names):
                 'productsFilter': '0000111011'
             }
             stop_to_crawl: Stop = r[1]  # take second stop because first one is already crawled Wien
-            fiona_geometry_is_avaible = fiona_geometry is not None and fiona_geometry is not False
+            fiona_geometry_is_avaible = fiona_geometry is not None and fiona_geometry is not False and (
+                        type(fiona_geometry) is list and len(fiona_geometry) > 0)
             point = shape({'type': 'Point', 'coordinates': [stop_to_crawl.stop_lon, stop_to_crawl.stop_lat]})
-            if (fiona_geometry_is_avaible and point.within(fiona_geometry)) or (
+            point_is_within = False
+            if fiona_geometry_is_avaible:
+                for k in fiona_geometry:
+                    if point.within(k):
+                        point_is_within = True
+            if (fiona_geometry_is_avaible and point_is_within) or (
                     not fiona_geometry_is_avaible and not crawlStopOptions) or (
                     crawlStopOptions and southLatBorder < stop_to_crawl.stop_lat < northLatBorder and westLonBorder < stop_to_crawl.stop_lon < eastLonBorder):
                 stop_name_dict[r[1].stop_name] = (r[0], r[1])
@@ -1039,7 +1045,9 @@ if __name__ == "__main__":
             shapefile = getConfig('crawlStopOptions.shapefile')
             fiona_shape = fiona.open(shapefile)
             fiona_iteration = iter(fiona_shape)
-            fiona_geometry = shape(next(fiona_iteration)['geometry'])
+            fiona_geometry = []
+            for r in fiona_iteration:
+                fiona_geometry.append(shape(r['geometry']))
             del fiona_shape
             del fiona_iteration
         except KeyError:
