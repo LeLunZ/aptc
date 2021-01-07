@@ -5,7 +5,7 @@ cryptography==2.9.2
 Fiona==1.8.17
 Shapely==1.7.1
 idna==2.9
-lxml==4.5.1
+lxml==4.6.2
 googlemaps==4.4.2
 ndg-httpsclient==0.5.1
 psycopg2-binary==2.8.5
