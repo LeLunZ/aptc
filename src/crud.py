@@ -14,11 +14,10 @@ from Models.calendar_date import CalendarDate
 from Models.transport_type_image import TransportTypeImage
 from Models.stop_time_text import StopTimeText
 import sqlalchemy
-import pyhash
+import xxhash
 
 logger = logging.getLogger(__name__)
 
-hasher = pyhash.fnv1a_64()
 lock = threading.Lock()
 try:
     DATABASE_URI = 'postgres+psycopg2://' + str(getConfig('postgres'))
@@ -129,7 +128,7 @@ def add_calendar_dates(calendar_dates: [CalendarDate], only_dates_as_string: str
                 data.end_date = service.end_date
             service = data
     else:
-        hash_value = hasher(only_dates_as_string)
+        hash_value = xxhash.xxh3_64(only_dates_as_string).intdigest()
         calendar = s.query(Calendar).filter(
             and_(Calendar.calendar_dates_hash == hash_value, Calendar.start_date == service.start_date,
                  Calendar.end_date == service.end_date,
@@ -182,6 +181,7 @@ def get_stops_with_parent():
 
 def get_stop_with_id(parent_id):
     return s.query(Stop).filter(Stop.stop_id == parent_id).first()
+
 
 @lockF(lock)
 def remove_parent_from_all():

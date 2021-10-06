@@ -11,7 +11,7 @@ ndg-httpsclient==0.5.1
 psycopg2-binary==2.8.5
 pyasn1==0.4.8
 pycparser==2.20
-pyhash==0.9.3
+xxhash==2.0.2
 pyOpenSSL==19.1.0
 requests==2.23.0
 requests-futures==1.0.0
