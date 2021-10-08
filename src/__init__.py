@@ -1,15 +1,23 @@
+from pathlib import Path
+from zipfile import ZipFile
+import datetime
+import atexit
+
 import copy
+from selenium import webdriver
+import csv
+from lxml import html
 import json
 import logging
 import pickle
 import time
 from queue import Queue
 from threading import Thread
+from typing import Union
 
 import fiona
-from shapely.geometry import shape, mapping, Point, Polygon, MultiPolygon
+from shapely.geometry import shape
 import googlemaps
-from requests import Response
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
@@ -42,13 +50,10 @@ if __name__ == "__main__":
     from Models.calendar_date import CalendarDate
     from crud import *
 
-from selenium import webdriver
-import csv
-from lxml import html
-
 import os
-from zipfile import ZipFile
-import datetime
+import urllib3
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 stop_dict = {}
 
@@ -413,10 +418,8 @@ def export_all_tables():
                 for row in records:
                     outcsv.writerow(row.tocsv())
         end_session()
-        print(f'finished {i.__table__.name}', flush=True)
 
     if excluded_routes is not None:
-        print("removing routes")
         all_routes = []
         all_trips = []
         all_stop_times = []
@@ -476,7 +479,6 @@ def export_all_tables():
             outcsv = csv.writer(stop_times, delimiter=',')
             for row in all_stop_times:
                 outcsv.writerow(row)
-        print(f"done removing routes with type {excluded_routes}")
 
     with ZipFile('./Archiv.zip', 'w') as zip:
         for file in file_names:
@@ -513,6 +515,11 @@ def load_allg_feiertage():
             driver = webdriver.Chrome('./chromedriver')
         driver.get('https://www.timeanddate.de/feiertage/oesterreich/' + str(begin_date.year))
         WebDriverWait(driver, 7).until(EC.presence_of_element_located((By.XPATH, '//*/tbody')))
+        cookie_ok = driver.find_element_by_xpath(
+            "//*/button[contains(@class, 'fc-button') and contains(@class, 'fc-cta-consent') and contains(@class,'fc-primary-button')]")
+
+        cookie_ok.click()
+
         elements = driver.find_elements_by_xpath("//*/tbody/tr[@class='showrow']/th")
 
         for f in elements:
@@ -547,7 +554,7 @@ def location_data_thread():
             else:
                 try:
                     future_1 = session.get(
-                        'http://fahrplan.oebb.at/bin/ajax-getstop.exe/dn?REQ0JourneyStopsS0A=1&REQ0JourneyStopsB=12&S=' +
+                        'https://fahrplan.oebb.at/bin/ajax-getstop.exe/dn?REQ0JourneyStopsS0A=1&REQ0JourneyStopsB=12&S=' +
                         stop.stop_name.split('(')[0].strip() + '?&js=false&',
                         verify=False)
                     oebb_location = future_1.result()
@@ -567,9 +574,7 @@ def location_data_thread():
                     real_thread_safe_q.task_done()
         except:
             if finishUp:
-                print("finished stop thread")
                 exit(0)
-            print("sleeping 30 seconds")
             time.sleep(30)
 
 
@@ -624,7 +629,7 @@ def add_stop_times_from_web_page(tree, page, current_stops_dict, trip):
 stop_times_to_add = []
 
 
-def process_page(url, page: PageDTO):
+def process_page(url, page: Union[PageDTO, None]):
     if page is None:
         response = requests_retry_session().get(url, timeout=10, verify=False)
         page = request_processing_hook(response, None, None)  # TODO check if it is working
@@ -646,7 +651,7 @@ def process_page(url, page: PageDTO):
     for i, stop in enumerate(page.all_stations):
         if stop not in current_stops_dict:
             new_stop = Stop(stop_name=stop,
-                            stop_url=remove_param_from_url(page.links_of_all_stations[i], '&time='), location_type=0)
+                            stop_url=page.links_of_all_stations[i], location_type=0)
             new_stop = add_stop_without_check(new_stop)
             stop_dto = StopDTO(new_stop.stop_name, new_stop.stop_url, new_stop.location_type, new_stop.stop_id)
             # if stop_dto not in real_thread_safe_q.queue and (new_stop.stop_lat is None or new_stop.stop_lon is None): TODO Check if dont needed
@@ -694,7 +699,11 @@ def request_processing_hook(resp, *args, **kwargs):
     route_type = None
     url = resp.url
     try:
-        route_type = route_types[route_info]
+        if route_info.startswith('/img'):
+            route_type = route_types[route_info]
+        else:
+            p = Path(route_info)
+            route_type = route_types[str('/' / Path(*p.parts[2:]))]
     except KeyError:
         add_transport_name(route_info, url)
     new_route = Route(route_long_name=route_long_name,
@@ -764,7 +773,7 @@ station_ids = set()
 def load_all_stops_to_crawl(stop_names):
     future_session_stops = requests_retry_session_async(session=FuturesSession())
     futures = [future_session_stops.get(
-        'http://fahrplan.oebb.at/bin/ajax-getstop.exe/dn?REQ0JourneyStopsS0A=1&REQ0JourneyStopsB=12&S=' +
+        'https://fahrplan.oebb.at/bin/ajax-getstop.exe/dn?REQ0JourneyStopsS0A=1&REQ0JourneyStopsB=12&S=' +
         stop_name.split('(')[0].strip() + '?&js=false&',
         verify=False, timeout=6, hooks={'response': request_stops_processing_hook}) for
         stop_name
@@ -788,7 +797,7 @@ def load_all_stops_to_crawl(stop_names):
             }
             stop_to_crawl: Stop = r[1]  # take second stop because first one is already crawled Wien
             fiona_geometry_is_avaible = fiona_geometry is not None and fiona_geometry is not False and (
-                        type(fiona_geometry) is list and len(fiona_geometry) > 0)
+                    type(fiona_geometry) is list and len(fiona_geometry) > 0)
             point = shape({'type': 'Point', 'coordinates': [stop_to_crawl.stop_lon, stop_to_crawl.stop_lat]})
             point_is_within = False
             if fiona_geometry_is_avaible:
@@ -833,7 +842,7 @@ def load_all_stops_to_crawl(stop_names):
                     current_station_ids.append(si)
                     for date in date_arr:
                         set_date(date)
-                        re = 'http://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_scotty.vs_liveticker&evaId=' + str(
+                        re = 'https://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_scotty.vs_liveticker&evaId=' + str(
                             int(
                                 si)) + '&boardType=arr&time=00:00' + '&additionalTime=0&maxJourneys=100000&outputMode=tickerDataOnly&start=yes&selectDate' + '=period&dateBegin=' + \
                              date_w[0] + '&dateEnd=' + date_w[0] + '&productsFilter=1011111111011'
@@ -876,7 +885,7 @@ def load_all_stops_to_crawl(stop_names):
             main_station = main_station_journey_dict[i][0]
             for route in all_transport:
                 try:
-                    url = "http://fahrplan.oebb.at/bin/trainsearch.exe/dn"
+                    url = "https://fahrplan.oebb.at/bin/trainsearch.exe/dn"
                     querystring = {"ld": "2"}
                     for date in date_arr:
                         set_date(date)
@@ -914,12 +923,18 @@ def load_all_stops_to_crawl(stop_names):
 
 date_arr = []
 
+cur_line = 0
+file_hash = 0
+finished_crawling = False
+
 
 def crawl():
-    global stop_times_to_add, finishUp, update_stops_thread, date_arr
+    global stop_times_to_add, finishUp, update_stops_thread, date_arr, cur_line, finished_crawling, file_hash
     with open('Data/bus_stops.csv') as csv_file:
+        file_hash = xxhash.xxh3_64(''.join(csv_file.readlines()))
+        csv_file.seek(0)
         csv_reader = csv.reader(csv_file, delimiter=',')
-        row_count = sum(1 for row in csv_reader)
+        row_count = sum(1 for _ in csv_reader)
         try:
             begin = int(getConfig('csv.begin')) - 1
         except KeyError:
@@ -941,6 +956,17 @@ def crawl():
     except:
         date_arr = [date_w]
     stop_list = list(stop_set)
+
+    # Read State and check if we are continuing from a crash
+    if state_path.exists():
+        with open(state_path, 'rb') as f:
+            c_line, f_hash = pickle.load(f)
+        state_path.unlink(missing_ok=True)
+        if f_hash == file_hash:
+            if cur_line := (c_line - max_stops_to_crawl) < 0:
+                cur_line = 0
+            stop_list = stop_list[c_line:]
+
     stop_list_deleted = False
     commit()
     get_std_date()
@@ -956,7 +982,6 @@ def crawl():
         pass
     commit()
     new_session()
-    print("started crawling", flush=True)
     count12 = 0
     while True:
         if stop_list_deleted or len(stop_list) == 0:
@@ -977,6 +1002,7 @@ def crawl():
         else:
             to_crawl = stop_list[:max_stops_to_crawl]
             stop_list = stop_list[max_stops_to_crawl:]
+            cur_line += max_stops_to_crawl
         routes = load_all_stops_to_crawl(to_crawl)
         stop_times_to_add = []
         t = Thread(target=load_data_async, args=(routes,))
@@ -1009,11 +1035,10 @@ def crawl():
     finishUp = True
     logging.debug("waiting to finish now")
     while len(real_thread_safe_q.queue) > 0:
-        print(f'sleeping ten seconds')
         time.sleep(10)
-        print(f'{len(real_thread_safe_q.queue)} more stops to crawl')
     logging.debug("stops finished now")
     commit()
+    finished_crawling = True
 
 
 def match_station_with_google_maps():
@@ -1033,7 +1058,20 @@ def match_station_with_google_maps():
     commit()
 
 
+state_path = Path('Data/state.bin')
+
+
+def save_csv_state():
+    import pickle
+    if not finished_crawling and file_hash != 0:
+        with open(state_path, 'wb') as file:
+            pickle.dump((cur_line, file_hash), file)
+    else:
+        state_path.unlink(missing_ok=True)
+
+
 if __name__ == "__main__":
+    atexit.register(save_csv_state)
     try:
         continuesCrawling = getConfig('continues')
     except KeyError as e:
@@ -1054,7 +1092,7 @@ if __name__ == "__main__":
             pass
         except FileNotFoundError:
             pass
-        except:
+        except Exception as e:
             pass
 
         if crawlStopOptions:
@@ -1091,8 +1129,8 @@ if __name__ == "__main__":
         pass
     try:
         if getConfig('export'):
-            print('exporting all tables', flush=True)
             export_all_tables()
     except KeyError:
         pass
+
 exit(0)

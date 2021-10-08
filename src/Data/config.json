@@ -4,15 +4,19 @@
     "export": true,
     "continues": true,
     "matchWithParent": true,
-    "batchSize": 1,
+    "batchSize": 2,
     "crawlStopOptions": {
-      "shapefile": "./somepath"
+      "shapefile": "Data/austria/out.shp",
+      "northLatBorder": 48.08536738871169,
+      "southLatBorder": 47.603774445768614,
+      "westLonBorder": 12.658254628153767,
+      "eastLonBorder": 13.364932901149844
     },
     "dates": [
-      "18.08.2020",
-      "21.08.2020",
-      "22.08.2020",
-      "23.08.2020"
+      "27.10.2021",
+      "29.10.2021",
+      "30.10.2021",
+      "31.10.2021"
     ],
     "exportOptions": {
       "excludeRouteTypes": [

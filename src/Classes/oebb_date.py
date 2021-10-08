@@ -50,7 +50,7 @@ end_date: OebbDate = OebbDate()
 
 def get_std_date():
     global begin_date, end_date
-    website = requests_retry_session(retries=10).get('http://fahrplan.oebb.at/bin/query.exe/dn?')
+    website = requests_retry_session(retries=10).get('https://fahrplan.oebb.at/bin/query.exe/dn?')
     tree = html.fromstring(website.content)
     validity = tree.xpath('//*/span[@class=$validity]/text()', validity='timetable_validity')[0]
     end = validity.split('bis')[1].replace('.', ' ').strip()

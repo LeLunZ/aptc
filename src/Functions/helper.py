@@ -17,7 +17,8 @@ def get_all_name_of_transport_distinct(list_of_transport):
 def remove_param_from_url(url, to_remove):
     splitted_url = url.split(to_remove)
     left_part = splitted_url[0]
-    right_part = '&'.join(list(filter(lambda x: x.strip() != '', splitted_url[1].split('&')[::-1][:-1])))
+    some_python = splitted_url[1].split('&')[::-1][:-1]
+    right_part = '&'.join(list(filter(lambda x: x.strip() != '', some_python)))
     return left_part + '&' + right_part
 
 

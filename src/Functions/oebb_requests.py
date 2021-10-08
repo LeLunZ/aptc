@@ -63,7 +63,7 @@ def requests_retry_session_async(
 
 def get_location_suggestion_from_string(location: str):
     oebb_location = requests_retry_session().get(
-        'http://fahrplan.oebb.at/bin/ajax-getstop.exe/dn?REQ0JourneyStopsS0A=1&REQ0JourneyStopsB=12&S=' + location + '?&js=false&',
+        'https://fahrplan.oebb.at/bin/ajax-getstop.exe/dn?REQ0JourneyStopsS0A=1&REQ0JourneyStopsB=12&S=' + location + '?&js=false&',
         verify=False)
     locations = oebb_location.content[8:-22]
     locations = json.loads(locations.decode('iso-8859-1'))
@@ -90,7 +90,7 @@ def get_all_station_ids_from_station(station):
 def get_all_routes_from_station(station_id):
     try:
         routes_of_station = requests_retry_session().get(
-            'http://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_scotty.vs_liveticker&evaId=' + str(
+            'https://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_scotty.vs_liveticker&evaId=' + str(
                 int(station_id)) + '&boardType=arr&time=00:00'
                                    '&additionalTime=0&maxJourneys=100000&outputMode=tickerDataOnly&start=yes&selectDate'
                                    '=period&dateBegin=' + date_w[0] + 'dateEnd=' + date_w[0] + '&productsFilter=1011111111011',
@@ -102,7 +102,7 @@ def get_all_routes_from_station(station_id):
 
 
 def get_all_routes_of_transport_and_station(transport_number, station):
-    url = "http://fahrplan.oebb.at/bin/trainsearch.exe/dn"
+    url = "https://fahrplan.oebb.at/bin/trainsearch.exe/dn"
     querystring = {"ld": "2"}
     payload = {
         'trainname': transport_number,
