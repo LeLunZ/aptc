@@ -6,11 +6,10 @@
     "matchWithParent": true,
     "batchSize": 2,
     "crawlStopOptions": {
-      "shapefile": "Data/austria/out.shp",
-      "northLatBorder": 48.08536738871169,
-      "southLatBorder": 47.603774445768614,
-      "westLonBorder": 12.658254628153767,
-      "eastLonBorder": 13.364932901149844
+      "northLatBorder": 48.387346,
+      "southLatBorder": 48.211107,
+      "westLonBorder": 14.244371,
+      "eastLonBorder": 14.417334
     },
     "dates": [
       "27.10.2021",

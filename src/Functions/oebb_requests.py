@@ -123,3 +123,18 @@ def get_all_routes_of_transport_and_station(transport_number, station):
     all_routes = tree.xpath('//*/td[@class=$name]/a/@href', name='fcell')
     all_routes = list(map(lambda l: l.split('?')[0], all_routes))
     return all_routes
+
+
+def get_stops_near_coordinates():
+    url = 'https://fahrplan.oebb.at/bin/mgate.exe'
+    payload = {"id": "zhig4m8imm4dyg4s", "ver": "1.32", "lang": "deu", "auth": {"type": "AID", "aid": "5vHavmuWPWIfetEe"},
+            "client": {"id": "OEBB", "type": "WEB", "name": "webapp", "l": "vs_webapp"}, "formatted": False,
+            "ext": "OEBB.7", "svcReqL": [{"meth": "LocGeoPos", "req": {
+            "ring": {"cCrd": {"x": 14390716, "y": 48319277}, "minDist": 0, "maxDist": 10000}, "maxLoc": 10,
+            "locFltrL": [{"type": "PROD", "mode": "INC", "value": 8191}], "getPOIs": False}, "id": "1|15|"}]}
+
+    locations = requests_retry_session().post(url, json=payload, verify=False)
+    # live map for the new web app https://fahrplan.oebb.at/webapp/#!P|TP!histId|0!histKey|H362702
+    json_data = json.loads(locations.content.decode('iso-8859-1'))
+    return json_data
+

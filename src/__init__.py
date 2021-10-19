@@ -480,7 +480,7 @@ def export_all_tables():
             for row in all_stop_times:
                 outcsv.writerow(row)
 
-    with ZipFile('./Archiv.zip', 'w') as zip:
+    with ZipFile(f'./GTFS_{str(begin_date)}-{str(end_date)}.zip', 'w') as zip:
         for file in file_names:
             zip.write(file)
 
@@ -582,10 +582,13 @@ def match_station_with_parents():
     all_stops = get_stops_with_parent()
     parent_id_stop_dict = {}
     for stop in all_stops:
-        if stop.parent_station not in parent_id_stop_dict:
-            parent_id_stop_dict[stop.parent_station] = [stop]
-        else:
-            parent_id_stop_dict[stop.parent_station].append(stop)
+        if stop.stop_lat is None or stop.stop_lon is None:
+            if stop.parent_station not in parent_id_stop_dict:
+                parent_id_stop_dict[stop.parent_station] = [stop]
+            else:
+                parent_id_stop_dict[stop.parent_station].append(stop)
+
+
     for id in parent_id_stop_dict:
         parent_stop = get_stop_with_id(id)
         childs = parent_id_stop_dict[id]
@@ -969,7 +972,6 @@ def crawl():
 
     stop_list_deleted = False
     commit()
-    get_std_date()
     load_allg_feiertage()
     update_stops_thread = Thread(target=location_data_thread)
     update_stops_thread.daemon = True
@@ -1102,6 +1104,7 @@ if __name__ == "__main__":
             eastLonBorder = getConfig('crawlStopOptions.eastLonBorder')
     except KeyError as e:
         crawlStopOptions = False
+    get_std_date()
     try:
         if url := getConfig('url'):
             update_stops_thread = Thread(target=location_data_thread)
