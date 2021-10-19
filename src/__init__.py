@@ -515,11 +515,13 @@ def load_allg_feiertage():
             driver = webdriver.Chrome('./chromedriver')
         driver.get('https://www.timeanddate.de/feiertage/oesterreich/' + str(begin_date.year))
         WebDriverWait(driver, 7).until(EC.presence_of_element_located((By.XPATH, '//*/tbody')))
-        cookie_ok = driver.find_element_by_xpath(
-            "//*/button[contains(@class, 'fc-button') and contains(@class, 'fc-cta-consent') and contains(@class,'fc-primary-button')]")
+        try:
+            cookie_ok = driver.find_element_by_xpath(
+                "//*/button[contains(@class, 'fc-button') and contains(@class, 'fc-cta-consent') and contains(@class,'fc-primary-button')]")
 
-        cookie_ok.click()
-
+            cookie_ok.click()
+        except EC.NoSuchElementException:
+            pass
         elements = driver.find_elements_by_xpath("//*/tbody/tr[@class='showrow']/th")
 
         for f in elements:
