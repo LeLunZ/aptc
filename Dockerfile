@@ -1,11 +1,11 @@
-FROM python:3
+FROM python:3.9
 
 WORKDIR /install
 COPY requirements.txt .
 RUN pip install --prefix="/install" -r requirements.txt
 
 
-FROM python:3
+FROM python:3.9
 
 COPY --from=0 /install /usr/local
 
