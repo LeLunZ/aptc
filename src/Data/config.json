@@ -6,16 +6,16 @@
     "matchWithParent": true,
     "batchSize": 2,
     "crawlStopOptions": {
-      "northLatBorder": 48.387346,
-      "southLatBorder": 48.211107,
-      "westLonBorder": 14.244371,
-      "eastLonBorder": 14.417334
+      "northLatBorder": 49.037299,
+      "southLatBorder": 46.369467,
+      "westLonBorder": 9.456417,
+      "eastLonBorder": 17.168406
     },
     "dates": [
-      "27.10.2021",
-      "29.10.2021",
-      "30.10.2021",
-      "31.10.2021"
+      "08.11.2021",
+      "12.11.2021",
+      "13.11.2021",
+      "14.11.2021"
     ],
     "exportOptions": {
       "excludeRouteTypes": [
