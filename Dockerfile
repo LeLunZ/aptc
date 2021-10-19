@@ -11,8 +11,6 @@ COPY --from=0 /install /usr/local
 
 RUN apt-get update -qq && apt-get upgrade -y
 
-RUN pip3 install Fiona==1.8.17
-
 # install gdal
 ENV DEBIAN_FRONTEND="noninteractive" TZ="Europe/Berlin"
 
@@ -22,6 +20,8 @@ RUN apt-get install -y libgdal-dev g++ --no-install-recommends && \
 
 ENV CPLUS_INCLUDE_PATH=/usr/include/gdal
 ENV C_INCLUDE_PATH=/usr/include/gdal
+
+RUN pip3 install Fiona==1.8.17 Shapely==1.7.1
 
 # install google chrome
 RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
