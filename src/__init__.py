@@ -133,7 +133,7 @@ route_types = {
 }
 
 stop_times_executor = None
-
+state_path = Path('Data/state.pkl')
 
 def extract_date_from_str(calendar: Calendar, date_str: str, add=True):
     official_weekdays = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
@@ -934,7 +934,7 @@ finished_crawling = False
 def crawl():
     global stop_times_to_add, finishUp, update_stops_thread, date_arr, cur_line, finished_crawling, file_hash
     with open('Data/bus_stops.csv') as csv_file:
-        file_hash = xxhash.xxh3_64(''.join(csv_file.readlines()))
+        file_hash = xxhash.xxh3_64(''.join(csv_file.readlines())).hexdigest()
         csv_file.seek(0)
         csv_reader = csv.reader(csv_file, delimiter=',')
         row_count = sum(1 for _ in csv_reader)
@@ -963,7 +963,7 @@ def crawl():
     # Read State and check if we are continuing from a crash
     if state_path.exists():
         with open(state_path, 'rb') as f:
-            c_line, f_hash = pickle.load(f)
+            (c_line, f_hash) = pickle.load(f)
         state_path.unlink(missing_ok=True)
         if f_hash == file_hash:
             if cur_line := (c_line - max_stops_to_crawl) < 0:
@@ -985,6 +985,7 @@ def crawl():
     commit()
     new_session()
     count12 = 0
+    atexit.register(save_csv_state)
     while True:
         if stop_list_deleted or len(stop_list) == 0:
             if not stop_list_deleted:
@@ -1022,6 +1023,8 @@ def crawl():
                 pass
             except Exception as e:
                 logging.error(f'load_route {page.url} {repr(e)}')
+            except KeyboardInterrupt:
+                exit(0)
         stop_times_executor = ThreadPoolExecutor()
         for tree, page, current_stops_dict, trip in stop_times_to_add:
             stop_times_executor.submit(add_stop_times_from_web_page, tree, page, current_stops_dict,
@@ -1059,21 +1062,18 @@ def match_station_with_google_maps():
             stop.stop_lon = lng
     commit()
 
-
-state_path = Path('Data/state.bin')
-
-
 def save_csv_state():
     import pickle
     if not finished_crawling and file_hash != 0:
-        with open(state_path, 'wb') as file:
-            pickle.dump((cur_line, file_hash), file)
+        file = open(state_path, 'wb')
+        data_f = (cur_line, file_hash)
+        pickle.dump(data_f, file)
+        file.close()
     else:
         state_path.unlink(missing_ok=True)
 
 
 if __name__ == "__main__":
-    atexit.register(save_csv_state)
     try:
         continuesCrawling = getConfig('continues')
     except KeyError as e:
