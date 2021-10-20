@@ -6,5 +6,5 @@ services:
     build: .
     network_mode: "host"
     volumes:
-    - ./src/Data/:/app/Data/
-    - ./db/:/app/db/
+      - ./src/Data/:/app/Data/
+      - ./db/:/app/db/
