@@ -800,7 +800,7 @@ def load_all_stops_to_crawl(stop_names):
                 'sqView=1&start': 'Information aufrufen',
                 'productsFilter': '0000111011'
             }
-            stop_to_crawl: Stop = r[1]  # take second stop because first one is already crawled Wien
+            stop_to_crawl: Stop = r[1]  # take second stop because first one is already crawled
             fiona_geometry_is_avaible = fiona_geometry is not None and fiona_geometry is not False and (
                     type(fiona_geometry) is list and len(fiona_geometry) > 0)
             point = shape({'type': 'Point', 'coordinates': [stop_to_crawl.stop_lon, stop_to_crawl.stop_lat]})
