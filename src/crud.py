@@ -154,6 +154,9 @@ def get_all_stops_in_list(stops):
     data = s.query(Stop).filter(Stop.stop_name.in_(stops)).all()
     return data
 
+def get_all_ext_id_from_stops():
+    data = s.query(Stop.ext_id).all()
+    return data
 
 def add_stop_without_check(stop: Stop):
     s.add(stop)
@@ -171,6 +174,8 @@ def add_stop(stop: Stop):
             data.crawled = True
         if stop.parent_station is not None and data.parent_station is None:
             data.parent_station = stop.parent_station
+        if data.location_type == 0 and stop.location_type != data.location_type:
+            data.location_type = stop.location_type
         stop = data
     return stop
 

@@ -14,10 +14,13 @@ class Stop(Base):
     stop_lon = Column(Float, nullable=True)
     zone_id = Column(Text, nullable=True)
     stop_url = Column(Text, nullable=True)
-    location_type = Column(Integer, nullable=True)
+    location_type = Column(Integer, nullable=False)
     parent_station = Column(Text, nullable=True)
     wheelchair_boarding = Column(Text, nullable=True)
-    crawled = Column(Boolean, nullable=True)
+    crawled = Column(Boolean, default=False)
+    input = Column(Text, nullable=True)
+    ext_id = Column(Integer, nullable=True)
+    prod_class = Column(Integer, nullable=True)
 
     def __repr__(self):
         return "<Stop(name='{}', url='{}', id={})>" \

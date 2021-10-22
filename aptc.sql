@@ -20,9 +20,9 @@ DROP table if exists agency;
 DROP table if exists frequencies;
 DROP table if exists shapes;
 DROP table if exists transfers;
-DROP domain  if exists gtfstime;
-DROP domain  if exists wgs84_lat;
-DROP domain  if exists wgs84_lon;
+DROP domain if exists gtfstime;
+DROP domain if exists wgs84_lat;
+DROP domain if exists wgs84_lon;
 
 create domain wgs84_lat as double precision
     constraint wgs84_lat_check check ((VALUE >= ('-90'::integer)::double precision) AND
@@ -56,7 +56,7 @@ create table stops
         constraint stops_pkey
             primary key,
     stop_code           text,
-    stop_name           text not null,
+    stop_name           text   not null,
     stop_desc           text,
     stop_lat            double precision,
     stop_lon            double precision,
@@ -65,7 +65,10 @@ create table stops
     location_type       integer,
     parent_station      text,
     wheelchair_boarding text,
-    crawled             boolean
+    crawled             boolean not null,
+    input               text,
+    ext_id              integer,
+    prod_class          integer
 );
 
 create unique index stops_stop_name_uindex
@@ -102,7 +105,7 @@ create table calendar
     sunday              boolean    not null,
     start_date          numeric(8),
     end_date            numeric(8) not null,
-    no_fix_date         boolean    DEFAULT FALSE,
+    no_fix_date         boolean DEFAULT FALSE,
     calendar_dates_hash numeric(50)
 );
 
@@ -123,18 +126,18 @@ create table shapes
 
 create table trips
 (
-    route_id                    integer not null,
-    service_id                  integer,
-    trip_short_name             text,
-    trip_headsign               text,
-    direction_id                boolean,
-    block_id                    text,
-    shape_id                    text,
-    wheelchair_accessible       text,
-    trip_id                     serial  not null
+    route_id               integer not null,
+    service_id             integer,
+    trip_short_name        text,
+    trip_headsign          text,
+    direction_id           boolean,
+    block_id               text,
+    shape_id               text,
+    wheelchair_accessible  text,
+    trip_id                serial  not null
         constraint trips_pkey
             primary key,
-    oebb_url                    text,
+    oebb_url               text,
     station_departure_time text    not null
 );
 
@@ -203,4 +206,3 @@ create table stop_time_text
         constraint stop_time_text_pk
             primary key
 );
-

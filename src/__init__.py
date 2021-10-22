@@ -274,6 +274,7 @@ def extract_dates_from_oebb_page(tree, calendar, add=True):
     calendar.monday = False
     calendar.tuesday = False
     calendar.wednesday = False
+    calendar.wednesday = False
     calendar.thursday = False
     calendar.friday = False
     calendar.saturday = False
@@ -372,6 +373,7 @@ def save_simple_stops(names, ids, main_station):
         for index, (name, id) in enumerate(zip(names, ids)):
             if index == 0:
                 main_station.crawled = True
+                main_station.location_type = 1
                 main_station = add_stop(main_station)
                 continue
             new_stop = Stop(stop_name=name, parent_station=main_station.stop_id, stop_lat=main_station.stop_lat,
@@ -380,6 +382,7 @@ def save_simple_stops(names, ids, main_station):
             new_stop = add_stop(new_stop)
     else:
         main_station.crawled = True
+        main_station.location_type = 0
         main_station = add_stop(main_station)
 
 
@@ -635,6 +638,7 @@ stop_times_to_add = []
 
 
 def process_page(url, page: Union[PageDTO, None]):
+    # TODO when crawling check if one of the stations from a trip is already finished. If yes, the whole trip can be skipped
     if page is None:
         response = requests_retry_session().get(url, timeout=10, verify=False)
         page = request_processing_hook(response, None, None)  # TODO check if it is working
@@ -813,7 +817,7 @@ def load_all_stops_to_crawl(stop_names):
                 'sqView=1&start': 'Information aufrufen',
                 'productsFilter': '0000111011'
             }
-            stop_to_crawl: Stop = r[1]  # take second stop because first one is already crawled
+            stop_to_crawl: Stop = r[1]  # take second stop because first one is the json version of this one!!! Check the request hook
             if stop_is_to_crawl(stop_to_crawl):
                 stop_name_dict[r[1].stop_name] = (r[0], r[1])
                 futures_stops_args.append(("https://fahrplan.oebb.at/bin/stboard.exe/dn", payload, querystring))
