@@ -803,17 +803,16 @@ def load_all_stops_to_crawl(stop_names):
             stop_to_crawl: Stop = r[1]  # take second stop because first one is already crawled
             fiona_geometry_is_avaible = fiona_geometry is not None and fiona_geometry is not False and (
                     type(fiona_geometry) is list and len(fiona_geometry) > 0)
-            point = shape({'type': 'Point', 'coordinates': [stop_to_crawl.stop_lon, stop_to_crawl.stop_lat]})
-            point_is_within = False
-            if fiona_geometry_is_avaible:
-                for k in fiona_geometry:
-                    if point.within(k):
-                        point_is_within = True
-            if (fiona_geometry_is_avaible and point_is_within) or (
-                    not fiona_geometry_is_avaible and not crawlStopOptions) or (
-                    crawlStopOptions and southLatBorder < stop_to_crawl.stop_lat < northLatBorder and westLonBorder < stop_to_crawl.stop_lon < eastLonBorder):
+            if (not fiona_geometry_is_avaible and not crawlStopOptions) or (crawlStopOptions and southLatBorder < stop_to_crawl.stop_lat < northLatBorder and westLonBorder < stop_to_crawl.stop_lon < eastLonBorder):
                 stop_name_dict[r[1].stop_name] = (r[0], r[1])
                 futures_stops_args.append(("https://fahrplan.oebb.at/bin/stboard.exe/dn", payload, querystring))
+            elif fiona_geometry_is_avaible:
+                point = shape({'type': 'Point', 'coordinates': [stop_to_crawl.stop_lon, stop_to_crawl.stop_lat]})
+                for k in fiona_geometry:
+                    if point.within(k):
+                        stop_name_dict[r[1].stop_name] = (r[0], r[1])
+                        futures_stops_args.append(("https://fahrplan.oebb.at/bin/stboard.exe/dn", payload, querystring))
+                        break
         except Exception as e:
             pass
 
