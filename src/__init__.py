@@ -775,6 +775,19 @@ def request_station_id_processing_hook(resp, *args, **kwargs):
 station_ids = set()
 
 
+def stop_is_to_crawl(stop_to_check:Stop) -> bool:
+    fiona_geometry_is_avaible = fiona_geometry is not None and fiona_geometry is not False and (
+            type(fiona_geometry) is list and len(fiona_geometry) > 0)
+    if (not fiona_geometry_is_avaible and not crawlStopOptions) or (
+            crawlStopOptions and southLatBorder < stop_to_check.stop_lat < northLatBorder and westLonBorder < stop_to_check.stop_lon < eastLonBorder):
+        return True
+    elif fiona_geometry_is_avaible:
+        point = shape({'type': 'Point', 'coordinates': [stop_to_check.stop_lon, stop_to_check.stop_lat]})
+        for k in fiona_geometry:
+            if point.within(k):
+                return True
+    return False
+
 def load_all_stops_to_crawl(stop_names):
     future_session_stops = requests_retry_session_async(session=FuturesSession())
     futures = [future_session_stops.get(
@@ -801,18 +814,9 @@ def load_all_stops_to_crawl(stop_names):
                 'productsFilter': '0000111011'
             }
             stop_to_crawl: Stop = r[1]  # take second stop because first one is already crawled
-            fiona_geometry_is_avaible = fiona_geometry is not None and fiona_geometry is not False and (
-                    type(fiona_geometry) is list and len(fiona_geometry) > 0)
-            if (not fiona_geometry_is_avaible and not crawlStopOptions) or (crawlStopOptions and southLatBorder < stop_to_crawl.stop_lat < northLatBorder and westLonBorder < stop_to_crawl.stop_lon < eastLonBorder):
+            if stop_is_to_crawl(stop_to_crawl):
                 stop_name_dict[r[1].stop_name] = (r[0], r[1])
                 futures_stops_args.append(("https://fahrplan.oebb.at/bin/stboard.exe/dn", payload, querystring))
-            elif fiona_geometry_is_avaible:
-                point = shape({'type': 'Point', 'coordinates': [stop_to_crawl.stop_lon, stop_to_crawl.stop_lat]})
-                for k in fiona_geometry:
-                    if point.within(k):
-                        stop_name_dict[r[1].stop_name] = (r[0], r[1])
-                        futures_stops_args.append(("https://fahrplan.oebb.at/bin/stboard.exe/dn", payload, querystring))
-                        break
         except Exception as e:
             pass
 
