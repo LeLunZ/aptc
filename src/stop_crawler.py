@@ -23,6 +23,7 @@ state_path = Path('Data/state.pkl')
 cur_line = 0
 finished_crawling = None
 file_hash = None
+future_session_stops = requests_retry_session_async(session=FuturesSession())
 
 
 def request_stops_processing_hook(resp, *args, **kwargs):
@@ -75,7 +76,6 @@ def stop_is_to_crawl(stop_to_check: Stop) -> bool:
 
 
 def load_all_stops_to_crawl(stop_names):
-    future_session_stops = requests_retry_session_async(session=FuturesSession())
     futures = [future_session_stops.get(
         'https://fahrplan.oebb.at/bin/ajax-getstop.exe/dn?REQ0JourneyStopsS0A=1&REQ0JourneyStopsB=12&S=' +
         stop_name.split('(')[0].strip() + '?&js=false&',
