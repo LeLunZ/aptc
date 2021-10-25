@@ -2,14 +2,13 @@
   "default": {
     "crawl": true,
     "export": true,
-    "continues": true,
     "matchWithParent": true,
-    "batchSize": 8,
+    "batchSize": 4,
     "crawlStopOptions": {
-      "northLatBorder": 49.037299,
-      "southLatBorder": 46.369467,
-      "westLonBorder": 9.456417,
-      "eastLonBorder": 17.168406
+      "northLatBorder": 48.380244,
+      "southLatBorder": 48.210879,
+      "westLonBorder": 14.235355,
+      "eastLonBorder": 14.420606
     },
     "dates": [
       "08.11.2021",

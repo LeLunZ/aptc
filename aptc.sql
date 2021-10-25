@@ -52,11 +52,11 @@ create unique index agency_agency_name_uindex
 
 create table stops
 (
-    stop_id             serial not null
+    stop_id             serial  not null
         constraint stops_pkey
             primary key,
     stop_code           text,
-    stop_name           text   not null,
+    stop_name           text    not null,
     stop_desc           text,
     stop_lat            double precision,
     stop_lon            double precision,
@@ -68,11 +68,15 @@ create table stops
     crawled             boolean not null,
     input               text,
     ext_id              integer,
-    prod_class          integer
+    prod_class          integer,
+    siblings_searched   boolean not null
 );
 
-create unique index stops_stop_name_uindex
+create index stops_stop_name_uindex
     on stops (stop_name);
+
+create unique index stops_ext_id_index
+    on stops(ext_id);
 
 create table routes
 (

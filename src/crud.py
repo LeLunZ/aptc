@@ -1,20 +1,19 @@
 import logging
-import os
 import threading
-from typing import List
+
+import sqlalchemy
+import xxhash
 
 from Functions.config import getConfig
 from Models.agency import Agency
-from Models.route import Route
-from Models.stop import Stop
-from Models.stop_times import StopTime
-from Models.trip import Trip
 from Models.calendar import Calendar
 from Models.calendar_date import CalendarDate
-from Models.transport_type_image import TransportTypeImage
+from Models.route import Route
+from Models.stop import Stop
 from Models.stop_time_text import StopTimeText
-import sqlalchemy
-import xxhash
+from Models.stop_times import StopTime
+from Models.transport_type_image import TransportTypeImage
+from Models.trip import Trip
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +23,7 @@ try:
 except KeyError:
     DATABASE_URI = 'postgres+psycopg2://postgres:password@localhost:5432/postgres'
 
-from sqlalchemy import create_engine, and_, or_, func, literal_column, Text
+from sqlalchemy import create_engine, and_, or_, func
 from sqlalchemy.orm import sessionmaker
 
 engine = create_engine(DATABASE_URI, executemany_mode='values')
@@ -151,12 +150,24 @@ def add_calendar_dates(calendar_dates: [CalendarDate], only_dates_as_string: str
 
 
 def get_all_stops_in_list(stops):
-    data = s.query(Stop).filter(Stop.stop_name.in_(stops)).all()
+    data = s.query(Stop).filter(Stop.ext_id.in_(stops)).all()
     return data
+
+
+def get_all_ext_id_from_crawled_stops():
+    data = s.query(Stop.ext_id).filter(Stop.crawled == True).all()
+    return data
+
+
+def get_ext_id_from_crawled_stops_where_main():
+    data = s.query(Stop.ext_id).filter(Stop.prod_class != None).all()
+    return data
+
 
 def get_all_ext_id_from_stops():
     data = s.query(Stop.ext_id).all()
     return data
+
 
 def add_stop_without_check(stop: Stop):
     s.add(stop)
@@ -165,7 +176,7 @@ def add_stop_without_check(stop: Stop):
 
 
 def add_stop(stop: Stop):
-    data: Stop = s.query(Stop).filter(Stop.stop_name == stop.stop_name).first()
+    data: Stop = s.query(Stop).filter(Stop.ext_id == stop.ext_id).first()
     if data is None:
         s.add(stop)
         s.flush()
@@ -176,12 +187,17 @@ def add_stop(stop: Stop):
             data.parent_station = stop.parent_station
         if data.location_type == 0 and stop.location_type != data.location_type:
             data.location_type = stop.location_type
+        if data.prod_class is None and stop.prod_class is not None:
+            data.prod_class = stop.prod_class
+        if data.ext_id is None and stop.ext_id is not None:
+            data.ext_id = stop.ext_id
         stop = data
     return stop
 
 
 def get_stops_with_parent():
-    return s.query(Stop).filter(Stop.parent_station != None).all()
+    return s.query(Stop).filter(
+        and_(Stop.parent_station != None, or_(Stop.stop_lon == None, Stop.stop_lat == None))).all()
 
 
 def get_stop_with_id(parent_id):
@@ -197,8 +213,13 @@ def remove_parent_from_all():
 
 
 def load_all_uncrawled_stops(max_stops_to_crawl):
-    return s.query(Stop).filter(or_(Stop.crawled == None, Stop.crawled == False)).order_by(Stop.stop_lat,
-                                                                                           Stop.stop_lon).limit(
+    return s.query(Stop).filter(and_(Stop.crawled == False, Stop.prod_class != None)).order_by(Stop.stop_lat,
+                                                                                               Stop.stop_lon).limit(
+        max_stops_to_crawl).all()
+
+
+def sibling_search_stops(max_stops_to_crawl):
+    return s.query(Stop).filter(Stop.siblings_searched == False).order_by(Stop.stop_lat, Stop.stop_lon).limit(
         max_stops_to_crawl).all()
 
 

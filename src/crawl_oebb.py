@@ -1,63 +1,37 @@
-from pathlib import Path
-from zipfile import ZipFile
-import datetime
-import atexit
-
 import copy
-from selenium import webdriver
-import csv
-from lxml import html
+import datetime
 import json
-import logging
 import pickle
 import time
-from queue import Queue
-from threading import Thread
-from typing import Union
-
-import fiona
-from shapely.geometry import shape
-import googlemaps
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.by import By
-from requests_futures.sessions import FuturesSession
 from concurrent.futures import as_completed, ThreadPoolExecutor
+from pathlib import Path
+from threading import Thread
+from typing import List
+from urllib.parse import parse_qs, unquote, urlparse
 
-from Classes.DTOs import StopDTO, PageDTO
-from Functions.helper import add_day_to_calendar, extract_date_from_date_arr, merge_date, add_days_to_calendar, \
-    str_to_geocord, \
-    remove_param_from_url, skip_stop, get_all_name_of_transport_distinct, extract_date_objects_from_str
+from lxml import html
+from requests_futures.sessions import FuturesSession
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+# import fiona
+# from shapely.geometry import shape
+from selenium.webdriver.support.wait import WebDriverWait
+
+from Classes.DTOs import PageDTO
 from Classes.oebb_date import OebbDate, service_months, begin_date, end_date, get_std_date
-from Functions.config import getConfig
-from Functions.oebb_requests import requests_retry_session, requests_retry_session_async, date_w, set_date, weekday_name
-from urllib.parse import parse_qs, unquote
+from Functions.helper import add_day_to_calendar, extract_date_from_date_arr, merge_date, add_days_to_calendar, \
+    get_all_name_of_transport_distinct, extract_date_objects_from_str
+from Functions.oebb_requests import requests_retry_session_async, date_w, set_date, weekday_name
+from Functions.request_hooks import request_station_id_processing_hook, response_journey_hook
+from crud import *
 
 finishUp = False
-
-if __name__ == "__main__":
-    from Models.agency import Agency
-    from Models.route import Route
-    from Models.stop import Stop
-    from Models.stop_times import StopTime
-    from Models.trip import Trip
-
-    from Models.calendar import Calendar
-
-    from Models.frequencies import Frequency
-    from Models.shape import Shape
-    from Models.transfers import Transfer
-    from Models.calendar_date import CalendarDate
-    from crud import *
 
 import os
 import urllib3
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
-stop_dict = {}
-
-allg_feiertage = []
 
 logging.basicConfig(filename='./Data/aptc.log',
                     filemode='a',
@@ -81,8 +55,6 @@ except:
     pass
 
 q = []
-real_thread_safe_q = Queue()
-
 route_types = {
     '/img/vs_oebb/rex_pic.gif': 2,
     '/img/vs_oebb/r_pic.gif': 2,
@@ -131,9 +103,19 @@ route_types = {
     '/img/vs_oebb/ter_pic.gif': 106,
     '/img/vs_oebb/dpn_pic.gif': 106
 }
-
+date_arr = []
 stop_times_executor = None
-state_path = Path('Data/state.pkl')
+stop_times_to_add = []
+crawled_stop_ids = set([e.ext_id for e in get_all_ext_id_from_crawled_stops()])
+existing_stop_ids = set([e.ext_id for e in get_ext_id_from_crawled_stops_where_main()])
+allg_feiertage = []
+crawlStopOptions = None
+fiona_geometry = None
+southLatBorder = None
+northLatBorder = None
+westLonBorder = None
+eastLonBorder = None
+
 
 def extract_date_from_str(calendar: Calendar, date_str: str, add=True):
     official_weekdays = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
@@ -368,124 +350,24 @@ def extract_dates_from_oebb_page(tree, calendar, add=True):
     return calendar
 
 
-def save_simple_stops(names, ids, main_station):
-    if len(ids) > 1:
-        for index, (name, id) in enumerate(zip(names, ids)):
-            if index == 0:
-                main_station.crawled = True
-                main_station.location_type = 1
-                main_station = add_stop(main_station)
-                continue
-            new_stop = Stop(stop_name=name, parent_station=main_station.stop_id, stop_lat=main_station.stop_lat,
-                            stop_lon=main_station.stop_lon,
-                            location_type=0, crawled=True)
-            new_stop = add_stop(new_stop)
-    else:
-        main_station.crawled = True
-        main_station.location_type = 0
-        main_station = add_stop(main_station)
-
-
-def export_all_tables():
-    tables = [Agency, Calendar, CalendarDate, Frequency, Route, Trip, StopTime, Shape, Stop, Transfer]
-    file_names = []
-    os.chdir('./db')
-    try:
-        os.remove('./Archiv.zip')
-    except FileNotFoundError:
-        pass
-    try:
-        excluded_routes = getConfig('exportOptions.excludeRouteTypes')
-    except:
-        excluded_routes = None
-    for i in tables:
-        try:
-            os.remove(f'./{i.__table__.name}.txt')
-        except FileNotFoundError:
-            pass
-    for i in tables:
-        file_names.append(f'./{i.__table__.name}.txt')
-        new_session()
-        if i is StopTime:
-            q = query_element(i)
-            with open(f'./{i.__table__.name}.txt', 'a') as outfile:
-                outcsv = csv.writer(outfile, delimiter=',')
-                outcsv.writerow(i.firstline())
-                for dataset in windowed_query(q, StopTime.stop_times_id, 1000):
-                    outcsv.writerow(dataset.tocsv())
-        else:
-            with open(f'./{i.__table__.name}.txt', 'a') as outfile:
-                outcsv = csv.writer(outfile, delimiter=',')
-                outcsv.writerow(i.firstline())
-                records = get_from_table(i)
-                for row in records:
-                    outcsv.writerow(row.tocsv())
-        end_session()
-
-    if excluded_routes is not None:
-        all_routes = []
-        all_trips = []
-        all_stop_times = []
-        deleted_route_ids = []
-        deleted_trip_ids = []
-        with open(f'./{Route.__table__.name}.txt', 'r') as routes:
-            first_line_routes = routes.readline()
-            route_type_index = Route.firstline().index('route_type')
-            route_id_index = Route.firstline().index('route_id')
-            csv_reader = csv.reader(routes, delimiter=',')
-            for route in csv_reader:
-                if route[route_type_index] != '' and int(route[route_type_index]) in excluded_routes:
-                    deleted_route_ids.append(int(route[route_id_index]))
-                    continue
-                all_routes.append(route)
-
-        with open(f'./{Trip.__table__.name}.txt', 'r') as trips:
-            first_line_trips = trips.readline()
-            route_id_of_trip_index = Trip.firstline().index('route_id')
-            trip_id_index = Trip.firstline().index('trip_id')
-            csv_reader = csv.reader(trips, delimiter=',')
-            for trip in csv_reader:
-                if int(trip[route_id_of_trip_index]) in deleted_route_ids:
-                    deleted_trip_ids.append(int(trip[trip_id_index]))
-                    continue
-                all_trips.append(trip)
-
-        with open(f'./{StopTime.__table__.name}.txt', 'r') as stop_times:
-            first_line_stop_times = stop_times.readline()
-            trip_id_of_stop_time_index = StopTime.firstline().index("trip_id")
-            csv_reader = csv.reader(stop_times, delimiter=',')
-            for stop_time in csv_reader:
-                if int(stop_time[trip_id_of_stop_time_index]) in deleted_trip_ids:
-                    continue
-                all_stop_times.append(stop_time)
-
-        os.remove(f'./{Route.__table__.name}.txt')
-
-        with open(f'./{Route.__table__.name}.txt', 'a') as routes:
-            routes.writelines([first_line_routes])
-            outcsv = csv.writer(routes, delimiter=',')
-            for row in all_routes:
-                outcsv.writerow(row)
-
-        os.remove(f'./{Trip.__table__.name}.txt')
-
-        with open(f'./{Trip.__table__.name}.txt', 'a') as trips:
-            trips.writelines([first_line_trips])
-            outcsv = csv.writer(trips, delimiter=',')
-            for row in all_trips:
-                outcsv.writerow(row)
-
-        os.remove(f'./{StopTime.__table__.name}.txt')
-
-        with open(f'./{StopTime.__table__.name}.txt', 'a') as stop_times:
-            stop_times.writelines([first_line_stop_times])
-            outcsv = csv.writer(stop_times, delimiter=',')
-            for row in all_stop_times:
-                outcsv.writerow(row)
-
-    with ZipFile(f'./GTFS_{str(begin_date)}-{str(end_date)}.zip', 'w') as zip:
-        for file in file_names:
-            zip.write(file)
+def save_stop_family(stop_ids, stop_names, main_stop):
+    main_stop.location_type = 1
+    stop_list = []
+    existed = 0
+    for ids, name in zip(stop_ids, stop_names):
+        p_stop = main_stop.stop_id
+        if ids in existing_stop_ids:
+            existed += 1
+            p_stop = None
+        child_stop = Stop(stop_name=name, parent_station=p_stop, stop_lat=main_stop.stop_lat,
+                          stop_lon=main_stop.stop_lon,
+                          stop_url='https://fahrplan.oebb.at/bin/stboard.exe/dn?protocol=https:&input=' + str(ids),
+                          location_type=0, crawled=True, ext_id=ids)
+        new_stop = add_stop(child_stop)
+        stop_list.append(new_stop)
+    if 0 < existed == len(stop_names):
+        main_stop.location_type = 0
+    return stop_list
 
 
 def add_date_to_allg_feiertage(feiertag, year):
@@ -542,79 +424,18 @@ def load_allg_feiertage():
             pickle.dump(allg_feiertage, f)
 
 
-def location_data_thread():
-    global stop_dict, finishUp
-    session = requests_retry_session_async(session=FuturesSession(max_workers=1))
-    while True:
-        try:
-            stop = real_thread_safe_q.get(block=False)
-            if stop.stop_name.split('(')[0].strip() in stop_dict:
-                try:
-                    coords = stop_dict[stop.stop_name.split('(')[0].strip()]
-                    update_location_of_stop(stop, coords['y'], coords['x'])
-                except:
-                    pass
-                finally:
-                    real_thread_safe_q.task_done()
-            else:
-                try:
-                    future_1 = session.get(
-                        'https://fahrplan.oebb.at/bin/ajax-getstop.exe/dn?REQ0JourneyStopsS0A=1&REQ0JourneyStopsB=12&S=' +
-                        stop.stop_name.split('(')[0].strip() + '?&js=false&',
-                        verify=False)
-                    oebb_location = future_1.result()
-                    locations = oebb_location.content[8:-22]
-                    stop_suggestions = json.loads(locations.decode('iso-8859-1'))
-                    for stop_suggestion in stop_suggestions['suggestions']:
-                        stop_dict[stop_suggestion['value']] = {'y': str_to_geocord(stop_suggestion['ycoord']),
-                                                               'x': str_to_geocord(stop_suggestion['xcoord'])}
-                    if stop.stop_name.split('(')[0].strip() in stop_dict:
-                        current_station_cord = stop_dict.pop(stop.stop_name.split('(')[0].strip())
-                        update_location_of_stop(stop, current_station_cord['y'], current_station_cord['x'])
-                    else:
-                        pass  # dont do anything
-                except:
-                    pass
-                finally:
-                    real_thread_safe_q.task_done()
-        except:
-            if finishUp:
-                exit(0)
-            time.sleep(30)
-
-
-def match_station_with_parents():
-    all_stops = get_stops_with_parent()
-    parent_id_stop_dict = {}
-    for stop in all_stops:
-        if stop.stop_lat is None or stop.stop_lon is None:
-            if stop.parent_station not in parent_id_stop_dict:
-                parent_id_stop_dict[stop.parent_station] = [stop]
-            else:
-                parent_id_stop_dict[stop.parent_station].append(stop)
-
-
-    for id in parent_id_stop_dict:
-        parent_stop = get_stop_with_id(id)
-        childs = parent_id_stop_dict[id]
-        for child in childs:
-            update_location_of_stop(child, parent_stop.stop_lat, parent_stop.stop_lon)
-    remove_parent_from_all()
-    commit()
-
-
-def add_stop_times_from_web_page(tree, page, current_stops_dict, trip):
+def add_stop_times_from_web_page(tree, page: PageDTO, current_stops_dict, trip):
     headsign = None
     stop_before_current = None
     stop_time_list = []
-    for i in range(len(page.all_stations)):
+    for i in range(len(page.stop_names)):
         all_times = list(map(lambda x: x.strip(),
                              tree.xpath('//*/tr[@class=$first or @class=$second][$count]/td[@class=$third]/text()',
                                         first='zebracol-2',
                                         second="zebracol-1", third='center sepline', count=i + 1)))
         if str(all_times[2]).strip() != '' and str(all_times[2]).strip() != page.route.route_long_name.strip():
             headsign = str(all_times[2]).strip()
-        stop = current_stops_dict[page.all_stations[i]]
+        stop = current_stops_dict[page.stop_ids[i]]
         new_stop_time = StopTime(stop_id=stop.stop_id, trip_id=trip.trip_id,
                                  arrival_time=all_times[0] if all_times[0] == '' else all_times[0] + ':00',
                                  departure_time=all_times[1] if all_times[1] == '' else all_times[1] + ':00',
@@ -634,20 +455,15 @@ def add_stop_times_from_web_page(tree, page, current_stops_dict, trip):
     add_stop_times(stop_time_list)
 
 
-stop_times_to_add = []
-
-
-def process_page(url, page: Union[PageDTO, None]):
-    # TODO when crawling check if one of the stations from a trip is already finished. If yes, the whole trip can be skipped
-    if page is None:
-        response = requests_retry_session().get(url, timeout=10, verify=False)
-        page = request_processing_hook(response, None, None)  # TODO check if it is working
+def process_page(url, page: PageDTO):
     if page.calendar_data is None:
         raise Exception(f'no calendar_data')
+
     if page.agency is None:
         new_agency: Agency = get_from_table_first(Agency)
     else:
         new_agency: Agency = add_agency(page.agency)
+
     page.route.agency_id = new_agency.agency_id
     route = add_route(page.route)
     calendar = add_calendar_dates(page.calendar_data[0], page.calendar_data[1], page.calendar_data[2])
@@ -655,17 +471,16 @@ def process_page(url, page: Union[PageDTO, None]):
     if new_trip.service_id is None:
         raise Exception(f'no service_id {url}')
     trip: Trip = add_trip(new_trip, f'{page.first_station}{page.dep_time}')
-    stops_on_db = get_all_stops_in_list(page.all_stations)
-    current_stops_dict = {i.stop_name: i for i in stops_on_db}
-    for i, stop in enumerate(page.all_stations):
-        if stop not in current_stops_dict:
-            new_stop = Stop(stop_name=stop,
-                            stop_url=page.links_of_all_stations[i], location_type=0)
+    stops_on_db = get_all_stops_in_list(page.stop_ids)
+    current_stops_dict = {i.ext_id: i for i in stops_on_db}
+    for i, (stop_name, stop_id) in enumerate(zip(page.stop_names, page.stop_ids)):
+        if stop_id not in current_stops_dict:
+            stop_url = page.stop_links[i]
+            new_stop = Stop(stop_name=stop_name,
+                            stop_url=stop_url, location_type=0,
+                            ext_id=stop_id)
             new_stop = add_stop_without_check(new_stop)
-            stop_dto = StopDTO(new_stop.stop_name, new_stop.stop_url, new_stop.location_type, new_stop.stop_id)
-            # if stop_dto not in real_thread_safe_q.queue and (new_stop.stop_lat is None or new_stop.stop_lon is None): TODO Check if dont needed
-            real_thread_safe_q.put(stop_dto)
-            current_stops_dict[stop] = new_stop
+            current_stops_dict[stop_id] = new_stop
     tree = html.fromstring(page.page)
     stop_times_to_add.append((tree, page, current_stops_dict, trip))
 
@@ -674,15 +489,22 @@ def request_processing_hook(resp, *args, **kwargs):
     route_page = resp
     traffic_day = None
     tree = html.fromstring(route_page.content)
+    all_links_of_station = tree.xpath('//*/tr[@class=$first or @class=$second]/*/a/@href', first='zebracol-2',
+                                      second="zebracol-1")
+    crawled_stop_ids = [int(parse_qs(urlparse(link).query)['input'][0]) for link in all_links_of_station]
+
+    # If a given station id in the route is already crawled,
+    # the route must be already in the database. So we can stop processing
+    if any(s_ids in crawled_stop_ids for s_ids in crawled_stop_ids):
+        raise TripAlreadyPresentError
+
     route_long_name = \
         tree.xpath('((//*/tr[@class=$first])[1]/td[@class=$second])[last()]/text()', first='zebracol-2',
                    second='center sepline')[0].strip()
     all_stations = tree.xpath('//*/tr[@class=$first or @class=$second]/*/a/text()', first='zebracol-2',
                               second="zebracol-1")
-    all_links_of_station = tree.xpath('//*/tr[@class=$first or @class=$second]/*/a/@href', first='zebracol-2',
-                                      second="zebracol-1")
-    extra_info_operator = tree.xpath('//*/strong[text() =$first]/../text()', first='Betreiber:')
-    extra_info_remarks = tree.xpath('//*/strong[text() =$first]/../text()', first='Bemerkungen:')
+    extra_info_operator = tree.xpath('//*/strong[text()=$first]/../text()', first='Betreiber:')
+    extra_info_remarks = tree.xpath('//*/strong[text()=$first]/../text()', first='Bemerkungen:')
     new_agency = Agency()
     if extra_info_operator:
         operator = list(filter(lambda x: x.strip() != '', extra_info_operator))[0].strip()
@@ -715,6 +537,7 @@ def request_processing_hook(resp, *args, **kwargs):
             route_type = route_types[str('/' / Path(*p.parts[2:]))]
     except KeyError:
         add_transport_name(route_info, url)
+        route_type = -1
     new_route = Route(route_long_name=route_long_name,
                       route_type=route_type,
                       route_url=url)
@@ -729,7 +552,8 @@ def request_processing_hook(resp, *args, **kwargs):
                                     second="zebracol-1", third='center sepline', count=1)))
     first_station = all_stations[0]
     dep_time = all_times[1]
-    resp.data = PageDTO(new_agency, new_route, calendar_data, first_station, dep_time, all_stations,
+
+    resp.data = PageDTO(new_agency, new_route, calendar_data, first_station, dep_time, all_stations, crawled_stop_ids,
                         all_links_of_station, resp.content)
 
 
@@ -738,50 +562,24 @@ def load_data_async(routes):
     futures = [future_session.get(route, timeout=3, verify=False, hooks={'response': request_processing_hook}) for
                route
                in routes]
-    count = 0
     for i in as_completed(futures):
         try:
-            count += 1
             response = i.result()
             q.append(response)
+        except TripAlreadyPresentError:
+            pass
         except Exception as e:
             print(f'{i} {str(e)}', flush=True)
     exit(0)
 
 
-def add_all_empty_to_queue():
-    all_stops = get_stops_without_location()
-    for stop in all_stops:
-        stop_dto = StopDTO(stop.stop_name, stop.stop_url, stop.location_type, stop.stop_id)
-        if stop_dto not in list(real_thread_safe_q.queue) and (stop.stop_lat is None or stop.stop_lon is None):
-            real_thread_safe_q.put(stop_dto)
+def stop_is_to_crawl(stop_to_check: Stop) -> bool:
+    if stop_to_check.ext_id in crawled_stop_ids:
+        return False
 
-
-def request_stops_processing_hook(resp, *args, **kwargs):
-    locations = resp.content[8:-22]
-    locations = json.loads(locations.decode('iso-8859-1'))
-    suggestion = locations['suggestions']
-    main_station = suggestion[0]
-    stops = [main_station]
-    for se in suggestion:
-        stops.append(Stop(stop_name=se['value'],
-                          stop_lat=str_to_geocord(se['ycoord']),
-                          stop_lon=str_to_geocord(se['xcoord']), location_type=0))
-    resp.data = stops
-
-
-def request_station_id_processing_hook(resp, *args, **kwargs):
-    tree = html.fromstring(resp.content)
-    all_stations = tree.xpath('//*/option/@value')
-    resp.data = all_stations
-
-
-station_ids = set()
-
-
-def stop_is_to_crawl(stop_to_check:Stop) -> bool:
     fiona_geometry_is_avaible = fiona_geometry is not None and fiona_geometry is not False and (
             type(fiona_geometry) is list and len(fiona_geometry) > 0)
+
     if (not fiona_geometry_is_avaible and not crawlStopOptions) or (
             crawlStopOptions and southLatBorder < stop_to_check.stop_lat < northLatBorder and westLonBorder < stop_to_check.stop_lon < eastLonBorder):
         return True
@@ -792,109 +590,84 @@ def stop_is_to_crawl(stop_to_check:Stop) -> bool:
                 return True
     return False
 
-def load_all_stops_to_crawl(stop_names):
-    future_session_stops = requests_retry_session_async(session=FuturesSession())
-    futures = [future_session_stops.get(
-        'https://fahrplan.oebb.at/bin/ajax-getstop.exe/dn?REQ0JourneyStopsS0A=1&REQ0JourneyStopsB=12&S=' +
-        stop_name.split('(')[0].strip() + '?&js=false&',
-        verify=False, timeout=6, hooks={'response': request_stops_processing_hook}) for
-        stop_name
-        in stop_names]
-    futures_stops = []
-    futures_stops_args = []
-    stop_name_dict = {}
-    count = 0
-    for i in as_completed(futures):
-        try:
-            response = i.result()
-            r = response.data
-            querystring = {"ld": "3"}
-            payload = {
-                'sqView': '1&input=' + r[0][  # Linz
-                    'value'] + '&time=21:42&maxJourneys=50&dateBegin=&dateEnd=&selectDate=&productsFilter=0000111011&editStation=yes&dirInput=&',
-                'input': r[0]['value'],
-                'inputRef': r[0]['value'] + '#' + str(int(r[0]['extId'])),
-                'sqView=1&start': 'Information aufrufen',
-                'productsFilter': '0000111011'
-            }
-            stop_to_crawl: Stop = r[1]  # take second stop because first one is the json version of this one!!! Check the request hook
-            if stop_is_to_crawl(stop_to_crawl):
-                stop_name_dict[r[1].stop_name] = (r[0], r[1])
-                futures_stops_args.append(("https://fahrplan.oebb.at/bin/stboard.exe/dn", payload, querystring))
-        except Exception as e:
-            pass
 
-    station_id_list = []
+def load_all_routes_from_stops(stops: List[Stop]):
+    future_session_stops = requests_retry_session_async(session=FuturesSession())
+    futures_stops_args = []
+    stop_ext_id_dict = {}
+
+    for stop in stops:
+        querystring = {"ld": "3"}
+        payload = {
+            'sqView': '1&input=' + stop.input + '&time=21:42&maxJourneys=50&dateBegin=&dateEnd=&selectDate=&productsFilter=0000111011&editStation=yes&dirInput=&',
+            'input': stop.input,
+            'inputRef': stop.input + '#' + str(stop.ext_id),
+            'sqView=1&start': 'Information aufrufen',
+            'productsFilter': '0000111011'
+        }
+        if stop_is_to_crawl(stop):
+            stop_ext_id_dict[stop.ext_id] = stop
+            futures_stops_args.append(("https://fahrplan.oebb.at/bin/stboard.exe/dn", payload, querystring))
+
     futures_stops = [future_session_stops.post(url, data=payload, params=querystring, verify=False,
                                                hooks={'response': request_station_id_processing_hook}) for
                      (url, payload, querystring) in futures_stops_args]
-    route_url_dict = {}
+    current_station_ids = set()
     future_args = []
     if len(futures_stops) == 0:
         return []
     for f in as_completed(futures_stops):
         try:
             result = f.result()
-            all_station_ids = result.data
-            all_station_names = None
-            data = parse_qs(result.request.body)
-            inputRef = data['inputRef'][0]
-            original_name = inputRef.split('#')[0]
-            if all_station_ids is None or not all_station_ids:
-                original_id = inputRef.split('#')[1]
-                all_station_ids = [original_id]
-            else:
-                all_station_names = list(
-                    map(lambda x: unquote(''.join(x.split('|')[:-1]), encoding='iso-8859-1'), all_station_ids))
-                all_station_ids = list(map(lambda x: x.split('|')[-1], all_station_ids))
-            current_station_ids = []
-            for si in all_station_ids:
-                if si not in station_ids:
-                    station_ids.add(si)
-                    current_station_ids.append(si)
+            all_stations = result.data  # get all station ids from response
+            station_names = list(
+                map(lambda x: unquote(''.join(x.split('|')[:-1]), encoding='iso-8859-1'), all_stations))
+            station_ids = list(map(lambda x: int(x.split('|')[-1]), all_stations))
+            new_stop = False
+            for s_n, s_i in zip(station_names, station_ids):
+                if s_i not in crawled_stop_ids and s_i not in current_station_ids:
+                    new_stop = True
+                    current_station_ids.add(s_i)
                     for date in date_arr:
                         set_date(date)
                         re = 'https://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_scotty.vs_liveticker&evaId=' + str(
-                            int(
-                                si)) + '&boardType=arr&time=00:00' + '&additionalTime=0&maxJourneys=100000&outputMode=tickerDataOnly&start=yes&selectDate' + '=period&dateBegin=' + \
+                            int(s_i)) + '&boardType=arr&time=00:00' + '&additionalTime=0&maxJourneys=100000&outputMode=tickerDataOnly&start=yes&selectDate' + '=period&dateBegin=' + \
                              date_w[0] + '&dateEnd=' + date_w[0] + '&productsFilter=1011111111011'
-                        route_url_dict[re] = stop_name_dict[original_name][0]
                         future_args.append(re)
-            if len(current_station_ids) > 0:
-                station_id_list.append((stop_name_dict[original_name][0], current_station_ids))
-                save_simple_stops(all_station_names, all_station_ids, stop_name_dict[original_name][1])
+            if new_stop:
+                if len(result.data) > 1:
+                    stops = save_stop_family(station_ids[1:], station_names[1:], stop_ext_id_dict[station_ids[0]])
+                    for stop in stops:
+                        stop_ext_id_dict[stop.ext_id] = stop
+                else:
+                    stop = stop_ext_id_dict[station_ids[0]]
+                    stop.crawled = True
+            else:
+                logging.debug(f'not new stops {station_names}')
         except Exception as e:
-            logging.error("Skipped one station")
+            logging.error("Skipped one station: " + str(e))
 
     future_routes = [future_session_stops.get(url, timeout=20, verify=False) for url in future_args]
-    main_station_journey_dict = {}
+
+    station_journeys = {}
     for f in as_completed(future_routes):
         try:
             result = f.result()
             routes_of_station = result
-            main_station = route_url_dict[result.url]
-            if main_station['id'] not in main_station_journey_dict:
-                main_station_journey_dict[main_station['id']] = [main_station]
             json_data = json.loads(routes_of_station.content.decode('iso-8859-1')[14:-1])
             if json_data is not None and json_data['maxJ'] is not None:
-                main_station_journey_dict[main_station['id']].extend(
-                    list(map(lambda x: x, json_data['journey'])))
+                station_id = int(json_data['stationEvaId'])
+                station_journeys[station_id] = list(map(lambda x: x, json_data['journey']))
         except Exception as e:
             print(str(e), flush=True)
 
     routes = set()
     future_route_url = []
 
-    def response_journey_hook(resp, *args, **kwargs):
-        tree = html.fromstring(resp.content)
-        all_routes = tree.xpath('//*/td[@class=$name]/a/@href', name='fcell')
-        all_routes = list(map(lambda l: l.split('?')[0], all_routes))
-        resp.data = all_routes
-
     try:
-        for i in main_station_journey_dict:
-            all_transport = get_all_name_of_transport_distinct(main_station_journey_dict[i][1:])
-            main_station = main_station_journey_dict[i][0]
+        for s_id in station_journeys:
+            all_transport = get_all_name_of_transport_distinct(station_journeys[s_id])
+            stop = stop_ext_id_dict[s_id]
             for route in all_transport:
                 try:
                     url = "https://fahrplan.oebb.at/bin/trainsearch.exe/dn"
@@ -903,8 +676,8 @@ def load_all_stops_to_crawl(stop_names):
                         set_date(date)
                         payload = {
                             'trainname': route,
-                            'stationname': main_station['value'],
-                            'REQ0JourneyStopsSID': main_station['id'],
+                            'stationname': stop.stop_name,
+                            'REQ0JourneyStopsSID': stop.ext_id,
                             'selectDate': 'oneday',
                             'date': f'{weekday_name}, {date_w}',
                             'wDayExt0': 'Mo|Di|Mi|Do|Fr|Sa|So',
@@ -915,12 +688,13 @@ def load_all_stops_to_crawl(stop_names):
                             'stationFilter': '81,01,02,03,04,05,06,07,08,09',
                             'start': 'Suchen'
                         }
-                        future_response = future_session_stops.post(url, data=payload, params=querystring, verify=False,
+                        future_response = future_session_stops.post(url, data=payload, params=querystring,
+                                                                    verify=False,
                                                                     hooks={'response': response_journey_hook})
                         future_route_url.append(future_response)
                 except Exception as e:
                     logging.error(
-                        f'get_all_routes_of_transport_and_station {route} {main_station} {str(e)}')
+                        f'get_all_routes_of_transport_and_station {route} {stop.name} {str(e)}')
     except:
         pass
     for i in as_completed(future_route_url):
@@ -930,35 +704,11 @@ def load_all_stops_to_crawl(stop_names):
         except:
             pass
     future_session_stops.close()
-    return routes
-
-
-date_arr = []
-
-cur_line = 0
-file_hash = 0
-finished_crawling = False
+    return routes, stop_ext_id_dict.keys()
 
 
 def crawl():
-    global stop_times_to_add, finishUp, update_stops_thread, date_arr, cur_line, finished_crawling, file_hash
-    with open('Data/bus_stops.csv') as csv_file:
-        file_hash = xxhash.xxh3_64(''.join(csv_file.readlines())).hexdigest()
-        csv_file.seek(0)
-        csv_reader = csv.reader(csv_file, delimiter=',')
-        row_count = sum(1 for _ in csv_reader)
-        try:
-            begin = int(getConfig('csv.begin')) - 1
-        except KeyError:
-            begin = 1
-        try:
-            end = int(getConfig('csv.end')) - 1
-        except KeyError:
-            end = row_count - 1
-        csv_file.seek(0)
-        stop_set = set()
-        for row in skip_stop(csv_reader, begin, end):
-            stop_set.add(row[0])
+    global stop_times_to_add, finishUp, date_arr
     try:
         max_stops_to_crawl = getConfig('batchSize')
     except:
@@ -967,24 +717,9 @@ def crawl():
         date_arr = getConfig('dates')
     except:
         date_arr = [date_w]
-    stop_list = list(stop_set)
 
-    # Read State and check if we are continuing from a crash
-    if state_path.exists():
-        with open(state_path, 'rb') as f:
-            (c_line, f_hash) = pickle.load(f)
-        state_path.unlink(missing_ok=True)
-        if f_hash == file_hash:
-            if cur_line := (c_line - max_stops_to_crawl) < 0:
-                cur_line = 0
-            stop_list = stop_list[c_line:]
-
-    stop_list_deleted = False
     commit()
     load_allg_feiertage()
-    update_stops_thread = Thread(target=location_data_thread)
-    update_stops_thread.daemon = True
-    update_stops_thread.start()
     try:
         if getConfig('resetDBstatus'):
             for stop in get_from_table(Stop):
@@ -994,28 +729,13 @@ def crawl():
     commit()
     new_session()
     count12 = 0
-    atexit.register(save_csv_state)
     while True:
-        if stop_list_deleted or len(stop_list) == 0:
-            if not stop_list_deleted:
-                logging.debug(f'deleting stop_list starting with database crawl')
-                del stop_list
-                stop_list_deleted = True
-            if not continuesCrawling:
-                break
-            stop_set = set()
-            for stop in (uncrawled := load_all_uncrawled_stops(max_stops_to_crawl)):
-                stop_set.add(stop.stop_name)
-                stop.crawled = True
-            commit()
-            if uncrawled is None or len(uncrawled) == 0:
-                break
-            to_crawl = list(stop_set)
-        else:
-            to_crawl = stop_list[:max_stops_to_crawl]
-            stop_list = stop_list[max_stops_to_crawl:]
-            cur_line += max_stops_to_crawl
-        routes = load_all_stops_to_crawl(to_crawl)
+        for stop in (uncrawled := load_all_uncrawled_stops(max_stops_to_crawl)):
+            stop.crawled = True
+        commit()
+        if uncrawled is None or len(uncrawled) == 0:
+            break
+        routes, ext_ids = load_all_routes_from_stops(uncrawled)
         stop_times_to_add = []
         t = Thread(target=load_data_async, args=(routes,))
         t.daemon = True
@@ -1041,52 +761,18 @@ def crawl():
         stop_times_executor.shutdown(wait=True)
         commit()
         new_session()
+        crawled_stop_ids.update(ext_ids)
         count12 = count12 + 1
         logging.debug(f'finished batch {count12 * max_stops_to_crawl}')
     logging.debug("finished crawling")
     logging.debug("adding all other stops")
-    add_all_empty_to_queue()
-    finishUp = True
-    logging.debug("waiting to finish now")
-    while len(real_thread_safe_q.queue) > 0:
-        time.sleep(10)
     logging.debug("stops finished now")
     commit()
-    finished_crawling = True
+    return count12
 
 
-def match_station_with_google_maps():
-    key = getConfig('googleMapsKey')
-    gmaps = googlemaps.Client(key=key)
-    all_stops = get_stops_without_location()
-    for stop in all_stops:
-        geocoding = gmaps.geocode(stop.stop_name)
-        if geocoding is None or len(geocoding) == 0:
-            print(f'couldnt find {stop.stop_name} on google maps')
-        else:
-            location = geocoding[0]['geometry']['location']
-            lat = location['lat']
-            lng = location['lng']
-            stop.stop_lat = lat
-            stop.stop_lon = lng
-    commit()
-
-def save_csv_state():
-    import pickle
-    if not finished_crawling and file_hash != 0:
-        file = open(state_path, 'wb')
-        data_f = (cur_line, file_hash)
-        pickle.dump(data_f, file)
-        file.close()
-    else:
-        state_path.unlink(missing_ok=True)
-
-
-if __name__ == "__main__":
-    try:
-        continuesCrawling = getConfig('continues')
-    except KeyError as e:
-        continuesCrawling = False
+def crawl_routes():
+    global northLatBorder, southLatBorder, westLonBorder, eastLonBorder, crawlStopOptions, fiona_geometry
     try:
         fiona_geometry = False
         crawlStopOptions = 'crawlStopOptions' in getConfig()
@@ -1114,35 +800,8 @@ if __name__ == "__main__":
     except KeyError as e:
         crawlStopOptions = False
     get_std_date()
-    try:
-        if url := getConfig('url'):
-            update_stops_thread = Thread(target=location_data_thread)
-            update_stops_thread.daemon = True
-            update_stops_thread.start()
-            process_page(url, None)
-            real_thread_safe_q.join()
-            commit()
-    except KeyError:
-        pass
-    try:
-        if getConfig('crawl'):
-            crawl()
-    except KeyError as e:
-        pass
-    try:
-        if getConfig('matchWithParent'):
-            match_station_with_parents()
-    except KeyError as e:
-        pass
-    try:
-        if getConfig('useGoogleMaps'):
-            match_station_with_google_maps()
-    except KeyError:
-        pass
-    try:
-        if getConfig('export'):
-            export_all_tables()
-    except KeyError:
-        pass
+    crawl()
 
-exit(0)
+
+if __name__ == '__main__':
+    crawl_routes()

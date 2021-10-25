@@ -19,8 +19,9 @@ class Stop(Base):
     wheelchair_boarding = Column(Text, nullable=True)
     crawled = Column(Boolean, default=False)
     input = Column(Text, nullable=True)
-    ext_id = Column(Integer, nullable=True)
+    ext_id = Column(Integer, nullable=True, unique=True)
     prod_class = Column(Integer, nullable=True)
+    siblings_searched = Column(Boolean, nullable=False, default=False)
 
     def __repr__(self):
         return "<Stop(name='{}', url='{}', id={})>" \

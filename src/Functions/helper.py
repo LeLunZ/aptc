@@ -1,7 +1,25 @@
+import csv
 import datetime
+import os
+from zipfile import ZipFile
 
+import googlemaps
 from Models.calendar import Calendar
-from Classes.oebb_date import end_date, OebbDate, service_months
+from Classes.oebb_date import begin_date, end_date, OebbDate, service_months
+
+from crud import get_stops_without_location, commit, get_stops_with_parent, get_stop_with_id, update_location_of_stop, \
+    remove_parent_from_all, new_session, query_element, windowed_query, get_from_table, end_session
+from Functions.config import getConfig
+
+from Models.agency import Agency
+from Models.calendar_date import CalendarDate
+from Models.frequencies import Frequency
+from Models.route import Route
+from Models.shape import Shape
+from Models.stop import Stop
+from Models.stop_times import StopTime
+from Models.transfers import Transfer
+from Models.trip import Trip
 
 inv_map = {v: k for k, v in service_months.items()}
 
@@ -195,3 +213,141 @@ def extract_date_objects_from_str(dates_list, dates, start_date, finish_date):
             continue
         else:
             month = None
+
+
+def match_station_with_google_maps():
+    key = getConfig('googleMapsKey')
+    gmaps = googlemaps.Client(key=key)
+    all_stops = get_stops_without_location()
+    for stop in all_stops:
+        geocoding = gmaps.geocode(stop.stop_name)
+        if geocoding is None or len(geocoding) == 0:
+            print(f'couldnt find {stop.stop_name} on google maps')
+        else:
+            location = geocoding[0]['geometry']['location']
+            lat = location['lat']
+            lng = location['lng']
+            stop.stop_lat = lat
+            stop.stop_lon = lng
+    commit()
+
+
+def match_station_with_parents():
+    all_stops = get_stops_with_parent()
+    parent_id_stop_dict = {}
+    for stop in all_stops:
+        if stop.stop_lat is None or stop.stop_lon is None:
+            if stop.parent_station not in parent_id_stop_dict:
+                parent_id_stop_dict[stop.parent_station] = [stop]
+            else:
+                parent_id_stop_dict[stop.parent_station].append(stop)
+
+    for id in parent_id_stop_dict:
+        parent_stop = get_stop_with_id(id)
+        childs = parent_id_stop_dict[id]
+        for child in childs:
+            update_location_of_stop(child, parent_stop.stop_lat, parent_stop.stop_lon)
+    remove_parent_from_all()
+    commit()
+
+
+def export_all_tables():
+    tables = [Agency, Calendar, CalendarDate, Frequency, Route, Trip, StopTime, Shape, Stop, Transfer]
+    file_names = []
+    os.chdir('./db')
+    try:
+        os.remove('./Archiv.zip')
+    except FileNotFoundError:
+        pass
+    try:
+        excluded_routes = getConfig('exportOptions.excludeRouteTypes')
+    except:
+        excluded_routes = None
+    for i in tables:
+        try:
+            os.remove(f'./{i.__table__.name}.txt')
+        except FileNotFoundError:
+            pass
+    for i in tables:
+        file_names.append(f'./{i.__table__.name}.txt')
+        new_session()
+        if i is StopTime:
+            q = query_element(i)
+            with open(f'./{i.__table__.name}.txt', 'a') as outfile:
+                outcsv = csv.writer(outfile, delimiter=',')
+                outcsv.writerow(i.firstline())
+                for dataset in windowed_query(q, StopTime.stop_times_id, 1000):
+                    outcsv.writerow(dataset.tocsv())
+        else:
+            with open(f'./{i.__table__.name}.txt', 'a') as outfile:
+                outcsv = csv.writer(outfile, delimiter=',')
+                outcsv.writerow(i.firstline())
+                records = get_from_table(i)
+                for row in records:
+                    outcsv.writerow(row.tocsv())
+        end_session()
+
+    if excluded_routes is not None:
+        all_routes = []
+        all_trips = []
+        all_stop_times = []
+        deleted_route_ids = []
+        deleted_trip_ids = []
+        with open(f'./{Route.__table__.name}.txt', 'r') as routes:
+            first_line_routes = routes.readline()
+            route_type_index = Route.firstline().index('route_type')
+            route_id_index = Route.firstline().index('route_id')
+            csv_reader = csv.reader(routes, delimiter=',')
+            for route in csv_reader:
+                if route[route_type_index] != '' and int(route[route_type_index]) in excluded_routes:
+                    deleted_route_ids.append(int(route[route_id_index]))
+                    continue
+                all_routes.append(route)
+
+        with open(f'./{Trip.__table__.name}.txt', 'r') as trips:
+            first_line_trips = trips.readline()
+            route_id_of_trip_index = Trip.firstline().index('route_id')
+            trip_id_index = Trip.firstline().index('trip_id')
+            csv_reader = csv.reader(trips, delimiter=',')
+            for trip in csv_reader:
+                if int(trip[route_id_of_trip_index]) in deleted_route_ids:
+                    deleted_trip_ids.append(int(trip[trip_id_index]))
+                    continue
+                all_trips.append(trip)
+
+        with open(f'./{StopTime.__table__.name}.txt', 'r') as stop_times:
+            first_line_stop_times = stop_times.readline()
+            trip_id_of_stop_time_index = StopTime.firstline().index("trip_id")
+            csv_reader = csv.reader(stop_times, delimiter=',')
+            for stop_time in csv_reader:
+                if int(stop_time[trip_id_of_stop_time_index]) in deleted_trip_ids:
+                    continue
+                all_stop_times.append(stop_time)
+
+        os.remove(f'./{Route.__table__.name}.txt')
+
+        with open(f'./{Route.__table__.name}.txt', 'a') as routes:
+            routes.writelines([first_line_routes])
+            outcsv = csv.writer(routes, delimiter=',')
+            for row in all_routes:
+                outcsv.writerow(row)
+
+        os.remove(f'./{Trip.__table__.name}.txt')
+
+        with open(f'./{Trip.__table__.name}.txt', 'a') as trips:
+            trips.writelines([first_line_trips])
+            outcsv = csv.writer(trips, delimiter=',')
+            for row in all_trips:
+                outcsv.writerow(row)
+
+        os.remove(f'./{StopTime.__table__.name}.txt')
+
+        with open(f'./{StopTime.__table__.name}.txt', 'a') as stop_times:
+            stop_times.writelines([first_line_stop_times])
+            outcsv = csv.writer(stop_times, delimiter=',')
+            for row in all_stop_times:
+                outcsv.writerow(row)
+
+    with ZipFile(f'./GTFS_{str(begin_date)}-{str(end_date)}.zip', 'w') as zip:
+        for file in file_names:
+            zip.write(file)

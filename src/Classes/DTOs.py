@@ -12,8 +12,9 @@ class PageDTO:
     calendar_data: Tuple
     first_station: str
     dep_time: str
-    all_stations: List
-    links_of_all_stations: List
+    stop_names: List
+    stop_ids: List
+    stop_links: List
     page: str
 
 
