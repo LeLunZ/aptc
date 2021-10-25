@@ -40,4 +40,4 @@ ENV AM_I_IN_A_DOCKER_CONTAINER Yes
 
 WORKDIR /app
 COPY src .
-CMD ["python", "__init__.py"]
+CMD ["python", "run.py"]
