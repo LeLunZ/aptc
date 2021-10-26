@@ -1,18 +1,19 @@
+import atexit
 import csv
 import pickle
+import signal
 from concurrent.futures import as_completed
 from pathlib import Path
 
 import fiona
 import urllib3
 from requests_futures.sessions import FuturesSession
+from shapely.geometry import shape
 
 from Functions.helper import skip_stop, match_station_with_google_maps
 from Functions.oebb_requests import requests_retry_session_async
 from Functions.request_hooks import request_stops_processing_hook, extract_real_name_from_stop_page
 from crud import *
-
-from shapely.geometry import shape
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -126,7 +127,10 @@ def crawl_stops(init=False):
                 if cur_line := (c_line - max_stops_to_crawl) < 0:
                     cur_line = 0
                 stop_list = stop_list[c_line:]
-
+        atexit.register(save_csv_state)
+        signal.signal(signal.SIGTERM, save_csv_state)
+        signal.signal(signal.SIGINT, save_csv_state)
+        finished_crawling = False
         # Crawl csv file with limit
         while len(stop_list) != 0:
             to_crawl = stop_list[:max_stops_to_crawl]
@@ -134,7 +138,7 @@ def crawl_stops(init=False):
             cur_line += max_stops_to_crawl
             load_all_stops_to_crawl(to_crawl)
             commit()
-
+        finished_crawling = True
     # Crawl uncrawled stops from database
     uncrawled = sibling_search_stops(max_stops_to_crawl)
     while len(uncrawled) != 0:
@@ -157,6 +161,8 @@ def crawl_stops(init=False):
 
 def save_csv_state():
     import pickle
+    if finished_crawling is None:
+        return
     if not finished_crawling and file_hash != 0:
         file = open(state_path, 'wb')
         data_f = (cur_line, file_hash)
