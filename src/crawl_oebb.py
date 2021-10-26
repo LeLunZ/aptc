@@ -14,8 +14,8 @@ from requests_futures.sessions import FuturesSession
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
-# import fiona
-# from shapely.geometry import shape
+import fiona
+from shapely.geometry import shape
 from selenium.webdriver.support.wait import WebDriverWait
 
 from Classes.DTOs import PageDTO

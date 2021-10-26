@@ -3,7 +3,7 @@ import pickle
 from concurrent.futures import as_completed
 from pathlib import Path
 
-# import fiona
+import fiona
 import urllib3
 from requests_futures.sessions import FuturesSession
 
@@ -12,7 +12,7 @@ from Functions.oebb_requests import requests_retry_session_async
 from Functions.request_hooks import request_stops_processing_hook, extract_real_name_from_stop_page
 from crud import *
 
-# from shapely.geometry import shape
+from shapely.geometry import shape
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -66,6 +66,7 @@ def load_all_stops_to_crawl(stop_names, database=False, db_stop_ids=None):
             response_data = response.data
             for stop in response_data:
                 if stop_is_to_crawl(stop) or (database and stop.ext_id in db_stop_ids and stop.ext_id not in stop_ids):
+                    stop_ids.add(stop.ext_id)
                     stop_url = f'https://fahrplan.oebb.at/bin/stboard.exe/dn?protocol=https:&input={stop.ext_id}'
                     stop_page_req.append(future_session_stops.get(stop_url, verify=False,
                                                                   hooks={'response': extract_real_name_from_stop_page}))
@@ -79,7 +80,6 @@ def load_all_stops_to_crawl(stop_names, database=False, db_stop_ids=None):
             ext_id, name = response.data
             stop = stop_ext_id_dict[ext_id]
             stop.stop_name = name
-            stop_ids.add(stop.ext_id)
             if database:
                 lat = stop.stop_lat
                 lon = stop.stop_lon
