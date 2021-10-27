@@ -228,6 +228,12 @@ def sibling_search_stops(max_stops_to_crawl):
         max_stops_to_crawl).all()
 
 
+def get_all_stops_without_location(max_stops_to_crawl):
+    return s.query(Stop).filter(and_(Stop.stop_lat == None, Stop.prod_class == None)).order_by(Stop.ext_id,
+                                                                                               Stop.prod_class).limit(
+        max_stops_to_crawl).all()
+
+
 @lockF(lock)
 def update_location_of_stop(stop, lat, lng):
     try:
@@ -270,7 +276,7 @@ def get_from_table_with_filter(t, f):
 
 
 def get_stops_without_location():
-    return s.query(Stop).filter(or_(Stop.stop_lon == None, Stop.stop_lat == None)).all()
+    return s.query(Stop).filter(Stop.stop_lon == None).all()
 
 
 def get_from_table_first(t):

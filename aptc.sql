@@ -69,7 +69,8 @@ create table stops
     input               text,
     ext_id              integer,
     prod_class          integer,
-    siblings_searched   boolean not null
+    siblings_searched   boolean not null,
+    group_ext_id        text
 );
 
 create index stops_stop_name_uindex

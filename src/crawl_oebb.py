@@ -9,14 +9,14 @@ from threading import Thread
 from typing import List
 from urllib.parse import parse_qs, unquote, urlparse
 
+import fiona
 from lxml import html
 from requests_futures.sessions import FuturesSession
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
-import fiona
-from shapely.geometry import shape
 from selenium.webdriver.support.wait import WebDriverWait
+from shapely.geometry import shape
 
 from Classes.DTOs import PageDTO
 from Classes.oebb_date import OebbDate, service_months, begin_date, end_date, get_std_date
@@ -370,6 +370,13 @@ def save_stop_family(stop_ids, stop_names, main_stop):
     return stop_list
 
 
+def save_stop(stop_id, stop_name):
+    new_stop = Stop(stop_name=stop_name,
+                    stop_url='https://fahrplan.oebb.at/bin/stboard.exe/dn?protocol=https:&input=' + str(stop_id),
+                    location_type=0, crawled=True, ext_id=stop_id)
+    return add_stop(new_stop)
+
+
 def add_date_to_allg_feiertage(feiertag, year):
     date = OebbDate()
     f_split = feiertag.split(' ')
@@ -623,10 +630,9 @@ def load_all_routes_from_stops(stops: List[Stop]):
             station_names = list(
                 map(lambda x: unquote(''.join(x.split('|')[:-1]), encoding='iso-8859-1'), all_stations))
             station_ids = list(map(lambda x: int(x.split('|')[-1]), all_stations))
-            new_stop = False
             for s_n, s_i in zip(station_names, station_ids):
                 if s_i not in crawled_stop_ids and s_i not in current_station_ids:
-                    new_stop = True
+                    save_stop(s_i, s_n)
                     current_station_ids.add(s_i)
                     for date in date_arr:
                         set_date(date)
@@ -634,18 +640,6 @@ def load_all_routes_from_stops(stops: List[Stop]):
                             int(s_i)) + '&boardType=arr&time=00:00' + '&additionalTime=0&maxJourneys=100000&outputMode=tickerDataOnly&start=yes&selectDate' + '=period&dateBegin=' + \
                              date_w[0] + '&dateEnd=' + date_w[0] + '&productsFilter=1011111111011'
                         future_args.append(re)
-            if new_stop:
-                if len(result.data) > 1:
-                    # if stops are the same type:
-                    # location_type = 0 for all
-                    #
-                    # if one stop is higher. What to do with the rest sometimes stops doesnt belong there.
-                    stops = save_stop_family(station_ids[1:], station_names[1:], stop_ext_id_dict[station_ids[0]])
-                    for stop in stops:
-                        stop_ext_id_dict[stop.ext_id] = stop
-                else:
-                    stop = stop_ext_id_dict[station_ids[0]]
-                    stop.crawled = True
             else:
                 logging.debug(f'not new stops {station_names}')
         except Exception as e:
@@ -767,7 +761,7 @@ def crawl():
         new_session()
         crawled_stop_ids.update(ext_ids)
         count12 = count12 + 1
-        logging.debug(f'finished batch {count12 * max_stops_to_crawl}')
+        logging.debug(f'finished route batch {count12 * max_stops_to_crawl}')
     logging.debug("finished crawling")
     logging.debug("adding all other stops")
     logging.debug("stops finished now")

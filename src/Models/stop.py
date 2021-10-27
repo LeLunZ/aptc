@@ -1,5 +1,5 @@
+from sqlalchemy import Column, Integer, Float, Text, Boolean
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, Date, Float, Text, Boolean
 
 Base = declarative_base()
 
@@ -22,6 +22,7 @@ class Stop(Base):
     ext_id = Column(Integer, nullable=True, unique=True)
     prod_class = Column(Integer, nullable=True)
     siblings_searched = Column(Boolean, nullable=False, default=False)
+    group_ext_id = Column(Text, nullable=True)
 
     def __repr__(self):
         return "<Stop(name='{}', url='{}', id={})>" \

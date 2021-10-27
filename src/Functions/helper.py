@@ -215,10 +215,10 @@ def extract_date_objects_from_str(dates_list, dates, start_date, finish_date):
             month = None
 
 
-def match_station_with_google_maps():
+def match_station_with_google_maps(stops):
     key = getConfig('googleMapsKey')
     gmaps = googlemaps.Client(key=key)
-    all_stops = get_stops_without_location()
+    all_stops = stops
     for stop in all_stops:
         geocoding = gmaps.geocode(stop.stop_name)
         if geocoding is None or len(geocoding) == 0:
