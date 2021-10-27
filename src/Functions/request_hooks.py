@@ -26,16 +26,17 @@ def request_stops_processing_hook(resp, *args, **kwargs):
             if se['extId'].startswith('81'):
                 if (int(se['prodClass']) & 2280) != 0:
                     pass  # its a meta object with routes. but sometimes it doesnt have children (so its not a meta anymore)
-                    location_type = 1 or 0
+                    location_type = -1  # 1 or 0
                 else:
                     pass  # its a train station. Comes with other stations which are also stations.
-                            # but sometimes object is a parent station with routes and children stops
-                    location_type = 0 or 1
+                    # but sometimes object is a parent station with routes and children stops
+                    location_type = -1  # 0 or 1
             else:
                 if (int(se['prodClass']) & 63) != 0:
+                    location_type = -1 # 0 or 1
                     pass  # Its a station (metahst) (Bus, Tram, Train etc). But sometimes its also a stop
                 if (int(se['prodClass']) & 63) == 0:
-                    pass # its a single stop no parent
+                    pass  # its a single stop no parent
                     location_type = 0
 
         if (ext_id_str := str(int(se['extId']))).startswith('11'):

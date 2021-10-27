@@ -636,6 +636,10 @@ def load_all_routes_from_stops(stops: List[Stop]):
                         future_args.append(re)
             if new_stop:
                 if len(result.data) > 1:
+                    # if stops are the same type:
+                    # location_type = 0 for all
+                    #
+                    # if one stop is higher. What to do with the rest sometimes stops doesnt belong there.
                     stops = save_stop_family(station_ids[1:], station_names[1:], stop_ext_id_dict[station_ids[0]])
                     for stop in stops:
                         stop_ext_id_dict[stop.ext_id] = stop

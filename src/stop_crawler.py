@@ -131,7 +131,6 @@ def crawl_stops(init=False):
         atexit.register(save_csv_state)
         signal.signal(signal.SIGTERM, save_csv_state)
         signal.signal(signal.SIGINT, save_csv_state)
-        signal.signal(signal.SIGSTOP, save_csv_state)
         finished_crawling = False
         # Crawl csv file with limit
         while len(stop_list) != 0:
