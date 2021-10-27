@@ -173,6 +173,7 @@ def get_all_names_from_searched_stops():
     data = s.query(Stop.stop_name).filter(Stop.siblings_searched == False).all()
     return data
 
+
 def add_stop_without_check(stop: Stop):
     s.add(stop)
     s.flush()
@@ -217,13 +218,13 @@ def remove_parent_from_all():
 
 
 def load_all_uncrawled_stops(max_stops_to_crawl):
-    return s.query(Stop).filter(and_(Stop.crawled == False, Stop.prod_class != None)).order_by(Stop.stop_lat,
-                                                                                               Stop.stop_lon).limit(
+    return s.query(Stop).filter(and_(Stop.crawled == False, Stop.prod_class != None)).order_by(Stop.ext_id,
+                                                                                               Stop.prod_class).limit(
         max_stops_to_crawl).all()
 
 
 def sibling_search_stops(max_stops_to_crawl):
-    return s.query(Stop).filter(Stop.siblings_searched == False).order_by(Stop.stop_lat, Stop.stop_lon).limit(
+    return s.query(Stop).filter(Stop.siblings_searched == False).order_by(Stop.ext_id, Stop.prod_class).limit(
         max_stops_to_crawl).all()
 
 

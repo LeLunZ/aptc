@@ -40,7 +40,7 @@ def request_stops_processing_hook(resp, *args, **kwargs):
                     location_type = 0
 
         if (ext_id_str := str(int(se['extId']))).startswith('11'):
-            continue  # Meta Object like Cities
+            pass   # continue?? Meta Object like Cities
         elif ext_id_str.startswith('13') and (int(se['prodClass']) & 63) != 0:
             pass  # Its a station (metahst) (Bus, Tram, Train etc)
             location_type = 1
