@@ -63,7 +63,7 @@ create table stops
     zone_id             text,
     stop_url            text,
     location_type       integer,
-    parent_station      text,
+    parent_station      integer,
     wheelchair_boarding text,
     crawled             boolean not null,
     input               text,

@@ -15,7 +15,7 @@ class Stop(Base):
     zone_id = Column(Text, nullable=True)
     stop_url = Column(Text, nullable=True)
     location_type = Column(Integer, nullable=False)
-    parent_station = Column(Text, nullable=True)
+    parent_station = Column(Integer, nullable=True)
     wheelchair_boarding = Column(Text, nullable=True)
     crawled = Column(Boolean, default=False)
     input = Column(Text, nullable=True)

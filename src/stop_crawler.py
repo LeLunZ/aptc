@@ -17,7 +17,8 @@ from crud import *
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-stop_ids = set([e.ext_id for e in get_all_ext_id_from_stops()])
+stop_ids = set([int(e.ext_id) for e in get_all_ext_id_from_stops()])
+searched_text = set([str(e.stop_name) for e in get_all_names_from_searched_stops()])
 state_path = Path('Data/state.pkl')
 cur_line = 0
 finished_crawling = None
@@ -52,12 +53,12 @@ def stop_is_to_crawl(stop_to_check: Stop) -> bool:
 
 def load_all_stops_to_crawl(stop_names, database=False, db_stop_ids=None):
     futures = [future_session_stops.get(
-        'https://fahrplan.oebb.at/bin/ajax-getstop.exe/dn?REQ0JourneyStopsS0A=1&REQ0JourneyStopsB=12&S=' +
-        stop_name.split('(')[0].strip() + '?&js=false&',
+        'https://fahrplan.oebb.at/bin/ajax-getstop.exe/dn?REQ0JourneyStopsS0A=1&REQ0JourneyStopsB=35&S=' +
+        stop_name + '?&js=false&',
         verify=False, timeout=6, hooks={'response': request_stops_processing_hook}) for
         stop_name
-        in stop_names]
-
+        in stop_names if stop_name not in searched_text]
+    searched_text.update(stop_names)
     stop_ext_id_dict = {}
     stop_page_req = []
 
@@ -65,7 +66,7 @@ def load_all_stops_to_crawl(stop_names, database=False, db_stop_ids=None):
         try:
             response = i.result()
             response_data = response.data
-            for stop in response_data:
+            for count, stop in enumerate(response_data):
                 if stop_is_to_crawl(stop) or (database and stop.ext_id in db_stop_ids and stop.ext_id not in stop_ids):
                     stop_ids.add(stop.ext_id)
                     stop_url = f'https://fahrplan.oebb.at/bin/stboard.exe/dn?protocol=https:&input={stop.ext_id}'
@@ -130,6 +131,7 @@ def crawl_stops(init=False):
         atexit.register(save_csv_state)
         signal.signal(signal.SIGTERM, save_csv_state)
         signal.signal(signal.SIGINT, save_csv_state)
+        signal.signal(signal.SIGSTOP, save_csv_state)
         finished_crawling = False
         # Crawl csv file with limit
         while len(stop_list) != 0:

@@ -169,6 +169,10 @@ def get_all_ext_id_from_stops():
     return data
 
 
+def get_all_names_from_searched_stops():
+    data = s.query(Stop.stop_name).filter(Stop.siblings_searched == False).all()
+    return data
+
 def add_stop_without_check(stop: Stop):
     s.add(stop)
     s.flush()
