@@ -15,11 +15,13 @@ from Functions.request_hooks import request_stops_processing_hook, extract_real_
     request_station_id_processing_hook
 from crud import *
 
+fiona_geometry = None
 try:
     import fiona
     from shapely.geometry import shape
-except ImportError:
+except (ImportError, AttributeError):
     logging.debug('Gdal not installed. Shapefile wont work')
+    fiona_geometry = False
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -33,7 +35,6 @@ finished_crawling = None
 file_hash = None
 future_session_stops = requests_retry_session_async(session=FuturesSession())
 crawlStopOptions = None
-fiona_geometry = None
 southLatBorder = None
 northLatBorder = None
 westLonBorder = None
@@ -278,19 +279,19 @@ def save_csv_state(sig=None, frame=None):
 def start_stop_crawler():
     global northLatBorder, southLatBorder, westLonBorder, eastLonBorder, crawlStopOptions, fiona_geometry
     try:
-        fiona_geometry = False
         crawlStopOptions = 'crawlStopOptions' in getConfig()
-        try:
-            shapefile = getConfig('crawlStopOptions.shapefile')
-            fiona_shape = fiona.open(shapefile)
-            fiona_iteration = iter(fiona_shape)
-            fiona_geometry = []
-            for r in fiona_iteration:
-                fiona_geometry.append(shape(r['geometry']))
-            del fiona_shape
-            del fiona_iteration
-        except (KeyError, FileNotFoundError, Exception):
-            pass
+        if fiona_geometry is not False:
+            try:
+                shapefile = getConfig('crawlStopOptions.shapefile')
+                fiona_shape = fiona.open(shapefile)
+                fiona_iteration = iter(fiona_shape)
+                fiona_geometry = []
+                for r in fiona_iteration:
+                    fiona_geometry.append(shape(r['geometry']))
+                del fiona_shape
+                del fiona_iteration
+            except (KeyError, FileNotFoundError, Exception):
+                pass
 
         if crawlStopOptions:
             northLatBorder = getConfig('crawlStopOptions.northLatBorder')

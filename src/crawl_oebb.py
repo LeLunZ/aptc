@@ -24,11 +24,13 @@ from Functions.oebb_requests import requests_retry_session_async, date_w, set_da
 from Functions.request_hooks import response_journey_hook
 from crud import *
 
+fiona_geometry = None
 try:
     import fiona
     from shapely.geometry import shape
-except ImportError:
+except (ImportError, AttributeError):
     logging.debug('Gdal not installed. Shapefile wont work')
+    fiona_geometry = False
 finishUp = False
 
 import os
@@ -89,7 +91,7 @@ crawled_stop_ids = set([e.ext_id for e in get_all_ext_id_from_crawled_stops()])
 
 allg_feiertage = []
 crawlStopOptions = None
-fiona_geometry = None
+
 southLatBorder = None
 northLatBorder = None
 westLonBorder = None
@@ -162,7 +164,7 @@ def extract_date_from_str(calendar: Calendar, date_str: str, add=True):
     not_working_calendar_date = []
 
     if irregular_dates is not None:
-        if 'allg. Feiertg' in irregular_dates:
+        if 'allg. Feiertg' in irregular_dates:  # TODO check spelling
             not_working_calendar_date.extend(copy.deepcopy(allg_feiertage))
         extract_date_objects_from_str(not_working_calendar_date, irregular_dates, start_date, finish_date)
     extended_working_dates = []
@@ -721,23 +723,19 @@ def crawl():
 def crawl_routes():
     global northLatBorder, southLatBorder, westLonBorder, eastLonBorder, crawlStopOptions, fiona_geometry
     try:
-        fiona_geometry = False
         crawlStopOptions = 'crawlStopOptions' in getConfig()
-        try:
-            shapefile = getConfig('crawlStopOptions.shapefile')
-            fiona_shape = fiona.open(shapefile)
-            fiona_iteration = iter(fiona_shape)
-            fiona_geometry = []
-            for r in fiona_iteration:
-                fiona_geometry.append(shape(r['geometry']))
-            del fiona_shape
-            del fiona_iteration
-        except KeyError:
-            pass
-        except FileNotFoundError:
-            pass
-        except Exception as e:
-            pass
+        if fiona_geometry is not False:
+            try:
+                shapefile = getConfig('crawlStopOptions.shapefile')
+                fiona_shape = fiona.open(shapefile)
+                fiona_iteration = iter(fiona_shape)
+                fiona_geometry = []
+                for r in fiona_iteration:
+                    fiona_geometry.append(shape(r['geometry']))
+                del fiona_shape
+                del fiona_iteration
+            except (KeyError, FileNotFoundError, Exception) as e:
+                pass
 
         if crawlStopOptions:
             northLatBorder = getConfig('crawlStopOptions.northLatBorder')
