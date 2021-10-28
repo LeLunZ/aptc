@@ -165,8 +165,7 @@ def load_all_stops_to_crawl_(stops):
             if real_stop.siblings_searched is False:
                 stop_ids_searched.add(real_stop.ext_id)
                 real_stop.siblings_searched = True
-                all_stops_to_add = [stop.stop_name for stop in response_data if
-                                    stop_is_to_crawl(stop)]
+                all_stops_to_add = [stop.stop_name for stop in response_data if stop_is_to_crawl(stop)]
                 stops_for_search.update(all_stops_to_add)
             if real_stop.info_searched is False:
                 stop_ids_info.add(real_stop.ext_id)
