@@ -583,7 +583,6 @@ def load_all_routes_from_stops(stops: List[Stop]):
     future_session_stops = requests_retry_session_async(session=FuturesSession())
     stop_ext_id_dict = {s.ext_id: s for s in stops}
 
-    stops = [stop for stop in stops if stop_is_to_crawl(stop)]
     stop_names = [stop.stop_name for stop in stops]
     stop_ids = [stop.ext_id for stop in stops]
     future_args = []
@@ -679,7 +678,7 @@ def crawl():
     new_session()
     count12 = 0
     while True:
-        for stop in (uncrawled := load_all_uncrawled_stops(max_stops_to_crawl)):
+        for stop in (uncrawled := load_all_uncrawled_stops(max_stops_to_crawl, stop_is_to_crawl)):
             stop.crawled = True
         commit()
         if uncrawled is None or len(uncrawled) == 0:
