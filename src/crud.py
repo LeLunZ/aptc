@@ -223,20 +223,24 @@ def remove_parent_from_all():
 
 
 def load_all_uncrawled_stops(max_stops_to_crawl, check_stop_method):
-    stops = s.query(Stop).filter(and_(Stop.crawled == False, Stop.info_searched == True)).order_by(Stop.ext_id,
-                                                                                                   Stop.prod_class).limit(
+    stops = s.query(Stop).filter(
+        and_(Stop.crawled == False, Stop.info_searched == True, Stop.prod_class != None)).order_by(Stop.ext_id,
+                                                                                                 Stop.prod_class).limit(
         max_stops_to_crawl).all()
 
     all_stops = []
     for stop in stops:
         if check_stop_method(stop):
+            all_stops.append(stop)
             all_stops.extend(
                 s.query(Stop).filter(and_(Stop.crawled == False, or_(Stop.group_ext_id.like(f'%,{stop.ext_id}'),
                                                                      Stop.group_ext_id.like(f'{stop.ext_id},%'),
                                                                      Stop.group_ext_id.like(f'%,{stop.ext_id},%'),
                                                                      Stop.group_ext_id.like(f'{stop.ext_id}')))).all())
+        else:
+            stop.crawled = True
 
-    return set(all_stops + stops)
+    return set(all_stops)
 
     # return s.query(Stop).filter(and_(Stop.crawled == False, Stop.prod_class != None)).order_by(Stop.ext_id,
     #                                                                                           Stop.prod_class).limit(

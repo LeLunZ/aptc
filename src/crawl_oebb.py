@@ -164,7 +164,9 @@ def extract_date_from_str(calendar: Calendar, date_str: str, add=True):
     not_working_calendar_date = []
 
     if irregular_dates is not None:
-        if 'allg. Feiertg' in irregular_dates:  # TODO check spelling
+        if 'allg. Feiert' in irregular_dates:  # TODO check spelling
+            print(irregular_dates)
+            logging.debug(irregular_dates)
             not_working_calendar_date.extend(copy.deepcopy(allg_feiertage))
         extract_date_objects_from_str(not_working_calendar_date, irregular_dates, start_date, finish_date)
     extended_working_dates = []
