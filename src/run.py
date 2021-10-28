@@ -1,5 +1,7 @@
 import logging
 
+import urllib3
+
 from Functions.config import getConfig
 from Functions.helper import export_all_tables
 from crawl_oebb import crawl, crawl_routes
@@ -10,6 +12,23 @@ logging.basicConfig(filename='./Data/aptc.log',
                     format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
                     datefmt='%H:%M:%S',
                     level=logging.DEBUG)
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+try:
+    logging.getLogger("requests").setLevel(logging.CRITICAL)
+except:
+    pass
+
+try:
+    logging.getLogger("urllib3").setLevel(logging.CRITICAL)
+except:
+    pass
+
+try:
+    logging.getLogger("selenium").setLevel(logging.CRITICAL)
+except:
+    pass
 
 if __name__ == '__main__':
     try:

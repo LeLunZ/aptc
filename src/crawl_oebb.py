@@ -7,52 +7,31 @@ from concurrent.futures import as_completed, ThreadPoolExecutor
 from pathlib import Path
 from threading import Thread
 from typing import List
-from urllib.parse import parse_qs, unquote, urlparse
+from urllib.parse import parse_qs, urlparse
 
-import fiona
 from lxml import html
 from requests_futures.sessions import FuturesSession
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
-from shapely.geometry import shape
 
 from Classes.DTOs import PageDTO
 from Classes.oebb_date import OebbDate, service_months, begin_date, end_date, get_std_date
 from Functions.helper import add_day_to_calendar, extract_date_from_date_arr, merge_date, add_days_to_calendar, \
     get_all_name_of_transport_distinct, extract_date_objects_from_str
 from Functions.oebb_requests import requests_retry_session_async, date_w, set_date, weekday_name
-from Functions.request_hooks import request_station_id_processing_hook, response_journey_hook
+from Functions.request_hooks import response_journey_hook
 from crud import *
 
+try:
+    import fiona
+    from shapely.geometry import shape
+except ImportError:
+    logging.debug('Gdal not installed. Shapefile wont work')
 finishUp = False
 
 import os
-import urllib3
-
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
-logging.basicConfig(filename='./Data/aptc.log',
-                    filemode='a',
-                    format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
-                    datefmt='%H:%M:%S',
-                    level=logging.DEBUG)
-
-try:
-    logging.getLogger("requests").setLevel(logging.CRITICAL)
-except:
-    pass
-
-try:
-    logging.getLogger("urllib3").setLevel(logging.CRITICAL)
-except:
-    pass
-
-try:
-    logging.getLogger("selenium").setLevel(logging.CRITICAL)
-except:
-    pass
 
 q = []
 route_types = {
@@ -107,7 +86,7 @@ date_arr = []
 stop_times_executor = None
 stop_times_to_add = []
 crawled_stop_ids = set([e.ext_id for e in get_all_ext_id_from_crawled_stops()])
-existing_stop_ids = set([e.ext_id for e in get_ext_id_from_crawled_stops_where_main()])
+
 allg_feiertage = []
 crawlStopOptions = None
 fiona_geometry = None
@@ -356,9 +335,9 @@ def save_stop_family(stop_ids, stop_names, main_stop):
     existed = 0
     for ids, name in zip(stop_ids, stop_names):
         p_stop = main_stop.stop_id
-        if ids in existing_stop_ids:
-            existed += 1
-            p_stop = None
+        # if ids in existing_stop_ids:
+        #    existed += 1
+        #    p_stop = None
         child_stop = Stop(stop_name=name, parent_station=p_stop, stop_lat=main_stop.stop_lat,
                           stop_lon=main_stop.stop_lon,
                           stop_url='https://fahrplan.oebb.at/bin/stboard.exe/dn?protocol=https:&input=' + str(ids),
@@ -498,11 +477,11 @@ def request_processing_hook(resp, *args, **kwargs):
     tree = html.fromstring(route_page.content)
     all_links_of_station = tree.xpath('//*/tr[@class=$first or @class=$second]/*/a/@href', first='zebracol-2',
                                       second="zebracol-1")
-    crawled_stop_ids = [int(parse_qs(urlparse(link).query)['input'][0]) for link in all_links_of_station]
+    crawled_stop_ids_ = [int(parse_qs(urlparse(link).query)['input'][0]) for link in all_links_of_station]
 
     # If a given station id in the route is already crawled,
     # the route must be already in the database. So we can stop processing
-    if any(s_ids in crawled_stop_ids for s_ids in crawled_stop_ids):
+    if any(s_ids in crawled_stop_ids for s_ids in crawled_stop_ids_):
         raise TripAlreadyPresentError
 
     route_long_name = \
@@ -560,7 +539,7 @@ def request_processing_hook(resp, *args, **kwargs):
     first_station = all_stations[0]
     dep_time = all_times[1]
 
-    resp.data = PageDTO(new_agency, new_route, calendar_data, first_station, dep_time, all_stations, crawled_stop_ids,
+    resp.data = PageDTO(new_agency, new_route, calendar_data, first_station, dep_time, all_stations, crawled_stop_ids_,
                         all_links_of_station, resp.content)
 
 
@@ -600,50 +579,20 @@ def stop_is_to_crawl(stop_to_check: Stop) -> bool:
 
 def load_all_routes_from_stops(stops: List[Stop]):
     future_session_stops = requests_retry_session_async(session=FuturesSession())
-    futures_stops_args = []
-    stop_ext_id_dict = {}
+    stop_ext_id_dict = {s.ext_id: s for s in stops}
 
-    for stop in stops:
-        querystring = {"ld": "3"}
-        payload = {
-            'sqView': '1&input=' + stop.input + '&time=21:42&maxJourneys=50&dateBegin=&dateEnd=&selectDate=&productsFilter=0000111011&editStation=yes&dirInput=&',
-            'input': stop.input,
-            'inputRef': stop.input + '#' + str(stop.ext_id),
-            'sqView=1&start': 'Information aufrufen',
-            'productsFilter': '0000111011'
-        }
-        if stop_is_to_crawl(stop):
-            stop_ext_id_dict[stop.ext_id] = stop
-            futures_stops_args.append(("https://fahrplan.oebb.at/bin/stboard.exe/dn", payload, querystring))
-
-    futures_stops = [future_session_stops.post(url, data=payload, params=querystring, verify=False,
-                                               hooks={'response': request_station_id_processing_hook}) for
-                     (url, payload, querystring) in futures_stops_args]
-    current_station_ids = set()
+    stops = [stop for stop in stops if stop_is_to_crawl(stop)]
+    stop_names = [stop.stop_name for stop in stops]
+    stop_ids = [stop.ext_id for stop in stops]
     future_args = []
-    if len(futures_stops) == 0:
-        return []
-    for f in as_completed(futures_stops):
-        try:
-            result = f.result()
-            all_stations = result.data  # get all station ids from response
-            station_names = list(
-                map(lambda x: unquote(''.join(x.split('|')[:-1]), encoding='iso-8859-1'), all_stations))
-            station_ids = list(map(lambda x: int(x.split('|')[-1]), all_stations))
-            for s_n, s_i in zip(station_names, station_ids):
-                if s_i not in crawled_stop_ids and s_i not in current_station_ids:
-                    save_stop(s_i, s_n)
-                    current_station_ids.add(s_i)
-                    for date in date_arr:
-                        set_date(date)
-                        re = 'https://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_scotty.vs_liveticker&evaId=' + str(
-                            int(s_i)) + '&boardType=arr&time=00:00' + '&additionalTime=0&maxJourneys=100000&outputMode=tickerDataOnly&start=yes&selectDate' + '=period&dateBegin=' + \
-                             date_w[0] + '&dateEnd=' + date_w[0] + '&productsFilter=1011111111011'
-                        future_args.append(re)
-            else:
-                logging.debug(f'not new stops {station_names}')
-        except Exception as e:
-            logging.error("Skipped one station: " + str(e))
+    for s_n, s_i in zip(stop_names, stop_ids):
+        if s_i not in crawled_stop_ids:
+            for date in date_arr:
+                set_date(date)
+                re = 'https://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_scotty.vs_liveticker&evaId=' + str(
+                    int(s_i)) + '&boardType=arr&time=00:00' + '&additionalTime=0&maxJourneys=100000&outputMode=tickerDataOnly&start=yes&selectDate' + '=period&dateBegin=' + \
+                     date_w[0] + '&dateEnd=' + date_w[0] + '&productsFilter=1011111111011'
+                future_args.append(re)
 
     future_routes = [future_session_stops.get(url, timeout=20, verify=False) for url in future_args]
 

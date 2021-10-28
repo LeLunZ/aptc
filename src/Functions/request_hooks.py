@@ -53,7 +53,7 @@ def request_stops_processing_hook(resp, *args, **kwargs):
                           prod_class=int(se['prodClass']),
                           stop_url='https://fahrplan.oebb.at/bin/stboard.exe/dn?protocol=https:&input=' + str(
                               int(se['extId'])),
-                          location_type=0, siblings_searched=count == 0, crawled=False))
+                          location_type=0, siblings_searched=count == 0, crawled=False, info_searched=True))
     resp.data = stops
 
 

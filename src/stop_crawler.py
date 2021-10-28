@@ -6,10 +6,8 @@ from concurrent.futures import as_completed
 from pathlib import Path
 from urllib.parse import unquote
 
-import fiona
 import urllib3
 from requests_futures.sessions import FuturesSession
-from shapely.geometry import shape
 
 from Functions.helper import skip_stop
 from Functions.oebb_requests import requests_retry_session_async
@@ -17,9 +15,17 @@ from Functions.request_hooks import request_stops_processing_hook, extract_real_
     request_station_id_processing_hook
 from crud import *
 
+try:
+    import fiona
+    from shapely.geometry import shape
+except ImportError:
+    logging.debug('Gdal not installed. Shapefile wont work')
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-stop_ids = set([int(e.ext_id) for e in get_all_ext_id_from_stops()])
+stop_ids_db = set([int(e.ext_id) for e in get_all_ext_id_from_stops()])
+stop_ids_searched = set([int(e.ext_id) for e in get_all_ext_id_from_stops_where_siblings_searched()])
+stop_ids_info = set([int(e.ext_id) for e in get_all_ext_id_from_stops_where_info_searched()])
 searched_text = set([str(e.stop_name) for e in get_all_names_from_searched_stops()])
 state_path = Path('Data/state.pkl')
 cur_line = 0
@@ -35,7 +41,7 @@ eastLonBorder = None
 
 
 def stop_is_to_crawl(stop_to_check: Stop) -> bool:
-    if stop_to_check.ext_id in stop_ids:
+    if stop_to_check.ext_id in stop_ids_db:
         return False
 
     fiona_geometry_is_avaible = fiona_geometry is not None and fiona_geometry is not False and (
@@ -53,13 +59,34 @@ def stop_is_to_crawl(stop_to_check: Stop) -> bool:
     return False
 
 
-def load_all_stops_to_crawl(stop_names, database=False, db_stop_ids=None):
+def handle_stop_group_response(f, stop_ext_id_dict):
+    try:
+        result = f.result()
+        all_stations = result.data  # get all station ids from response
+        station_names = list(
+            map(lambda x: unquote(''.join(x.split('|')[:-1]), encoding='iso-8859-1'), all_stations))
+        station_ids = list(map(lambda x: int(x.split('|')[-1]), all_stations))
+        main_station: Stop = stop_ext_id_dict[station_ids[0]]
+        if (ext_id_str := ','.join(str(s) for s in station_ids[1:])) != '':
+            main_station.group_ext_id = ext_id_str
+        for s_n, s_i in zip(station_names[1:], station_ids[1:]):
+            if s_i not in stop_ids_db:
+                stop_ids_db.add(s_i)
+                stop = Stop(stop_name=s_n, ext_id=s_i,
+                            stop_url='https://fahrplan.oebb.at/bin/stboard.exe/dn?protocol=https:&input=' + str(
+                                s_i),
+                            location_type=0)
+                add_stop_without_check(stop)
+    except Exception as e:
+        pass
+
+
+def load_all_stops_to_crawl(stop_names):
     futures = [future_session_stops.get(
         'https://fahrplan.oebb.at/bin/ajax-getstop.exe/dn?REQ0JourneyStopsS0A=1&REQ0JourneyStopsB=35&S=' +
         stop_name + '?&js=false&',
         verify=False, timeout=6, hooks={'response': request_stops_processing_hook}) for
-        stop_name
-        in stop_names if stop_name not in searched_text]
+        stop_name in stop_names if stop_name not in searched_text]
     searched_text.update(stop_names)
     stop_ext_id_dict = {}
     stop_page_req = []
@@ -69,11 +96,14 @@ def load_all_stops_to_crawl(stop_names, database=False, db_stop_ids=None):
             response = i.result()
             response_data = response.data
             for count, stop in enumerate(response_data):
-                if stop_is_to_crawl(stop) or (database and stop.ext_id in db_stop_ids and stop.ext_id not in stop_ids):
-                    stop_ids.add(stop.ext_id)
+                if stop_is_to_crawl(stop):
+                    if stop.siblings_searched:
+                        stop_ids_searched.add(stop.ext_id)
+                    stop_ids_db.add(stop.ext_id)
+                    stop_ids_info.add(stop.ext_id)
                     stop_url = f'https://fahrplan.oebb.at/bin/stboard.exe/dn?protocol=https:&input={stop.ext_id}'
-                    stop_page_req.append(stop_url)
                     stop_ext_id_dict[stop.ext_id] = stop
+                    stop_page_req.append(stop_url)
         except Exception as e:
             pass
 
@@ -88,16 +118,7 @@ def load_all_stops_to_crawl(stop_names, database=False, db_stop_ids=None):
             ext_id, name = response.data
             stop = stop_ext_id_dict[ext_id]
             stop.stop_name = name
-            if database:
-                lat = stop.stop_lat
-                lon = stop.stop_lon
-                stop = add_stop(stop)
-                stop.location_type = 0
-                stop.stop_lat = lat
-                stop.stop_lon = lon
-                stop.parent_station = None
-            else:
-                add_stop_without_check(stop)
+            add_stop_without_check(stop)
             querystring = {"ld": "3"}
             payload = {
                 'sqView': '1&input=' + stop.stop_name + '&time=21:42&maxJourneys=50&dateBegin=&dateEnd=&selectDate=&productsFilter=0000111011&editStation=yes&dirInput=&',
@@ -114,24 +135,69 @@ def load_all_stops_to_crawl(stop_names, database=False, db_stop_ids=None):
                 (url, payload, querystring) in futures_stops_args]
 
     for f in as_completed(futures_):
+        handle_stop_group_response(f, stop_ext_id_dict)
+
+
+def load_all_stops_to_crawl_(stops):
+    def hook_factory(stop: Stop):
+        def object_interceptor(response, *request_args, **request_kwargs):
+            response.stop = stop
+            request_stops_processing_hook(response, request_args, request_kwargs)
+
+        return object_interceptor
+
+    search_texts = [stop.stop_name for stop in stops]
+    futures = [future_session_stops.get(
+        'https://fahrplan.oebb.at/bin/ajax-getstop.exe/dn?REQ0JourneyStopsS0A=1&REQ0JourneyStopsB=35&S=' +
+        stop.stop_name + '?&js=false&',
+        verify=False, timeout=6, hooks={'response': hook_factory(stop)}) for
+        stop in stops]
+    searched_text.update(search_texts)
+    stop_ext_id_dict = {stop.ext_id: stop for stop in stops}
+    stops_for_search = set()
+    futures_stops_args = []
+    for i in as_completed(futures):
         try:
-            result = f.result()
-            all_stations = result.data  # get all station ids from response
-            station_names = list(
-                map(lambda x: unquote(''.join(x.split('|')[:-1]), encoding='iso-8859-1'), all_stations))
-            station_ids = list(map(lambda x: int(x.split('|')[-1]), all_stations))
-            main_station: Stop = stop_ext_id_dict[station_ids[0]]
-            main_station.group_ext_id = ','.join(str(s) for s in station_ids[1:])
-            for s_n, s_i in zip(station_names[1:], station_ids[1:]):
-                if s_i not in stop_ids:
-                    stop_ids.add(s_i)
-                    stop = Stop(stop_name=s_n, ext_id=s_i,
-                                stop_url='https://fahrplan.oebb.at/bin/stboard.exe/dn?protocol=https:&input=' + str(
-                                    s_i),
-                                location_type=0)
-                    add_stop_without_check(stop)
-        except Exception:
+            response = i.result()
+            response_data = response.data
+            real_stop = response.stop
+            if real_stop.siblings_searched is False:
+                stop_ids_searched.add(real_stop.ext_id)
+                real_stop.siblings_searched = True
+                all_stops_to_add = [stop.stop_name for stop in response_data if
+                                    stop_is_to_crawl(stop)]
+                stops_for_search.update(all_stops_to_add)
+            if real_stop.info_searched is False:
+                stop_ids_info.add(real_stop.ext_id)
+                real_stop.info_searched = True
+                hopeful_stop = [stop for stop in response_data if stop.ext_id == real_stop.ext_id]
+                if len(hopeful_stop) != 0:
+                    stop = hopeful_stop[0]
+                    real_stop.stop_lat = stop.stop_lat
+                    real_stop.stop_lon = stop.stop_lon
+                    real_stop.input = stop.input
+                    real_stop.prod_class = stop.prod_class
+                    querystring = {"ld": "3"}
+                    payload = {
+                        'sqView': '1&input=' + stop.stop_name + '&time=21:42&maxJourneys=50&dateBegin=&dateEnd=&selectDate=&productsFilter=0000111011&editStation=yes&dirInput=&',
+                        'input': stop.stop_name,
+                        'inputRef': stop.stop_name + '#' + str(stop.ext_id),
+                        'sqView=1&start': 'Information aufrufen',
+                        'productsFilter': '0000111011'
+                    }
+                    futures_stops_args.append(("https://fahrplan.oebb.at/bin/stboard.exe/dn", payload, querystring))
+                pass
+        except Exception as e:
             pass
+
+    futures_ = [future_session_stops.post(url, data=payload, params=querystring, verify=False,
+                                          hooks={'response': request_station_id_processing_hook}) for
+                (url, payload, querystring) in futures_stops_args]
+
+    for f in as_completed(futures_):
+        handle_stop_group_response(f, stop_ext_id_dict)
+
+    load_all_stops_to_crawl(stops_for_search)
 
 
 def crawl_stops(init=False):
@@ -163,7 +229,7 @@ def crawl_stops(init=False):
                 (c_line, f_hash) = pickle.load(f)
             state_path.unlink(missing_ok=True)
             if f_hash == file_hash:
-                if cur_line := (c_line - max_stops_to_crawl) < 0:
+                if (cur_line := (c_line - max_stops_to_crawl)) < 0:
                     cur_line = 0
                 stop_list = stop_list[c_line:]
         atexit.register(save_csv_state)
@@ -180,16 +246,14 @@ def crawl_stops(init=False):
             logging.debug(f'finished batch {cur_line}')
         finished_crawling = True
     # Crawl uncrawled stops from database
+    global stop_ids_db
+    stop_ids_db = set([int(e.ext_id) for e in get_all_ext_id_from_stops()])
     uncrawled = sibling_search_stops(max_stops_to_crawl)
     while len(uncrawled) != 0:
-        stop_names = []
-        cur_stop_ids = []
+        load_all_stops_to_crawl_(uncrawled)
         for stop in uncrawled:
             stop.siblings_searched = True
-            stop_names.append(stop.stop_name)
-            cur_stop_ids.append(stop.ext_id)
-        commit()
-        load_all_stops_to_crawl(stop_names, not init, cur_stop_ids)
+            stop.info_searched = True
         commit()
         uncrawled = sibling_search_stops(max_stops_to_crawl)
 
@@ -198,7 +262,7 @@ def crawl_stops(init=False):
     # match_station_with_parents()
 
 
-def save_csv_state():
+def save_csv_state(sig=None, frame=None):
     import pickle
     if finished_crawling is None:
         return

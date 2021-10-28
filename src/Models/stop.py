@@ -22,6 +22,7 @@ class Stop(Base):
     ext_id = Column(Integer, nullable=True, unique=True)
     prod_class = Column(Integer, nullable=True)
     siblings_searched = Column(Boolean, nullable=False, default=False)
+    info_searched = Column(Boolean, nullable=False, default=False)
     group_ext_id = Column(Text, nullable=True)
 
     def __repr__(self):

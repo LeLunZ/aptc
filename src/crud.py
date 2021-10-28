@@ -159,13 +159,18 @@ def get_all_ext_id_from_crawled_stops():
     return data
 
 
-def get_ext_id_from_crawled_stops_where_main():
-    data = s.query(Stop.ext_id).filter(Stop.prod_class != None).all()
+def get_all_ext_id_from_stops():
+    data = s.query(Stop.ext_id).all()
     return data
 
 
-def get_all_ext_id_from_stops():
-    data = s.query(Stop.ext_id).all()
+def get_all_ext_id_from_stops_where_siblings_searched():
+    data = s.query(Stop.ext_id).filter(Stop.siblings_searched == True).all()
+    return data
+
+
+def get_all_ext_id_from_stops_where_info_searched():
+    data = s.query(Stop.ext_id).filter(Stop.info_searched == True).all()
     return data
 
 
@@ -218,9 +223,22 @@ def remove_parent_from_all():
 
 
 def load_all_uncrawled_stops(max_stops_to_crawl):
-    return s.query(Stop).filter(and_(Stop.crawled == False, Stop.prod_class != None)).order_by(Stop.ext_id,
-                                                                                               Stop.prod_class).limit(
+    stops = s.query(Stop).filter(Stop.crawled == False).order_by(Stop.ext_id, Stop.prod_class).limit(
         max_stops_to_crawl).all()
+
+    all_stops = []
+    for stop in stops:
+        all_stops.extend(
+            s.query(Stop).filter(and_(Stop.crawled == False, or_(Stop.group_ext_id.like(f'%,{stop.ext_id}'),
+                                                                 Stop.group_ext_id.like(f'{stop.ext_id},%'),
+                                                                 Stop.group_ext_id.like(f'%,{stop.ext_id},%'),
+                                                                 Stop.group_ext_id.like(f'{stop.ext_id}')))).all())
+
+    return set(all_stops + stops)
+
+    # return s.query(Stop).filter(and_(Stop.crawled == False, Stop.prod_class != None)).order_by(Stop.ext_id,
+    #                                                                                           Stop.prod_class).limit(
+    #    max_stops_to_crawl).all()
 
 
 def sibling_search_stops(max_stops_to_crawl):

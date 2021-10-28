@@ -70,6 +70,7 @@ create table stops
     ext_id              integer,
     prod_class          integer,
     siblings_searched   boolean not null,
+    info_searched       boolean not null,
     group_ext_id        text
 );
 
