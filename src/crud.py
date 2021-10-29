@@ -248,7 +248,7 @@ def load_all_uncrawled_stops(max_stops_to_crawl, check_stop_method):
 
 
 def sibling_search_stops(max_stops_to_crawl):
-    return s.query(Stop).filter(Stop.siblings_searched == False).order_by(Stop.ext_id, Stop.prod_class).limit(
+    return s.query(Stop).filter(or_(Stop.siblings_searched == False, Stop.info_searched == False)).order_by(Stop.ext_id, Stop.prod_class).limit(
         max_stops_to_crawl).all()
 
 

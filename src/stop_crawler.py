@@ -203,8 +203,9 @@ def load_all_stops_to_crawl_(stops):
 def crawl_stops(init=False):
     global cur_line, finished_crawling, file_hash
     stop_set = set()
-    if init:
-        with open('Data/bus_stops.csv') as csv_file:
+    csv_path = Path('Data/bus_stops.csv')
+    if init and csv_path.exists():
+        with open(csv_path) as csv_file:
             file_hash = xxhash.xxh3_64(''.join(csv_file.readlines())).hexdigest()
             csv_file.seek(0)
             csv_reader = csv.reader(csv_file, delimiter=',')
