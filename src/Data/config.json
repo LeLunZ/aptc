@@ -1,6 +1,7 @@
 {
   "default": {
     "crawl": true,
+    "skipCSV": true,
     "export": true,
     "matchWithParent": true,
     "batchSize": 4,
