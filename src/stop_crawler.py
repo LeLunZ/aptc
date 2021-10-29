@@ -179,14 +179,14 @@ def load_all_stops_to_crawl_(stops):
                     real_stop.prod_class = stop.prod_class
                 querystring = {"ld": "3"}
                 payload = {
-                    'sqView': '1&input=' + real_stop.ext_id + '&time=21:42&maxJourneys=50&dateBegin=&dateEnd=&selectDate=&productsFilter=0000111011&editStation=yes&dirInput=&',
-                    'input': real_stop.ext_id,
+                    'sqView': '1&input=' + str(
+                        real_stop.ext_id) + '&time=21:42&maxJourneys=50&dateBegin=&dateEnd=&selectDate=&productsFilter=0000111011&editStation=yes&dirInput=&',
+                    'input': str(real_stop.ext_id),
                     'inputRef': real_stop.stop_name + '#' + str(real_stop.ext_id),
                     'sqView=1&start': 'Information aufrufen',
                     'productsFilter': '0000111011'
                 }
                 futures_stops_args.append(("https://fahrplan.oebb.at/bin/stboard.exe/dn", payload, querystring))
-                pass
         except Exception as e:
             pass
 
@@ -197,7 +197,8 @@ def load_all_stops_to_crawl_(stops):
     for f in as_completed(futures_):
         handle_stop_group_response(f, stop_ext_id_dict)
 
-    load_all_stops_to_crawl(stops_for_search)
+    if len(stops_for_search) > 0:
+        load_all_stops_to_crawl(stops_for_search)
 
 
 def crawl_stops(init=False):
