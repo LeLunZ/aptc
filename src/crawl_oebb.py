@@ -679,6 +679,7 @@ def crawl():
     commit()
     new_session()
     count12 = 0
+    logging.debug("starting route crawling")
     while True:
         for stop in (uncrawled := load_all_uncrawled_stops(max_stops_to_crawl, stop_is_to_crawl)):
             stop.crawled = True
@@ -714,9 +715,7 @@ def crawl():
         crawled_stop_ids.update(ext_ids)
         count12 = count12 + 1
         logging.debug(f'finished route batch {count12 * max_stops_to_crawl}')
-    logging.debug("finished crawling")
-    logging.debug("adding all other stops")
-    logging.debug("stops finished now")
+    logging.debug("finished route crawling")
     commit()
     return count12
 

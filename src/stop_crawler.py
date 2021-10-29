@@ -220,7 +220,7 @@ def crawl_stops(init=False):
         max_stops_to_crawl = getConfig('batchSize')
     except:
         max_stops_to_crawl = 3
-
+    logging.debug("starting stops crawling")
     stop_list = list(stop_set)
     if init:
         # Read State and check if we are continuing from a crash
@@ -258,6 +258,7 @@ def crawl_stops(init=False):
         commit()
         uncrawled = sibling_search_stops(max_stops_to_crawl)
 
+    logging.debug("finished stops crawling")
     # match_station_with_google_maps()
     # Call after crawling whole Routes
     # match_station_with_parents()
