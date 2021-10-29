@@ -245,6 +245,7 @@ def crawl_stops(init=False):
             commit()
             logging.debug(f'finished batch {cur_line}')
         finished_crawling = True
+        logging.debug(f'finished all from csv')
     # Crawl uncrawled stops from database
     global stop_ids_db
     stop_ids_db = set([int(e.ext_id) for e in get_all_ext_id_from_stops()])
@@ -300,8 +301,8 @@ def start_stop_crawler():
     except KeyError as e:
         crawlStopOptions = False
     crawl_stops(init=True)
-    exit(0)
 
 
 if __name__ == '__main__':
     start_stop_crawler()
+    exit(0)
