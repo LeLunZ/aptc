@@ -33,8 +33,13 @@ except:
 if __name__ == '__main__':
     try:
         if getConfig('crawl'):
-            if not getConfig('skipCSV'):
-                start_stop_crawler()
+            skip_csv = False
+            try:
+                skip_csv = getConfig('skipCSV')
+            except Exception:
+                skip_csv = False
+            finally:
+                start_stop_crawler(skip_csv)
             crawl_routes()
             count = 1
             while count != 0:

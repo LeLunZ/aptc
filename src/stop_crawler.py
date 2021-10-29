@@ -276,7 +276,7 @@ def save_csv_state(sig=None, frame=None):
         state_path.unlink(missing_ok=True)
 
 
-def start_stop_crawler():
+def start_stop_crawler(only_init=False):
     global northLatBorder, southLatBorder, westLonBorder, eastLonBorder, crawlStopOptions, fiona_geometry
     try:
         crawlStopOptions = 'crawlStopOptions' in getConfig()
@@ -300,7 +300,8 @@ def start_stop_crawler():
             eastLonBorder = getConfig('crawlStopOptions.eastLonBorder')
     except KeyError as e:
         crawlStopOptions = False
-    crawl_stops(init=True)
+    if not only_init:
+        crawl_stops(init=True)
 
 
 if __name__ == '__main__':
