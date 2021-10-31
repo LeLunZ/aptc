@@ -36,6 +36,7 @@ finishUp = False
 import os
 
 q = []
+# TODO add description for each number
 route_types = {
     '/img/vs_oebb/rex_pic.gif': 2,
     '/img/vs_oebb/r_pic.gif': 2,
@@ -82,7 +83,11 @@ route_types = {
     '/img/vs_oebb/lil_pic.gif': 107,
     '/img/vs_oebb/bmz_pic.gif': 107,
     '/img/vs_oebb/ter_pic.gif': 106,
-    '/img/vs_oebb/dpn_pic.gif': 106
+    '/img/vs_oebb/dpn_pic.gif': 106,
+    '/img/vs_oebb/sp_pic.gif': 1,
+    'img/vs_oebb/ssb_pic.gif': 7,
+    '/img/vs_oebb/ecb_pic.gif': 102,
+    '/img/vs_oebb/re_pic.gif': 106
 }
 date_arr = []
 stop_times_executor = None
