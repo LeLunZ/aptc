@@ -37,6 +37,7 @@ import os
 
 q = []
 # TODO add description for each number
+# TODO change prefix
 route_types = {
     '/img/vs_oebb/rex_pic.gif': 2,
     '/img/vs_oebb/r_pic.gif': 2,
@@ -85,9 +86,10 @@ route_types = {
     '/img/vs_oebb/ter_pic.gif': 106,
     '/img/vs_oebb/dpn_pic.gif': 106,
     '/img/vs_oebb/sp_pic.gif': 1,
-    'img/vs_oebb/ssb_pic.gif': 7,
+    '/img/vs_oebb/ssb_pic.gif': 7,
     '/img/vs_oebb/ecb_pic.gif': 102,
-    '/img/vs_oebb/re_pic.gif': 106
+    '/img/vs_oebb/re_pic.gif': 106,
+    '/img/vs_oebb/zug_pic.gif': 2
 }
 date_arr = []
 stop_times_executor = None
@@ -480,6 +482,8 @@ def process_page(url, page: PageDTO):
     stop_times_to_add.append((tree, page, current_stops_dict, trip))
 
 
+transport_type_not_found = {}
+
 def request_processing_hook(resp, *args, **kwargs):
     route_page = resp
     traffic_day = None
@@ -531,7 +535,7 @@ def request_processing_hook(resp, *args, **kwargs):
             p = Path(route_info)
             route_type = route_types[str('/' / Path(*p.parts[2:]))]
     except KeyError:
-        add_transport_name(route_info, url)
+        transport_type_not_found[route_info] = url
         route_type = -1
     new_route = Route(route_long_name=route_long_name,
                       route_type=route_type,
@@ -715,6 +719,9 @@ def crawl():
             stop_times_executor.submit(add_stop_times_from_web_page, tree, page, current_stops_dict,
                                        trip)
         stop_times_executor.shutdown(wait=True)
+        for t,u in transport_type_not_found.items():
+            add_transport_name(t, u)
+        transport_type_not_found.clear()
         commit()
         new_session()
         crawled_stop_ids.update(ext_ids)
