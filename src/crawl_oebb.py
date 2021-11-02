@@ -484,6 +484,7 @@ def process_page(url, page: PageDTO):
 
 transport_type_not_found = {}
 
+
 def request_processing_hook(resp, *args, **kwargs):
     route_page = resp
     traffic_day = None
@@ -696,11 +697,11 @@ def crawl():
         if uncrawled is None or len(uncrawled) == 0:
             break
         routes, ext_ids = load_all_routes_from_stops(uncrawled)
+        commit()
         stop_times_to_add = []
         t = Thread(target=load_data_async, args=(routes,))
         t.daemon = True
         t.start()
-        commit()
         while t.is_alive() or (not t.is_alive() and len(q) > 0):
             if len(q) == 0:
                 time.sleep(0.01)
@@ -719,7 +720,7 @@ def crawl():
             stop_times_executor.submit(add_stop_times_from_web_page, tree, page, current_stops_dict,
                                        trip)
         stop_times_executor.shutdown(wait=True)
-        for t,u in transport_type_not_found.items():
+        for t, u in transport_type_not_found.items():
             add_transport_name(t, u)
         transport_type_not_found.clear()
         commit()
