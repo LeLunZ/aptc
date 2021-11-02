@@ -108,8 +108,7 @@ def add_stop_time_text(text1):
     return
 
 
-def add_calendar_dates(calendar_dates: [CalendarDate], only_dates_as_string: str, service: Calendar,
-                       includes_public_holidays=False):
+def add_calendar_dates(calendar_dates: [CalendarDate], only_dates_as_string: str, service: Calendar):
     if only_dates_as_string == '':
         data = s.query(Calendar).filter(
             and_(Calendar.calendar_dates_hash == None, or_(and_(Calendar.start_date == service.start_date,
@@ -122,7 +121,6 @@ def add_calendar_dates(calendar_dates: [CalendarDate], only_dates_as_string: str
                  Calendar.sunday == service.sunday)).first()
         service.calendar_dates_hash = None
         if data is None:
-            service.includes_public_holidays = includes_public_holidays
             s.add(service)
             s.flush()
         else:
@@ -143,7 +141,6 @@ def add_calendar_dates(calendar_dates: [CalendarDate], only_dates_as_string: str
                  Calendar.sunday == service.sunday))
         calendar = calendar.first()
         if calendar is None:
-            service.includes_public_holidays = includes_public_holidays
             service.calendar_dates_hash = hash_value
             s.add(service)
             s.flush()
