@@ -105,7 +105,7 @@ westLonBorder = None
 eastLonBorder = None
 
 
-def extract_date_from_str(calendar: Calendar, date_str: str, add=True):
+def extract_date_from_str(calendar: Calendar, date_str: str):
     official_weekdays = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
     date_str = date_str.replace(';', '')
     working_dates = date_str
@@ -232,13 +232,10 @@ def extract_date_from_str(calendar: Calendar, date_str: str, add=True):
         calendar.friday = True
         calendar.saturday = True
         calendar.sunday = True
-    if not add:
-        return exceptions_calendar_date, calendar_data_as_string, calendar, includes_public_holidays
-    calendar = add_calendar_dates(exceptions_calendar_date, calendar_data_as_string, calendar)
-    return calendar
+    return exceptions_calendar_date, calendar_data_as_string, calendar, includes_public_holidays
 
 
-def extract_dates_from_oebb_page(tree, calendar, add=True):
+def extract_dates_from_oebb_page(tree, calendar):
     extra_info_traffic_day = tree.xpath('//*/strong[text() =$first]/../text()', first='Verkehrstage:')
     traffic_day = None
 
@@ -334,15 +331,10 @@ def extract_dates_from_oebb_page(tree, calendar, add=True):
             exceptions_calendar_date[-1].date = date
             calendar_data_as_string += f',{date}{1}'
         calendar_data_as_string = calendar_data_as_string[1:]
-        if add:
-            calendar = add_calendar_dates(exceptions_calendar_date, calendar_data_as_string, calendar)
-        else:
-            return (exceptions_calendar_date, calendar_data_as_string, calendar, False)
+        return (exceptions_calendar_date, calendar_data_as_string, calendar, False)
     else:
-        calendar = extract_date_from_str(calendar, traffic_day, add)
-        if not add:
-            return calendar
-    return calendar
+        calendar = extract_date_from_str(calendar, traffic_day)
+        return calendar
 
 
 def save_stop_family(stop_ids, stop_names, main_stop):
@@ -468,7 +460,8 @@ def process_page(url, page: PageDTO):
 
     page.route.agency_id = new_agency.agency_id
     route = add_route(page.route)
-    calendar = add_calendar_dates(page.calendar_data[0], page.calendar_data[1], page.calendar_data[2], page.calendar_data[3])
+    calendar = add_calendar_dates(page.calendar_data[0], page.calendar_data[1], page.calendar_data[2],
+                                  page.calendar_data[3])
     new_trip = Trip(route_id=route.route_id, service_id=calendar.service_id, oebb_url=url)
     if new_trip.service_id is None:
         raise Exception(f'no service_id {url}')
@@ -548,7 +541,7 @@ def request_processing_hook(resp, *args, **kwargs):
                       route_url=url)
     calendar = Calendar()
     try:
-        calendar_data = extract_dates_from_oebb_page(tree, calendar, False)
+        calendar_data = extract_dates_from_oebb_page(tree, calendar)
     except:
         calendar_data = None
     all_times = list(map(lambda x: x.strip(),
