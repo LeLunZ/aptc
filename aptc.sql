@@ -78,7 +78,7 @@ create index stops_stop_name_uindex
     on stops (stop_name);
 
 create unique index stops_ext_id_index
-    on stops(ext_id);
+    on stops (ext_id);
 
 create table routes
 (
@@ -99,20 +99,22 @@ create table routes
 
 create table calendar
 (
-    service_id          serial     not null
+    service_id               serial      not null
         constraint calendar_pkey
             primary key,
-    monday              boolean    not null,
-    tuesday             boolean    not null,
-    wednesday           boolean    not null,
-    thursday            boolean    not null,
-    friday              boolean    not null,
-    saturday            boolean    not null,
-    sunday              boolean    not null,
-    start_date          numeric(8),
-    end_date            numeric(8) not null,
-    no_fix_date         boolean DEFAULT FALSE,
-    calendar_dates_hash numeric(50)
+    monday                   boolean     not null,
+    tuesday                  boolean     not null,
+    wednesday                boolean     not null,
+    thursday                 boolean     not null,
+    friday                   boolean     not null,
+    saturday                 boolean     not null,
+    sunday                   boolean     not null,
+    start_date               numeric(8),
+    end_date                 numeric(8)  not null,
+    no_fix_date              boolean              DEFAULT FALSE,
+    created_at               timestamptz NOT NULL DEFAULT NOW(),
+    includes_public_holidays boolean              DEFAULT FALSE,
+    calendar_dates_hash      numeric(50)
 );
 
 create unique index calendar_end_date_start_date_monday_tuesday_hash

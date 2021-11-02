@@ -170,11 +170,16 @@ def extract_date_from_str(calendar: Calendar, date_str: str, add=True):
                 add_day_to_calendar(calendar, date_arr[index])
     not_working_calendar_date = []
 
+    includes_public_holidays = False
     if irregular_dates is not None:
+        if 'Feiert' in irregular_dates:  # TODO check spelling
+            print(irregular_dates, flush=True)
+            logger.exception(irregular_dates)
         if 'allg. Feiert' in irregular_dates:  # TODO check spelling
-            print(irregular_dates)
-            logging.debug(irregular_dates)
+            print(irregular_dates, flush=True)
+            logger.exception(irregular_dates)
             not_working_calendar_date.extend(copy.deepcopy(allg_feiertage))
+            includes_public_holidays = True
         extract_date_objects_from_str(not_working_calendar_date, irregular_dates, start_date, finish_date)
     extended_working_dates = []
     if extended_dates is not None:
@@ -228,7 +233,7 @@ def extract_date_from_str(calendar: Calendar, date_str: str, add=True):
         calendar.saturday = True
         calendar.sunday = True
     if not add:
-        return exceptions_calendar_date, calendar_data_as_string, calendar
+        return exceptions_calendar_date, calendar_data_as_string, calendar, includes_public_holidays
     calendar = add_calendar_dates(exceptions_calendar_date, calendar_data_as_string, calendar)
     return calendar
 
@@ -332,7 +337,7 @@ def extract_dates_from_oebb_page(tree, calendar, add=True):
         if add:
             calendar = add_calendar_dates(exceptions_calendar_date, calendar_data_as_string, calendar)
         else:
-            return (exceptions_calendar_date, calendar_data_as_string, calendar)
+            return (exceptions_calendar_date, calendar_data_as_string, calendar, False)
     else:
         calendar = extract_date_from_str(calendar, traffic_day, add)
         if not add:
@@ -463,7 +468,7 @@ def process_page(url, page: PageDTO):
 
     page.route.agency_id = new_agency.agency_id
     route = add_route(page.route)
-    calendar = add_calendar_dates(page.calendar_data[0], page.calendar_data[1], page.calendar_data[2])
+    calendar = add_calendar_dates(page.calendar_data[0], page.calendar_data[1], page.calendar_data[2], page.calendar_data[3])
     new_trip = Trip(route_id=route.route_id, service_id=calendar.service_id, oebb_url=url)
     if new_trip.service_id is None:
         raise Exception(f'no service_id {url}')

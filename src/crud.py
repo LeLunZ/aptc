@@ -1,5 +1,6 @@
 import logging
 import threading
+from datetime import date
 
 import sqlalchemy
 import xxhash
@@ -107,18 +108,21 @@ def add_stop_time_text(text1):
     return
 
 
-def add_calendar_dates(calendar_dates: [CalendarDate], only_dates_as_string: str, service: Calendar):
+def add_calendar_dates(calendar_dates: [CalendarDate], only_dates_as_string: str, service: Calendar,
+                       includes_public_holidays=False):
     if only_dates_as_string == '':
         data = s.query(Calendar).filter(
             and_(Calendar.calendar_dates_hash == None, or_(and_(Calendar.start_date == service.start_date,
                                                                 Calendar.end_date == service.end_date),
-                                                           Calendar.no_fix_date == service.no_fix_date),
+                                                           and_(Calendar.no_fix_date == True,
+                                                                service.no_fix_date == True)),
                  Calendar.monday == service.monday, Calendar.tuesday == service.tuesday,
                  Calendar.wednesday == service.wednesday, Calendar.thursday == service.thursday,
                  Calendar.friday == service.friday, Calendar.saturday == service.saturday,
                  Calendar.sunday == service.sunday)).first()
         service.calendar_dates_hash = None
         if data is None:
+            service.includes_public_holidays = includes_public_holidays
             s.add(service)
             s.flush()
         else:
@@ -129,14 +133,17 @@ def add_calendar_dates(calendar_dates: [CalendarDate], only_dates_as_string: str
     else:
         hash_value = xxhash.xxh3_64(only_dates_as_string).intdigest()
         calendar = s.query(Calendar).filter(
-            and_(Calendar.calendar_dates_hash == hash_value, Calendar.start_date == service.start_date,
-                 Calendar.end_date == service.end_date,
+            and_(Calendar.calendar_dates_hash == hash_value, or_(and_(Calendar.start_date == service.start_date,
+                                                                      Calendar.end_date == service.end_date),
+                                                                 and_(Calendar.no_fix_date == True,
+                                                                      service.no_fix_date == True)),
                  Calendar.monday == service.monday, Calendar.tuesday == service.tuesday,
                  Calendar.wednesday == service.wednesday, Calendar.thursday == service.thursday,
                  Calendar.friday == service.friday, Calendar.saturday == service.saturday,
                  Calendar.sunday == service.sunday))
         calendar = calendar.first()
         if calendar is None:
+            service.includes_public_holidays = includes_public_holidays
             service.calendar_dates_hash = hash_value
             s.add(service)
             s.flush()
@@ -145,6 +152,9 @@ def add_calendar_dates(calendar_dates: [CalendarDate], only_dates_as_string: str
             s.bulk_save_objects(calendar_dates)
             s.flush()
         else:
+            if calendar.no_fix_date and service.no_fix_date:
+                calendar.start_date = service.start_date
+                calendar.end_date = service.end_date
             service = calendar
     return service
 
@@ -225,7 +235,7 @@ def remove_parent_from_all():
 def load_all_uncrawled_stops(max_stops_to_crawl, check_stop_method):
     stops = s.query(Stop).filter(
         and_(Stop.crawled == False, Stop.info_searched == True, Stop.prod_class != None)).order_by(Stop.ext_id,
-                                                                                                 Stop.prod_class).limit(
+                                                                                                   Stop.prod_class).limit(
         max_stops_to_crawl).all()
 
     all_stops = []
@@ -248,7 +258,8 @@ def load_all_uncrawled_stops(max_stops_to_crawl, check_stop_method):
 
 
 def sibling_search_stops(max_stops_to_crawl):
-    return s.query(Stop).filter(or_(Stop.siblings_searched == False, Stop.info_searched == False)).order_by(Stop.ext_id, Stop.prod_class).limit(
+    return s.query(Stop).filter(or_(Stop.siblings_searched == False, Stop.info_searched == False)).order_by(Stop.ext_id,
+                                                                                                            Stop.prod_class).limit(
         max_stops_to_crawl).all()
 
 
