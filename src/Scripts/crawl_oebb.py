@@ -411,7 +411,7 @@ def add_date_to_allg_feiertage(feiertag, year):
 def load_allg_feiertage():
     try:
         with open(
-                f'Data/pickle/{begin_date.year}-{begin_date.month}-{begin_date.day}-{end_date.year}-{end_date.month}-{end_date.day}.pickle',
+                f'../Data/pickle/{begin_date.year}-{begin_date.month}-{begin_date.day}-{end_date.year}-{end_date.month}-{end_date.day}.pickle',
                 'rb') as f:
             allg_feiertage.extend(pickle.load(f))
     except:
@@ -445,7 +445,7 @@ def load_allg_feiertage():
             add_date_to_allg_feiertage(f.text, end_date.year)
         driver.quit()
         with open(
-                f'Data/pickle/{begin_date.year}-{begin_date.month}-{begin_date.day}-{end_date.year}-{end_date.month}-{end_date.day}.pickle',
+                f'../Data/pickle/{begin_date.year}-{begin_date.month}-{begin_date.day}-{end_date.year}-{end_date.month}-{end_date.day}.pickle',
                 'wb') as f:
             pickle.dump(allg_feiertage, f)
 

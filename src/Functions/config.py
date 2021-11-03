@@ -6,7 +6,7 @@ try:
 except:
     config_env = 'default'
 
-with open('./Data/config.json') as config_file:
+with open('../Data/config.json') as config_file:
     config = json.load(config_file)[config_env]
 
 
