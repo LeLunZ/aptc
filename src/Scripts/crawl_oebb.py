@@ -49,7 +49,7 @@ finishUp = False
 import os
 
 q = []
-# TODO change prefix
+oebb_img_prefix = ['/img/vs_oebb/', '/hafas-res/img/vs_oebb/']
 
 # Route_Types
 # 0 - Tram, Streetcar, Light rail. Any light rail or street level system within a metropolitan area.
@@ -73,57 +73,57 @@ q = []
 # 1500 - Taxi Service
 # 1700 - Miscellaneous Service
 route_types = {
-    '/img/vs_oebb/rex_pic.gif': 2,
-    '/img/vs_oebb/r_pic.gif': 2,
-    '/img/vs_oebb/s_pic.gif': 1,
-    '/img/vs_oebb/os_pic.gif': 2,
-    '/img/vs_oebb/ex_pic.gif': 2,
-    '/img/vs_oebb/hog_pic.gif': 3,
-    '/img/vs_oebb/nmg_pic.gif': 3,
-    '/img/vs_oebb/ntr_pic.gif': 0,
-    '/img/vs_oebb/hmp_pic.gif': 3,
-    '/img/vs_oebb/bus_pic.gif': 3,
-    '/img/vs_oebb/str_pic.gif': 0,
-    '/img/vs_oebb/er_pic.gif': 2,
-    '/img/vs_oebb/en_pic.gif': 2,
-    '/img/vs_oebb/atb_pic.gif': 115,
-    '/img/vs_oebb/arz_pic.gif': 115,
-    '/img/vs_oebb/ice_pic.gif': 101,
-    '/img/vs_oebb/d_pic.gif': 2,
-    '/img/vs_oebb/ast_pic.gif': 1500,
-    '/img/vs_oebb/rb_pic.gif': 2,
-    '/img/vs_oebb/bsv_pic.gif': 3,
-    '/img/vs_oebb/cat_pic.gif': 1,
-    '/img/vs_oebb/rj_pic.gif': 2,
-    '/img/vs_oebb/nj_pic.gif': 2,
-    '/img/vs_oebb/ec_pic.gif': 102,
-    '/img/vs_oebb/ic_pic.gif': 102,
-    '/img/vs_oebb/obu_pic.gif': 11,
-    '/img/vs_oebb/icb_pic.gif': 3,
-    '/img/vs_oebb/dps_pic.gif': 2,
-    '/img/vs_oebb/u_pic.gif': 1,
-    '/img/vs_oebb/wb_pic.gif': 2,
-    '/img/vs_oebb/rjx_pic.gif': 2,
-    '/img/vs_oebb/cjx_pic.gif': 2,
-    '/img/vs_oebb/t84_pic.gif': 1700,
-    '/img/vs_oebb/x70_pic.gif': 1700,
-    '/img/vs_oebb/u70_pic.gif': 1700,
-    '/img/vs_oebb/sb_pic.gif': 6,
-    '/img/vs_oebb/lkb_pic.gif': 0,
-    '/img/vs_oebb/rer_pic.gif': 109,
-    '/img/vs_oebb/sch_pic.gif': 1000,
-    '/img/vs_oebb/rgj_pic.gif': 2,
-    '/img/vs_oebb/val_pic.gif': 3,
-    '/img/vs_oebb/rfb_pic.gif': 715,
-    '/img/vs_oebb/lil_pic.gif': 107,
-    '/img/vs_oebb/bmz_pic.gif': 107,
-    '/img/vs_oebb/ter_pic.gif': 106,
-    '/img/vs_oebb/dpn_pic.gif': 106,
-    '/img/vs_oebb/sp_pic.gif': 1,
-    '/img/vs_oebb/ssb_pic.gif': 7,
-    '/img/vs_oebb/ecb_pic.gif': 102,
-    '/img/vs_oebb/re_pic.gif': 106,
-    '/img/vs_oebb/zug_pic.gif': 2
+    'rex_pic.gif': 2,
+    'r_pic.gif': 2,
+    's_pic.gif': 1,
+    'os_pic.gif': 2,
+    'ex_pic.gif': 2,
+    'hog_pic.gif': 3,
+    'nmg_pic.gif': 3,
+    'ntr_pic.gif': 0,
+    'hmp_pic.gif': 3,
+    'bus_pic.gif': 3,
+    'str_pic.gif': 0,
+    'er_pic.gif': 2,
+    'en_pic.gif': 2,
+    'atb_pic.gif': 115,
+    'arz_pic.gif': 115,
+    'ice_pic.gif': 101,
+    'd_pic.gif': 2,
+    'ast_pic.gif': 1500,
+    'rb_pic.gif': 2,
+    'bsv_pic.gif': 3,
+    'cat_pic.gif': 1,
+    'rj_pic.gif': 2,
+    'nj_pic.gif': 2,
+    'ec_pic.gif': 102,
+    'ic_pic.gif': 102,
+    'obu_pic.gif': 11,
+    'icb_pic.gif': 3,
+    'dps_pic.gif': 2,
+    'u_pic.gif': 1,
+    'wb_pic.gif': 2,
+    'rjx_pic.gif': 2,
+    'cjx_pic.gif': 2,
+    't84_pic.gif': 1700,
+    'x70_pic.gif': 1700,
+    'u70_pic.gif': 1700,
+    'sb_pic.gif': 6,
+    'lkb_pic.gif': 0,
+    'rer_pic.gif': 109,
+    'sch_pic.gif': 1000,
+    'rgj_pic.gif': 2,
+    'val_pic.gif': 3,
+    'rfb_pic.gif': 715,
+    'lil_pic.gif': 107,
+    'bmz_pic.gif': 107,
+    'ter_pic.gif': 106,
+    'dpn_pic.gif': 106,
+    'sp_pic.gif': 1,
+    'ssb_pic.gif': 7,
+    'ecb_pic.gif': 102,
+    're_pic.gif': 106,
+    'zug_pic.gif': 2
 }
 date_arr = []
 stop_times_executor = None
@@ -560,11 +560,13 @@ def request_processing_hook(resp, *args, **kwargs):
     route_type = None
     url = resp.url
     try:
-        if route_info.startswith('/img'):
-            route_type = route_types[route_info]
+        for prefix in oebb_img_prefix:
+            if route_info.startswith(prefix):
+                route_type = route_types[str(route_info).removeprefix(prefix)]
+                break
         else:
-            p = Path(route_info)
-            route_type = route_types[str('/' / Path(*p.parts[2:]))]
+            transport_type_not_found[route_info] = url
+            route_type = -1
     except KeyError:
         transport_type_not_found[route_info] = url
         route_type = -1
