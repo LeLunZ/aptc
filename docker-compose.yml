@@ -7,4 +7,5 @@ services:
     network_mode: "host"
     volumes:
         - ./src/Data/:/app/Data/
-        - ./db/:/app/db/
+        - ./db/:/db/
+        - ./logs/:/logs/

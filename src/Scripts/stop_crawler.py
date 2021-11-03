@@ -13,7 +13,7 @@ from Functions.helper import skip_stop
 from Functions.oebb_requests import requests_retry_session_async
 from Functions.request_hooks import request_stops_processing_hook, extract_real_name_from_stop_page, \
     request_station_id_processing_hook
-from crud import *
+from Scripts.crud import *
 
 fiona_geometry = None
 try:
@@ -29,7 +29,7 @@ stop_ids_db = set([int(e.ext_id) for e in get_all_ext_id_from_stops()])
 stop_ids_searched = set([int(e.ext_id) for e in get_all_ext_id_from_stops_where_siblings_searched()])
 stop_ids_info = set([int(e.ext_id) for e in get_all_ext_id_from_stops_where_info_searched()])
 searched_text = set([str(e.stop_name) for e in get_all_names_from_searched_stops()])
-state_path = Path('Data/state.pkl')
+state_path = Path('Data/pickle/state.pkl')
 cur_line = 0
 finished_crawling = None
 file_hash = None
@@ -204,7 +204,8 @@ def load_all_stops_to_crawl_(stops):
 def crawl_stops(init=False):
     global cur_line, finished_crawling, file_hash
     stop_set = set()
-    csv_path = Path('Data/bus_stops.csv')
+    file_path: str = getConfig('csvFile')
+    csv_path = Path(f'../Data/') / file_path
     if init and csv_path.exists():
         with open(csv_path) as csv_file:
             file_hash = xxhash.xxh3_64(''.join(csv_file.readlines())).hexdigest()

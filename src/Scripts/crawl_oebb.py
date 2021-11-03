@@ -1,6 +1,7 @@
 import copy
 import datetime
 import json
+import logging
 import pickle
 import time
 from concurrent.futures import as_completed, ThreadPoolExecutor
@@ -17,12 +18,24 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
 from Classes.DTOs import PageDTO
+from Models.agency import Agency
+from Models.calendar import Calendar
+from Models.calendar_date import CalendarDate
+from Models.route import Route
+from Models.stop import Stop
+from Models.stop_times import StopTime
+from Models.trip import Trip
 from Classes.oebb_date import OebbDate, service_months, begin_date, end_date, get_std_date
 from Functions.helper import add_day_to_calendar, extract_date_from_date_arr, merge_date, add_days_to_calendar, \
     get_all_name_of_transport_distinct, extract_date_objects_from_str
 from Functions.oebb_requests import requests_retry_session_async, date_w, set_date, weekday_name
 from Functions.request_hooks import response_journey_hook
-from crud import *
+from Functions.config import getConfig
+from Scripts.crud import add_stop, add_stop_times, get_all_ext_id_from_crawled_stops, get_from_table_first, add_route, \
+    add_agency, add_calendar_dates, add_trip, add_stop_without_check, get_all_stops_in_list, TripAlreadyPresentError, \
+    commit, get_from_table, new_session, load_all_uncrawled_stops, add_transport_name
+
+logger = logging.getLogger(__name__)
 
 fiona_geometry = None
 try:
@@ -36,8 +49,29 @@ finishUp = False
 import os
 
 q = []
-# TODO add description for each number
 # TODO change prefix
+
+# Route_Types
+# 0 - Tram, Streetcar, Light rail. Any light rail or street level system within a metropolitan area.
+# 1 - Subway, Metro. Any underground rail system within a metropolitan area.
+# 2 - Rail. Used for intercity or long-distance travel.
+# 3 - Bus. Used for short- and long-distance bus routes.
+# 4 - Ferry. Used for short- and long-distance boat service.
+# 5 - Cable tram. Used for street-level rail cars where the cable runs beneath the vehicle, e.g., cable car in San Francisco.
+# 6 - Aerial lift, suspended cable car (e.g., gondola lift, aerial tramway). Cable transport where cabins, cars, gondolas or open chairs are suspended by means of one or more cables.
+# 7 - Funicular. Any rail system designed for steep inclines.
+# 11 - Trolleybus. Electric buses that draw power from overhead wires using poles.
+# 12 - Monorail. Railway in which the track consists of a single rail or a beam.
+# 101 - High Speed Rail Service
+# 102 - Long Distance Trains
+# 106 - Regional Rail Service (TER (FR), Regionalzug (DE))
+# 107 - Tourist Railway Service
+# 109 - Suburban Railway (S-Bahn (DE), RER (FR), S-tog (Kopenhagen))
+# 115 - Vehicle Transport Rail Service
+# 715 - Demand and Response Bus Service
+# 1000 - Water Transport Service
+# 1500 - Taxi Service
+# 1700 - Miscellaneous Service
 route_types = {
     '/img/vs_oebb/rex_pic.gif': 2,
     '/img/vs_oebb/r_pic.gif': 2,
@@ -378,7 +412,7 @@ def add_date_to_allg_feiertage(feiertag, year):
 def load_allg_feiertage():
     try:
         with open(
-                f'Data/{begin_date.year}-{begin_date.month}-{begin_date.day}-{end_date.year}-{end_date.month}-{end_date.day}.pickle',
+                f'Data/pickle/{begin_date.year}-{begin_date.month}-{begin_date.day}-{end_date.year}-{end_date.month}-{end_date.day}.pickle',
                 'rb') as f:
             allg_feiertage.extend(pickle.load(f))
     except:
@@ -390,7 +424,7 @@ def load_allg_feiertage():
         if SECRET_KEY:
             driver = webdriver.Chrome(options=chrome_options)
         else:
-            driver = webdriver.Chrome('./chromedriver')
+            driver = webdriver.Chrome('../chromedriver')
         driver.get('https://www.timeanddate.de/feiertage/oesterreich/' + str(begin_date.year))
         WebDriverWait(driver, 7).until(EC.presence_of_element_located((By.XPATH, '//*/tbody')))
         try:
@@ -412,7 +446,7 @@ def load_allg_feiertage():
             add_date_to_allg_feiertage(f.text, end_date.year)
         driver.quit()
         with open(
-                f'Data/{begin_date.year}-{begin_date.month}-{begin_date.day}-{end_date.year}-{end_date.month}-{end_date.day}.pickle',
+                f'Data/pickle/{begin_date.year}-{begin_date.month}-{begin_date.day}-{end_date.year}-{end_date.month}-{end_date.day}.pickle',
                 'wb') as f:
             pickle.dump(allg_feiertage, f)
 

@@ -1,34 +1,61 @@
 import logging
+import sys
+from logging.config import dictConfig
 
 import urllib3
 
 from Functions.config import getConfig
 from Functions.helper import export_all_tables
-from crawl_oebb import crawl, crawl_routes
-from stop_crawler import start_stop_crawler, crawl_stops
+from Scripts.crawl_oebb import crawl, crawl_routes
+from Scripts.stop_crawler import start_stop_crawler, crawl_stops
 
-logging.basicConfig(filename='./Data/aptc.log',
-                    filemode='a',
-                    format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
-                    datefmt='%H:%M:%S',
-                    level=logging.DEBUG)
+loggers = ['timed', 'console']
+
+dictConfig({
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {'default': {
+        'format': '[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
+    }},
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'level': 'DEBUG',
+            'stream': sys.stdout,
+            'formatter': 'default'
+        },
+        'timed': {
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'level': 'DEBUG',
+            'formatter': 'default',
+            'backupCount': 3,
+            'filename': '../logs/aptc.log',
+            'when': 'W0'
+        }
+    },
+    'loggers': {
+        'Scripts': {
+            'handlers': loggers,
+            'level': 'DEBUG',
+            'propagate': False
+        },
+        '__main__': {
+            'handlers': loggers,
+            'level': 'DEBUG',
+            'propagate': False
+        },
+        '': {
+            'handlers': loggers,
+            'level': 'ERROR',
+            'propagate': False
+        }
+    }
+})
+
+logger = logging.getLogger(__name__)
+logger.debug('running')
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
-try:
-    logging.getLogger("requests").setLevel(logging.CRITICAL)
-except:
-    pass
-
-try:
-    logging.getLogger("urllib3").setLevel(logging.CRITICAL)
-except:
-    pass
-
-try:
-    logging.getLogger("selenium").setLevel(logging.CRITICAL)
-except:
-    pass
 
 if __name__ == '__main__':
     try:
@@ -44,7 +71,7 @@ if __name__ == '__main__':
             count = 1
             while count != 0:
                 print('Restarting crawling')
-                logging.debug('Restarting crawling')
+                logger.debug('Restarting crawling')
                 crawl_stops()
                 count = crawl()
     except KeyError as e:

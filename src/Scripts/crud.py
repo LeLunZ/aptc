@@ -1,6 +1,5 @@
 import logging
 import threading
-from datetime import date
 
 import sqlalchemy
 import xxhash
@@ -17,7 +16,6 @@ from Models.transport_type_image import TransportTypeImage
 from Models.trip import Trip
 
 logger = logging.getLogger(__name__)
-
 lock = threading.Lock()
 try:
     DATABASE_URI = 'postgres+psycopg2://' + str(getConfig('postgres'))

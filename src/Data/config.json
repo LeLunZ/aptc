@@ -5,6 +5,7 @@
     "export": true,
     "matchWithParent": true,
     "batchSize": 4,
+    "csvFile": "bus_stops.csv",
     "crawlStopOptions": {
       "northLatBorder": 48.380244,
       "southLatBorder": 48.210879,

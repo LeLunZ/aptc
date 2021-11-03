@@ -7,7 +7,8 @@ import googlemaps
 from Models.calendar import Calendar
 from Classes.oebb_date import begin_date, end_date, OebbDate, service_months
 
-from crud import get_stops_without_location, commit, get_stops_with_parent, get_stop_with_id, update_location_of_stop, \
+from Scripts.crud import get_stops_without_location, commit, get_stops_with_parent, get_stop_with_id, \
+    update_location_of_stop, \
     remove_parent_from_all, new_session, query_element, windowed_query, get_from_table, end_session
 from Functions.config import getConfig
 
@@ -254,7 +255,7 @@ def match_station_with_parents():
 def export_all_tables():
     tables = [Agency, Calendar, CalendarDate, Frequency, Route, Trip, StopTime, Shape, Stop, Transfer]
     file_names = []
-    os.chdir('./db')
+    os.chdir('../db')
     try:
         os.remove('./Archiv.zip')
     except FileNotFoundError:
