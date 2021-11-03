@@ -1,6 +1,7 @@
 import logging
 
 from Functions.config import getConfig
+from constants import shapes_path
 
 logger = logging.getLogger(__name__)
 
