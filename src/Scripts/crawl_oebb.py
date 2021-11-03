@@ -720,11 +720,11 @@ def crawl():
             try:
                 process_page(page.url, page.data)
             except CalendarDataNotFoundError as e:
-                pass
+                logger.debug(f'Could\'t load {page.url}')
             except TripAlreadyPresentError as e:
                 pass
             except Exception as e:
-                logger.exception(str(e) + f' with {page.url} {repr(e)}')
+                logger.exception(str(e) + f' with {page.url}}')
             except KeyboardInterrupt:
                 logger.exception('Keyboard interrupt')
                 exit(0)
