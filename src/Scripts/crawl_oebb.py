@@ -9,6 +9,7 @@ from threading import Thread
 from typing import List
 from urllib.parse import parse_qs, urlparse
 
+import requests
 from lxml import html
 from requests_futures.sessions import FuturesSession
 from selenium import webdriver
@@ -591,7 +592,7 @@ def load_data_async(routes):
             q.append(response)
         except TripAlreadyPresentError:
             pass
-        except (ConnectionError,MaxRetryError,ReadTimeoutError) as error:
+        except requests.exceptions.ConnectionError as error:
             logger.debug(f'Trying again with {error.request.url}')
             futures.append(future_session.get(error.request.url, verify=False, hooks={'response': request_processing_hook}))
         except Exception as e:
