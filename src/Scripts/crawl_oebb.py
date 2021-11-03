@@ -773,7 +773,7 @@ def crawl_routes():
             try:
                 shape_folder = Path('../shapes')
                 shapefile = getConfig('crawlStopOptions.shapefile')
-                fiona_shape = fiona.open(shape_folder / shapefile)
+                fiona_shape = fiona.open(str(shape_folder / shapefile))
                 fiona_iteration = iter(fiona_shape)
                 fiona_geometry = []
                 for r in fiona_iteration:
@@ -781,7 +781,7 @@ def crawl_routes():
                 del fiona_shape
                 del fiona_iteration
             except (KeyError, FileNotFoundError, Exception) as e:
-                pass
+                logger.exception(e)
 
         if crawlStopOptions:
             northLatBorder = getConfig('crawlStopOptions.northLatBorder')
