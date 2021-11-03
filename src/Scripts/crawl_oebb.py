@@ -724,7 +724,7 @@ def crawl():
             except TripAlreadyPresentError as e:
                 pass
             except Exception as e:
-                logger.exception(str(e) + f' with {page.url}}')
+                logger.exception(str(e) + f' with {page.url}')
             except KeyboardInterrupt:
                 logger.exception('Keyboard interrupt')
                 exit(0)
