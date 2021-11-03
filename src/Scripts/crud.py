@@ -4,6 +4,7 @@ import threading
 import sqlalchemy
 import xxhash
 
+from Classes.exceptions import TripAlreadyPresentError
 from Functions.config import getConfig
 from Models.agency import Agency
 from Models.calendar import Calendar
@@ -30,11 +31,6 @@ engine = create_engine(DATABASE_URI, executemany_mode='values')
 Session = sessionmaker(bind=engine, autoflush=False, autocommit=False, expire_on_commit=True)
 
 s = Session()
-
-
-class TripAlreadyPresentError(Exception):
-    pass
-
 
 def lockF(lock):
     def wrap(func):
@@ -223,8 +219,8 @@ def get_stop_with_id(parent_id):
 def remove_parent_from_all():
     try:
         s.query(Stop).filter(Stop.parent_station != None).update({Stop.parent_station: None})
-    except:
-        pass
+    except Exception as e:
+        logger.exception(e)
 
 
 def load_all_uncrawled_stops(max_stops_to_crawl, check_stop_method):
@@ -268,8 +264,8 @@ def get_all_stops_without_location(max_stops_to_crawl):
 def update_location_of_stop(stop, lat, lng):
     try:
         s.query(Stop).filter(stop.stop_id == Stop.stop_id).update({Stop.stop_lat: lat, Stop.stop_lon: lng})
-    except:
-        print("fucked up. Object probably not in session", flush=True)
+    except Exception as e:
+        logger.exception(e)
 
 
 def add_stop_time(stoptime: StopTime):
@@ -344,8 +340,8 @@ def commit():
 def end_session():
     try:
         s.close()
-    except:
-        pass
+    except Exception as e:
+        logger.exception(e)
 
 
 def column_windows(session, column, windowsize):

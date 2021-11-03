@@ -221,7 +221,7 @@ def crawl_stops(init=False):
 
     try:
         max_stops_to_crawl = getConfig('batchSize')
-    except:
+    except KeyError:
         max_stops_to_crawl = 3
     logger.info("starting stops crawling")
     stop_list = list(stop_set)

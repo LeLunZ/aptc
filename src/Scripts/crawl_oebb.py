@@ -18,6 +18,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
 from Classes.DTOs import PageDTO
+from Classes.exceptions import TripAlreadyPresentError, CalendarDataNotFoundError
 from Models.agency import Agency
 from Models.calendar import Calendar
 from Models.calendar_date import CalendarDate
@@ -32,7 +33,7 @@ from Functions.oebb_requests import requests_retry_session_async, date_w, set_da
 from Functions.request_hooks import response_journey_hook
 from Functions.config import getConfig
 from Scripts.crud import add_stop, add_stop_times, get_all_ext_id_from_crawled_stops, get_from_table_first, add_route, \
-    add_agency, add_calendar_dates, add_trip, add_stop_without_check, get_all_stops_in_list, TripAlreadyPresentError, \
+    add_agency, add_calendar_dates, add_trip, add_stop_without_check, get_all_stops_in_list, \
     commit, get_from_table, new_session, load_all_uncrawled_stops, add_transport_name
 
 logger = logging.getLogger(__name__)
@@ -484,7 +485,7 @@ def add_stop_times_from_web_page(tree, page: PageDTO, current_stops_dict, trip):
 
 def process_page(url, page: PageDTO):
     if page.calendar_data is None:
-        raise Exception(f'no calendar_data')
+        raise CalendarDataNotFoundError(f'no calendar_data')
 
     if page.agency is None:
         new_agency: Agency = get_from_table_first(Agency)

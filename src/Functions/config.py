@@ -3,7 +3,7 @@ import os
 
 try:
     config_env = os.environ['CRAWLER_CONFIG']
-except:
+except KeyError:
     config_env = 'default'
 
 with open('../Data/config.json') as config_file:
