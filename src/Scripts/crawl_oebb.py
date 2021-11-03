@@ -593,7 +593,7 @@ def load_data_async(routes):
         except TripAlreadyPresentError:
             pass
         except requests.exceptions.ConnectionError as error:
-            logger.debug(f'Trying again with {error.request.url}')
+            logger.info(f'Trying again with {error.request.url}')
             futures.append(future_session.get(error.request.url, verify=False, hooks={'response': request_processing_hook}))
         except Exception as e:
             logger.exception(e)
