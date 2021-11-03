@@ -581,8 +581,6 @@ def request_processing_hook(resp, *args, **kwargs):
 
 
 def load_data_async(routes):
-    def prep_request(route):
-
     future_session = requests_retry_session_async(session=FuturesSession())
     futures = [future_session.get(route, timeout=6, verify=False, hooks={'response': request_processing_hook}) for
                route
