@@ -5,7 +5,6 @@ import logging
 import pickle
 import time
 from concurrent.futures import as_completed, ThreadPoolExecutor
-from pathlib import Path
 from threading import Thread
 from typing import List
 from urllib.parse import parse_qs, urlparse
@@ -19,6 +18,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 from Classes.DTOs import PageDTO
 from Classes.exceptions import TripAlreadyPresentError, CalendarDataNotFoundError
+from Functions.geometry import stop_is_to_crawl_geometry
 from Models.agency import Agency
 from Models.calendar import Calendar
 from Models.calendar_date import CalendarDate
@@ -35,7 +35,7 @@ from Functions.config import getConfig
 from Scripts.crud import add_stop, add_stop_times, get_all_ext_id_from_crawled_stops, get_from_table_first, add_route, \
     add_agency, add_calendar_dates, add_trip, add_stop_without_check, get_all_stops_in_list, \
     commit, get_from_table, new_session, load_all_uncrawled_stops, add_transport_name
-from constants import make_shape, stop_is_to_crawl_geometry, pickle_path, chrome_driver_path
+from constants import pickle_path, chrome_driver_path
 
 logger = logging.getLogger(__name__)
 

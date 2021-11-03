@@ -8,12 +8,13 @@ from urllib.parse import unquote
 import urllib3
 from requests_futures.sessions import FuturesSession
 
+from Functions.geometry import stop_is_to_crawl_geometry
 from Functions.helper import skip_stop
 from Functions.oebb_requests import requests_retry_session_async
 from Functions.request_hooks import request_stops_processing_hook, extract_real_name_from_stop_page, \
     request_station_id_processing_hook
 from Scripts.crud import *
-from constants import stop_is_to_crawl_geometry, data_path, state_path
+from constants import data_path, state_path
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
