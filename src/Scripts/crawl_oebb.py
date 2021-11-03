@@ -565,7 +565,8 @@ def request_processing_hook(resp, *args, **kwargs):
     calendar = Calendar()
     try:
         calendar_data = extract_dates_from_oebb_page(tree, calendar)
-    except:
+    except Exception as e:
+        logger.exception(e)
         calendar_data = None
     all_times = list(map(lambda x: x.strip(),
                          tree.xpath('//*/tr[@class=$first or @class=$second][$count]/td[@class=$third]/text()',
