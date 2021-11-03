@@ -1,0 +1,27 @@
+{
+  "default": {
+    "crawl": true,
+    "skipCSV": true,
+    "export": true,
+    "matchWithParent": true,
+    "batchSize": 4,
+    "csvFile": "bus_stops.csv",
+    "crawlStopOptions": {
+      "northLatBorder": 48.380244,
+      "southLatBorder": 48.210879,
+      "westLonBorder": 14.235355,
+      "eastLonBorder": 14.420606
+    },
+    "dates": [
+      "08.11.2021",
+      "12.11.2021",
+      "13.11.2021",
+      "14.11.2021"
+    ],
+    "exportOptions": {
+      "excludeRouteTypes": [
+        1500
+      ]
+    }
+  }
+}

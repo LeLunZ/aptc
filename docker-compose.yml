@@ -9,3 +9,4 @@ services:
         - ./src/Data/:/Data/
         - ./db/:/db/
         - ./logs/:/logs/
+        - ./shapes/:/shapes/

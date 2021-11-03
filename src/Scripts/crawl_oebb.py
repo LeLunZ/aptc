@@ -5,6 +5,7 @@ import logging
 import pickle
 import time
 from concurrent.futures import as_completed, ThreadPoolExecutor
+from pathlib import Path
 from threading import Thread
 from typing import List
 from urllib.parse import parse_qs, urlparse
@@ -770,8 +771,9 @@ def crawl_routes():
         crawlStopOptions = 'crawlStopOptions' in getConfig()
         if fiona_geometry is not False:
             try:
+                shape_folder = Path('../shapes')
                 shapefile = getConfig('crawlStopOptions.shapefile')
-                fiona_shape = fiona.open(shapefile)
+                fiona_shape = fiona.open(shape_folder / shapefile)
                 fiona_iteration = iter(fiona_shape)
                 fiona_geometry = []
                 for r in fiona_iteration:
