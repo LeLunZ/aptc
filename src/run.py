@@ -57,7 +57,7 @@ dictConfig({
         },
         '': {
             'handlers': loggers,
-            'level': 'ERROR',
+            'level': 'DEBUG',
             'propagate': False
         }
     }
