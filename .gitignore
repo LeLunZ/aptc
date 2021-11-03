@@ -4,6 +4,6 @@ venv
 Data
 stop_example
 .idea
-*log
+logs/**
 db
-bus_stops.csv
+*.csv

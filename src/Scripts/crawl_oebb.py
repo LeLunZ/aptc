@@ -710,6 +710,7 @@ def crawl():
             except Exception as e:
                 logging.error(f'load_route {page.url} {repr(e)}')
             except KeyboardInterrupt:
+                logger.exception('Keyboard interrupt')
                 exit(0)
         stop_times_executor = ThreadPoolExecutor()
         for tree, page, current_stops_dict, trip in stop_times_to_add:
