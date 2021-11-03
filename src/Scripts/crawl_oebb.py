@@ -741,6 +741,8 @@ def crawl():
             page = q.pop()
             try:
                 process_page(page.url, page.data)
+            except CalendarDataNotFoundError as e:
+                pass
             except TripAlreadyPresentError as e:
                 pass
             except Exception as e:
