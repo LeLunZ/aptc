@@ -5,7 +5,6 @@ import logging
 import pickle
 import time
 from concurrent.futures import as_completed, ThreadPoolExecutor
-from pathlib import Path
 from threading import Thread
 from typing import List
 from urllib.parse import parse_qs, urlparse
@@ -42,7 +41,7 @@ try:
     import fiona
     from shapely.geometry import shape
 except (ImportError, AttributeError):
-    logging.debug('Gdal not installed. Shapefile wont work')
+    logger.debug('Gdal not installed. Shapefile wont work')
     fiona_geometry = False
 finishUp = False
 
@@ -601,7 +600,7 @@ def load_data_async(routes):
         except TripAlreadyPresentError:
             pass
         except Exception as e:
-            print(f'{i} {str(e)}', flush=True)
+            logger.exception(e)
     exit(0)
 
 
@@ -651,7 +650,7 @@ def load_all_routes_from_stops(stops: List[Stop]):
                 station_id = int(json_data['stationEvaId'])
                 station_journeys[station_id] = list(map(lambda x: x, json_data['journey']))
         except Exception as e:
-            print(str(e), flush=True)
+            logger.exception(e)
 
     routes = set()
     future_route_url = []
@@ -685,16 +684,15 @@ def load_all_routes_from_stops(stops: List[Stop]):
                                                                     hooks={'response': response_journey_hook})
                         future_route_url.append(future_response)
                 except Exception as e:
-                    logging.error(
-                        f'get_all_routes_of_transport_and_station {route} {stop.name} {str(e)}')
-    except:
-        pass
+                    logger.exception(e)
+    except Exception as e:
+        logger.exception(e)
     for i in as_completed(future_route_url):
         try:
             result = i.result()
             routes.update(result.data)
-        except:
-            pass
+        except Exception as e:
+            logger.exception(e)
     future_session_stops.close()
     return routes, stop_ext_id_dict.keys()
 
@@ -703,11 +701,11 @@ def crawl():
     global stop_times_to_add, finishUp, date_arr
     try:
         max_stops_to_crawl = getConfig('batchSize')
-    except:
+    except KeyError:
         max_stops_to_crawl = 3
     try:
         date_arr = getConfig('dates')
-    except:
+    except KeyError:
         date_arr = [date_w]
 
     commit()
@@ -716,12 +714,12 @@ def crawl():
         if getConfig('resetDBstatus'):
             for stop in get_from_table(Stop):
                 stop.crawled = False
-    except:
+    except KeyError:
         pass
     commit()
     new_session()
     count12 = 0
-    logging.debug("starting route crawling")
+    logger.info("starting route crawling")
     while True:
         for stop in (uncrawled := load_all_uncrawled_stops(max_stops_to_crawl, stop_is_to_crawl)):
             stop.crawled = True
@@ -744,7 +742,7 @@ def crawl():
             except TripAlreadyPresentError as e:
                 pass
             except Exception as e:
-                logging.error(f'load_route {page.url} {repr(e)}')
+                logger.exception(str(e) + f' with {page.url} {repr(e)}')
             except KeyboardInterrupt:
                 logger.exception('Keyboard interrupt')
                 exit(0)
@@ -760,8 +758,8 @@ def crawl():
         new_session()
         crawled_stop_ids.update(ext_ids)
         count12 = count12 + 1
-        logging.debug(f'finished route batch {count12 * max_stops_to_crawl}')
-    logging.debug("finished route crawling")
+        logger.info(f'finished route batch {count12 * max_stops_to_crawl}')
+    logger.info("finished route crawling")
     commit()
     return count12
 

@@ -20,7 +20,7 @@ try:
     import fiona
     from shapely.geometry import shape
 except (ImportError, AttributeError):
-    logging.debug('Gdal not installed. Shapefile wont work')
+    logger.debug('Gdal not installed. Shapefile wont work')
     fiona_geometry = False
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -223,7 +223,7 @@ def crawl_stops(init=False):
         max_stops_to_crawl = getConfig('batchSize')
     except:
         max_stops_to_crawl = 3
-    logging.debug("starting stops crawling")
+    logger.info("starting stops crawling")
     stop_list = list(stop_set)
     if init:
         # Read State and check if we are continuing from a crash
@@ -246,9 +246,9 @@ def crawl_stops(init=False):
             cur_line += max_stops_to_crawl
             load_all_stops_to_crawl(to_crawl)
             commit()
-            logging.debug(f'finished batch {cur_line}')
+            logger.info(f'finished batch {cur_line}')
         finished_crawling = True
-        logging.debug(f'finished all from csv')
+        logger.info(f'finished all from csv')
     # Crawl uncrawled stops from database
     global stop_ids_db
     stop_ids_db = set([int(e.ext_id) for e in get_all_ext_id_from_stops()])
@@ -261,7 +261,7 @@ def crawl_stops(init=False):
         commit()
         uncrawled = sibling_search_stops(max_stops_to_crawl)
 
-    logging.debug("finished stops crawling")
+    logger.info("finished stops crawling")
     # match_station_with_google_maps()
     # Call after crawling whole Routes
     # match_station_with_parents()

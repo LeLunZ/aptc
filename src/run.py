@@ -53,7 +53,6 @@ dictConfig({
 })
 
 logger = logging.getLogger(__name__)
-logger.debug('running')
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -71,13 +70,13 @@ if __name__ == '__main__':
             count = 1
             while count != 0:
                 print('Restarting crawling')
-                logger.debug('Restarting crawling')
+                logger.info('Restarting crawling')
                 crawl_stops()
                 count = crawl()
     except KeyError as e:
-        pass
+        logger.debug('Not crawling - no key in csv found')
     try:
         if getConfig('export'):
             export_all_tables()
     except KeyError:
-        pass
+        logger.debug('Not Export - no key in csv found')
