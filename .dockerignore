@@ -1,2 +1,5 @@
-venv
-__pycache__
+# Ignore everything
+**
+
+# Allow files and directories
+!/src/**
