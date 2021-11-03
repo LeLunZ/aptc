@@ -35,16 +35,10 @@ from Functions.config import getConfig
 from Scripts.crud import add_stop, add_stop_times, get_all_ext_id_from_crawled_stops, get_from_table_first, add_route, \
     add_agency, add_calendar_dates, add_trip, add_stop_without_check, get_all_stops_in_list, \
     commit, get_from_table, new_session, load_all_uncrawled_stops, add_transport_name
+from constants import make_shape, stop_is_to_crawl_geometry, pickle_path, chrome_driver_path
 
 logger = logging.getLogger(__name__)
 
-fiona_geometry = None
-try:
-    import fiona
-    from shapely.geometry import shape
-except (ImportError, AttributeError):
-    logger.debug('Gdal not installed. Shapefile wont work')
-    fiona_geometry = False
 finishUp = False
 
 import os
@@ -132,12 +126,6 @@ stop_times_to_add = []
 crawled_stop_ids = set([e.ext_id for e in get_all_ext_id_from_crawled_stops()])
 
 allg_feiertage = []
-crawlStopOptions = None
-
-southLatBorder = None
-northLatBorder = None
-westLonBorder = None
-eastLonBorder = None
 
 
 def extract_date_from_str(calendar: Calendar, date_str: str):
@@ -413,7 +401,7 @@ def add_date_to_allg_feiertage(feiertag, year):
 def load_allg_feiertage():
     try:
         with open(
-                f'../Data/pickle/{begin_date.year}-{begin_date.month}-{begin_date.day}-{end_date.year}-{end_date.month}-{end_date.day}.pickle',
+                pickle_path / f'{begin_date.year}-{begin_date.month}-{begin_date.day}-{end_date.year}-{end_date.month}-{end_date.day}.pickle',
                 'rb') as f:
             allg_feiertage.extend(pickle.load(f))
     except:
@@ -425,7 +413,7 @@ def load_allg_feiertage():
         if SECRET_KEY:
             driver = webdriver.Chrome(options=chrome_options)
         else:
-            driver = webdriver.Chrome('../Data/chromedriver')
+            driver = webdriver.Chrome(chrome_driver_path)
         driver.get('https://www.timeanddate.de/feiertage/oesterreich/' + str(begin_date.year))
         WebDriverWait(driver, 7).until(EC.presence_of_element_located((By.XPATH, '//*/tbody')))
         try:
@@ -447,7 +435,7 @@ def load_allg_feiertage():
             add_date_to_allg_feiertage(f.text, end_date.year)
         driver.quit()
         with open(
-                f'../Data/pickle/{begin_date.year}-{begin_date.month}-{begin_date.day}-{end_date.year}-{end_date.month}-{end_date.day}.pickle',
+                pickle_path / f'{begin_date.year}-{begin_date.month}-{begin_date.day}-{end_date.year}-{end_date.month}-{end_date.day}.pickle',
                 'wb') as f:
             pickle.dump(allg_feiertage, f)
 
@@ -610,18 +598,7 @@ def stop_is_to_crawl(stop_to_check: Stop) -> bool:
     if stop_to_check.ext_id in crawled_stop_ids:
         return False
 
-    fiona_geometry_is_avaible = fiona_geometry is not None and fiona_geometry is not False and (
-            type(fiona_geometry) is list and len(fiona_geometry) > 0)
-
-    if (not fiona_geometry_is_avaible and not crawlStopOptions) or (
-            crawlStopOptions and southLatBorder < stop_to_check.stop_lat < northLatBorder and westLonBorder < stop_to_check.stop_lon < eastLonBorder):
-        return True
-    elif fiona_geometry_is_avaible:
-        point = shape({'type': 'Point', 'coordinates': [stop_to_check.stop_lon, stop_to_check.stop_lat]})
-        for k in fiona_geometry:
-            if point.within(k):
-                return True
-    return False
+    return stop_is_to_crawl_geometry(stop_to_check)
 
 
 def load_all_routes_from_stops(stops: List[Stop]):
@@ -769,32 +746,6 @@ def crawl():
 
 
 def crawl_routes():
-    global northLatBorder, southLatBorder, westLonBorder, eastLonBorder, crawlStopOptions, fiona_geometry
-    try:
-        crawlStopOptions = 'crawlStopOptions' in getConfig()
-        if fiona_geometry is not False:
-            try:
-                shape_folder = Path('../shapes')
-                shapefile = getConfig('crawlStopOptions.shapefile')
-                shape_path = shape_folder / shapefile
-                logger.debug(shape_path)
-                fiona_shape = fiona.open(str(shape_folder / shapefile))
-                fiona_iteration = iter(fiona_shape)
-                fiona_geometry = []
-                for r in fiona_iteration:
-                    fiona_geometry.append(shape(r['geometry']))
-                del fiona_shape
-                del fiona_iteration
-            except (KeyError, FileNotFoundError, Exception) as e:
-                logger.exception(e)
-
-        if crawlStopOptions:
-            northLatBorder = getConfig('crawlStopOptions.northLatBorder')
-            southLatBorder = getConfig('crawlStopOptions.southLatBorder')
-            westLonBorder = getConfig('crawlStopOptions.westLonBorder')
-            eastLonBorder = getConfig('crawlStopOptions.eastLonBorder')
-    except KeyError as e:
-        crawlStopOptions = False
     get_std_date()
     crawl()
 

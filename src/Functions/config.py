@@ -1,12 +1,14 @@
 import json
 import os
 
+from constants import config_path
+
 try:
     config_env = os.environ['CRAWLER_CONFIG']
 except KeyError:
     config_env = 'default'
 
-with open('../Data/config.json') as config_file:
+with open(config_path) as config_file:
     config = json.load(config_file)[config_env]
 
 

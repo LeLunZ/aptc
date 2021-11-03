@@ -3,7 +3,6 @@ import csv
 import pickle
 import signal
 from concurrent.futures import as_completed
-from pathlib import Path
 from urllib.parse import unquote
 
 import urllib3
@@ -14,14 +13,7 @@ from Functions.oebb_requests import requests_retry_session_async
 from Functions.request_hooks import request_stops_processing_hook, extract_real_name_from_stop_page, \
     request_station_id_processing_hook
 from Scripts.crud import *
-
-fiona_geometry = None
-try:
-    import fiona
-    from shapely.geometry import shape
-except (ImportError, AttributeError):
-    logger.debug('Gdal not installed. Shapefile wont work')
-    fiona_geometry = False
+from constants import stop_is_to_crawl_geometry, data_path, state_path
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -29,35 +21,17 @@ stop_ids_db = set([int(e.ext_id) for e in get_all_ext_id_from_stops()])
 stop_ids_searched = set([int(e.ext_id) for e in get_all_ext_id_from_stops_where_siblings_searched()])
 stop_ids_info = set([int(e.ext_id) for e in get_all_ext_id_from_stops_where_info_searched()])
 searched_text = set([str(e.stop_name) for e in get_all_names_from_searched_stops()])
-state_path = Path('../Data/pickle/state.pkl')
 cur_line = 0
 finished_crawling = None
 file_hash = None
 future_session_stops = requests_retry_session_async(session=FuturesSession())
-crawlStopOptions = None
-southLatBorder = None
-northLatBorder = None
-westLonBorder = None
-eastLonBorder = None
 
 
 def stop_is_to_crawl(stop_to_check: Stop) -> bool:
     if stop_to_check.ext_id in stop_ids_db:
         return False
 
-    fiona_geometry_is_avaible = fiona_geometry is not None and fiona_geometry is not False and (
-            type(fiona_geometry) is list and len(fiona_geometry) > 0)
-
-    # If no crawlstopoptions and fiona geometry is available take every stop
-    if (not fiona_geometry_is_avaible and not crawlStopOptions) or (
-            crawlStopOptions and southLatBorder < stop_to_check.stop_lat < northLatBorder and westLonBorder < stop_to_check.stop_lon < eastLonBorder):
-        return True
-    elif fiona_geometry_is_avaible:
-        point = shape({'type': 'Point', 'coordinates': [stop_to_check.stop_lon, stop_to_check.stop_lat]})
-        for k in fiona_geometry:
-            if point.within(k):
-                return True
-    return False
+    return stop_is_to_crawl_geometry(stop_to_check)
 
 
 def handle_stop_group_response(f, stop_ext_id_dict):
@@ -205,7 +179,7 @@ def crawl_stops(init=False):
     global cur_line, finished_crawling, file_hash
     stop_set = set()
     file_path: str = getConfig('csvFile')
-    csv_path = Path(f'../Data/') / file_path
+    csv_path = data_path / file_path
     if init and csv_path.exists():
         with open(csv_path) as csv_file:
             file_hash = xxhash.xxh3_64(''.join(csv_file.readlines())).hexdigest()
@@ -224,9 +198,9 @@ def crawl_stops(init=False):
     except KeyError:
         max_stops_to_crawl = 3
     logger.info("starting stops crawling")
-    stop_list = list(stop_set)
     if init:
         # Read State and check if we are continuing from a crash
+        stop_list = list(stop_set)
         if state_path.exists():
             with open(state_path, 'rb') as f:
                 (c_line, f_hash) = pickle.load(f)
@@ -281,29 +255,8 @@ def save_csv_state(sig=None, frame=None):
 
 
 def start_stop_crawler(only_init=False):
-    global northLatBorder, southLatBorder, westLonBorder, eastLonBorder, crawlStopOptions, fiona_geometry
-    try:
-        crawlStopOptions = 'crawlStopOptions' in getConfig()
-        if fiona_geometry is not False:
-            try:
-                shapefile = getConfig('crawlStopOptions.shapefile')
-                fiona_shape = fiona.open(shapefile)
-                fiona_iteration = iter(fiona_shape)
-                fiona_geometry = []
-                for r in fiona_iteration:
-                    fiona_geometry.append(shape(r['geometry']))
-                del fiona_shape
-                del fiona_iteration
-            except (KeyError, FileNotFoundError, Exception):
-                pass
+    # Here you can do some init stuff
 
-        if crawlStopOptions:
-            northLatBorder = getConfig('crawlStopOptions.northLatBorder')
-            southLatBorder = getConfig('crawlStopOptions.southLatBorder')
-            westLonBorder = getConfig('crawlStopOptions.westLonBorder')
-            eastLonBorder = getConfig('crawlStopOptions.eastLonBorder')
-    except KeyError as e:
-        crawlStopOptions = False
     if not only_init:
         crawl_stops(init=True)
 

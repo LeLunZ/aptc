@@ -8,6 +8,7 @@ from Functions.config import getConfig
 from Functions.helper import export_all_tables
 from Scripts.crawl_oebb import crawl, crawl_routes
 from Scripts.stop_crawler import start_stop_crawler, crawl_stops
+from constants import logs_path
 
 loggers = ['timed', 'console']
 
@@ -29,12 +30,27 @@ dictConfig({
             'level': 'DEBUG',
             'formatter': 'default',
             'backupCount': 3,
-            'filename': '../logs/aptc.log',
+            'filename': f'{str(logs_path)}/aptc.log',
             'when': 'W0'
         }
     },
     'loggers': {
         'Scripts': {
+            'handlers': loggers,
+            'level': 'DEBUG',
+            'propagate': False
+        },
+        'Functions': {
+            'handlers': loggers,
+            'level': 'DEBUG',
+            'propagate': False
+        },
+        'Classes': {
+            'handlers': loggers,
+            'level': 'DEBUG',
+            'propagate': False
+        },
+        'constants': {
             'handlers': loggers,
             'level': 'DEBUG',
             'propagate': False
