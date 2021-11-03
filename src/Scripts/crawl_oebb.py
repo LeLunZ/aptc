@@ -15,6 +15,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
+from urllib3.exceptions import ReadTimeoutError, MaxRetryError
 
 from Classes.DTOs import PageDTO
 from Classes.exceptions import TripAlreadyPresentError, CalendarDataNotFoundError
@@ -580,8 +581,10 @@ def request_processing_hook(resp, *args, **kwargs):
 
 
 def load_data_async(routes):
+    def prep_request(route):
+
     future_session = requests_retry_session_async(session=FuturesSession())
-    futures = [future_session.get(route, timeout=3, verify=False, hooks={'response': request_processing_hook}) for
+    futures = [future_session.get(route, timeout=6, verify=False, hooks={'response': request_processing_hook}) for
                route
                in routes]
     for i in as_completed(futures):
@@ -590,6 +593,9 @@ def load_data_async(routes):
             q.append(response)
         except TripAlreadyPresentError:
             pass
+        except (ConnectionError,MaxRetryError,ReadTimeoutError) as error:
+            logger.debug(f'Trying again with {error.request.url}')
+            futures.append(future_session.get(error.request.url, verify=False, hooks={'response': request_processing_hook}))
         except Exception as e:
             logger.exception(e)
     exit(0)
