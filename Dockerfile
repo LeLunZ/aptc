@@ -38,6 +38,6 @@ RUN unzip /tmp/chromedriver.zip chromedriver -d /usr/local/bin/
 ENV DISPLAY=:99
 ENV AM_I_IN_A_DOCKER_CONTAINER Yes
 
-WORKDIR /app
+WORKDIR /app/src
 COPY src .
 ENTRYPOINT ["python", "run.py"]
