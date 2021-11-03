@@ -3,8 +3,7 @@ version: '3'
 services:
   aptc:
     container_name: aptc
-    build:
-      context: src
+    build: .
     network_mode: "host"
     volumes:
         - ./Data/:/app/Data/
