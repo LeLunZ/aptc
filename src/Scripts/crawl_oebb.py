@@ -776,6 +776,8 @@ def crawl_routes():
             try:
                 shape_folder = Path('../shapes')
                 shapefile = getConfig('crawlStopOptions.shapefile')
+                shape_path = shape_folder / shapefile
+                logger.debug(shape_path)
                 fiona_shape = fiona.open(str(shape_folder / shapefile))
                 fiona_iteration = iter(fiona_shape)
                 fiona_geometry = []
