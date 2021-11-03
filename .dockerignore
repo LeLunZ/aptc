@@ -3,3 +3,4 @@
 
 # Allow files and directories
 !/src/**
+!/requirements.txt
