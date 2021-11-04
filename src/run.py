@@ -44,12 +44,13 @@ dictConfig({
     'filters': {
         'DisallowFilter': {
             '()': LogFilter,
-            'params': ['TripAlreadyPresentError', 'CalendarDataNotFoundError', 'Timing - func', 'Retrying Url'],
+            'params': ['TripAlreadyPresentError', 'CalendarDataNotFoundError', 'NoAgencyPresentError', 'Timing - func',
+                       'Retrying Url'],
             'allow': False
         },
         'AllowExceptionFilter': {
             '()': LogFilter,
-            'params': ['TripAlreadyPresentError', 'CalendarDataNotFoundError'],
+            'params': ['TripAlreadyPresentError', 'CalendarDataNotFoundError', 'NoAgencyPresentError'],
             'allow': True
         },
         'AllowTimingFilter': {

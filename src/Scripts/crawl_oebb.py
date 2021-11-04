@@ -21,7 +21,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from urllib3.exceptions import ReadTimeoutError, MaxRetryError
 
 from Classes.DTOs import PageDTO
-from Classes.exceptions import TripAlreadyPresentError, CalendarDataNotFoundError, NoAgencyPresentError
+from Classes.exceptions import TripAlreadyPresentError, CalendarDataNotFoundError
 from Classes.oebb_date import OebbDate, service_months, begin_date, end_date, get_std_date
 from Functions.config import getConfig
 from Functions.geometry import stop_is_to_crawl_geometry, northLatBorder, southLatBorder, eastLonBorder, westLonBorder, \
@@ -734,7 +734,7 @@ def crawl():
                 process_page(page.url, page.data)
             except TripAlreadyPresentError:
                 rollback()
-            except (CalendarDataNotFoundError, NoAgencyPresentError):
+            except CalendarDataNotFoundError:
                 rollback()
                 logger.exception(traceback.format_exc() + f'\n{page.url}')
             except KeyboardInterrupt:
