@@ -733,12 +733,12 @@ def crawl():
             except CalendarDataNotFoundError:
                 rollback()
                 logger.exception(traceback.format_exc() + f'\n{page.url}')
-            except Exception as e:
-                rollback()
-                logger.exception(traceback.format_exc() + f'\n{page.url}')
             except KeyboardInterrupt:
                 logger.exception('Keyboard interrupt')
                 exit(0)
+            except Exception as e:
+                rollback()
+                logger.exception(traceback.format_exc() + f'\n{page.url}')
             else:
                 commit_()
         stop_times_executor = ThreadPoolExecutor()

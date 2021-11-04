@@ -144,7 +144,11 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 if __name__ == '__main__':
     try:
-        if getConfig('crawl'):
+        crawl = getConfig('crawl')
+    except KeyError as e:
+        logger.debug('Not crawling - no key in csv found')
+    else:
+        if crawl:
             skip_csv = False
             try:
                 skip_csv = getConfig('skipCSV')
@@ -159,8 +163,6 @@ if __name__ == '__main__':
                 logger.info('Restarting crawling')
                 crawl_stops()
                 count = crawl()
-    except KeyError as e:
-        logger.debug('Not crawling - no key in csv found')
     try:
         if getConfig('export'):
             export_all_tables()

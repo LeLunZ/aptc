@@ -5,7 +5,7 @@ from Models.agency import Agency
 from Models.route import Route
 
 
-@dataclass
+@dataclass(repr=False)
 class PageDTO:
     agency: Agency
     route: Route
