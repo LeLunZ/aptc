@@ -40,7 +40,8 @@ from Models.stop_times import StopTime
 from Models.trip import Trip
 from Scripts.crud import add_stop, add_stop_times, get_all_ext_id_from_crawled_stops, add_route, \
     add_agency, add_calendar_dates, add_trip, add_stop_without_check, get_all_stops_in_list, \
-    commit, get_from_table, new_session, load_all_uncrawled_stops, add_transport_name, rollback, check_stops
+    commit, get_from_table, new_session, load_all_uncrawled_stops, add_transport_name, rollback, check_stops, \
+    get_default_agency_id
 from constants import pickle_path, chrome_driver_path
 
 logger = logging.getLogger(__name__)
@@ -128,7 +129,7 @@ date_arr = []
 stop_times_executor = None
 stop_times_to_add = []
 crawled_stop_ids = set([e.ext_id for e in get_all_ext_id_from_crawled_stops()])
-
+default_agency_id = get_default_agency_id()
 allg_feiertage = []
 
 
@@ -462,11 +463,11 @@ def process_page(url, page: PageDTO):
         raise CalendarDataNotFoundError(f'no calendar_data')
 
     if page.agency is None:
-        raise NoAgencyPresentError(f'No Agency found in {url}')
+        logger.debug(f'NoAgencyPresentError - No Agency found in {url} - using default {default_agency_id}')
+        page.route.agency_id = default_agency_id
     else:
         new_agency: Agency = add_agency(page.agency)
-
-    page.route.agency_id = new_agency.agency_id
+        page.route.agency_id = new_agency.agency_id
     try:
         route = add_route(page.route)
         calendar = add_calendar_dates(page.calendar_data[0], page.calendar_data[1], page.calendar_data[2])

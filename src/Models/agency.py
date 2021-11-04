@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Text
+from sqlalchemy import Column, Integer, Text, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 
 from Scripts import primary_keys
@@ -14,6 +14,7 @@ class Agency(AgencyBase):
     agency_timezone = Column(Text, nullable=True)
     agency_lang = Column(Text, nullable=True)
     agency_phone = Column(Text, nullable=True)
+    is_default = Column(Boolean, nullable=False, default=False)
 
     def __repr__(self):
         return "<Agency(name='{}', url='{}', id={})>" \

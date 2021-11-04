@@ -56,6 +56,10 @@ def get_last_trip_id():
     return s.query(func.max(Trip.trip_id)).scalar()
 
 
+def get_default_agency_id():
+    return s.query(Agency.agency_id).filter(Agency.is_default == True).scalar()
+
+
 primary_keys.agency_id_count = id_ if (id_ := get_last_agency_id()) is not None else -1
 primary_keys.calendar_id_count = id_ if (id_ := get_last_calendar_id()) is not None else -1
 primary_keys.route_id_count = id_ if (id_ := get_last_route_id()) is not None else -1

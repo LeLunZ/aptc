@@ -45,7 +45,8 @@ create table agency
     agency_url      text,
     agency_timezone text,
     agency_lang     text,
-    agency_phone    text
+    agency_phone    text,
+    is_default      boolean not null DEFAULT False
 );
 
 create unique index agency_agency_name_uindex
