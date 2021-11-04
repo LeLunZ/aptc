@@ -10,7 +10,7 @@ from Scripts.crawl_oebb import crawl, crawl_routes
 from Scripts.stop_crawler import start_stop_crawler, crawl_stops
 from constants import logs_path
 
-loggers = ['timed', 'console', 'failed-url']
+loggers = ['timed', 'console', 'failed-url', 'timings', 'retry']
 
 
 class LogFilter(logging.Filter):
@@ -24,7 +24,7 @@ class LogFilter(logging.Filter):
             return True
 
         for param in self.params:
-            if param in record.msg:
+            if param in str(record.msg):
                 if self.allow:
                     return True
                 if not self.allow:

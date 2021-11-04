@@ -11,7 +11,7 @@ def timing(f):
         ts = time()
         result = f(*args, **kw)
         te = time()
-        logger.debug(f'Timing - func:{f.__name__} args:[{args}, {kw}] took: i%2.4f sec' % (te - ts))
+        logger.debug('Timing - func:{} args:[{}, {}] took: {:.4f} sec'.format(f.__name__, args, kw, te - ts))
         return result
 
     return wrap
