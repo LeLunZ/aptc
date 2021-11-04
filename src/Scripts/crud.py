@@ -1,12 +1,13 @@
 import logging
 import threading
-import traceback
+from functools import wraps
 
 import sqlalchemy
 import xxhash
 
 from Classes.exceptions import TripAlreadyPresentError
 from Functions.config import getConfig
+from Functions.helper import timing
 from Models.agency import Agency
 from Models.calendar import Calendar
 from Models.calendar_date import CalendarDate
@@ -36,6 +37,7 @@ s = Session()
 
 def lockF(lock):
     def wrap(func):
+        @wraps(func)
         def wrapped(*args):
             lock.acquire()
             try:
@@ -55,6 +57,7 @@ def add_agency(agency):
     data = s.query(Agency).filter(Agency.agency_name == agency.agency_name).first()
     if data is None:
         s.add(agency)
+        s.flush()
     else:
         agency = data
     return agency
@@ -70,6 +73,7 @@ def add_route(route: Route):
              Route.agency_id == route.agency_id)).first()
     if data is None:
         s.add(route)
+        s.flush()
     else:
         route = data
     return route
@@ -100,6 +104,7 @@ def add_stop_time_text(text1):
     return
 
 
+@timing
 def add_calendar_dates(calendar_dates: [CalendarDate], only_dates_as_string: str, service: Calendar):
     if only_dates_as_string == '':
         data = s.query(Calendar).filter(
@@ -114,6 +119,7 @@ def add_calendar_dates(calendar_dates: [CalendarDate], only_dates_as_string: str
         service.calendar_dates_hash = None
         if data is None:
             s.add(service)
+            s.flush()
         else:
             if data.no_fix_date and service.no_fix_date:
                 data.start_date = service.start_date
@@ -134,9 +140,10 @@ def add_calendar_dates(calendar_dates: [CalendarDate], only_dates_as_string: str
         if calendar is None:
             service.calendar_dates_hash = hash_value
             s.add(service)
+            s.flush()
             for i in calendar_dates:
                 i.service_id = service.service_id
-            s.bulk_save_objects(calendar_dates)
+            s.add_all(calendar_dates)
         else:
             if calendar.no_fix_date and service.no_fix_date:
                 calendar.start_date = service.start_date
@@ -177,6 +184,7 @@ def get_all_names_from_searched_stops():
 
 def add_stop_without_check(stop: Stop):
     s.add(stop)
+    s.flush()
     return stop
 
 
@@ -184,6 +192,7 @@ def add_stop(stop: Stop):
     data: Stop = s.query(Stop).filter(Stop.ext_id == stop.ext_id).first()
     if data is None:
         s.add(stop)
+        s.flush()
     else:
         if stop.crawled is True and (data.crawled is False or data.crawled is None):
             data.crawled = True
@@ -273,7 +282,7 @@ def add_stop_time(stoptime: StopTime):
 
 
 def add_stop_times(stoptime):
-    s.bulk_save_objects(stoptime)
+    s.add_all(stoptime)
 
 
 def add_transfer():
@@ -286,6 +295,7 @@ def add_trip(trip, hash1):
                                            Trip.station_departure_time == trip.station_departure_time)).first()
     if data is None:
         s.add(trip)
+        s.flush()
     else:
         raise TripAlreadyPresentError()
     return trip

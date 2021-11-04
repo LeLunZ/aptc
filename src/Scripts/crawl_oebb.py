@@ -31,7 +31,7 @@ from Models.stop_times import StopTime
 from Models.trip import Trip
 from Classes.oebb_date import OebbDate, service_months, begin_date, end_date, get_std_date
 from Functions.helper import add_day_to_calendar, extract_date_from_date_arr, merge_date, add_days_to_calendar, \
-    get_all_name_of_transport_distinct, extract_date_objects_from_str
+    get_all_name_of_transport_distinct, extract_date_objects_from_str, timing
 from Functions.oebb_requests import requests_retry_session_async, date_w, set_date, weekday_name
 from Functions.request_hooks import response_journey_hook
 from Functions.config import getConfig
@@ -260,6 +260,7 @@ def extract_date_from_str(calendar: Calendar, date_str: str):
     return exceptions_calendar_date, calendar_data_as_string, calendar
 
 
+@timing
 def extract_dates_from_oebb_page(tree, calendar):
     extra_info_traffic_day = tree.xpath('//*/strong[text() =$first]/../text()', first='Verkehrstage:')
     traffic_day = None
@@ -362,26 +363,6 @@ def extract_dates_from_oebb_page(tree, calendar):
         return calendar
 
 
-def save_stop_family(stop_ids, stop_names, main_stop):
-    main_stop.location_type = 1
-    stop_list = []
-    existed = 0
-    for ids, name in zip(stop_ids, stop_names):
-        p_stop = main_stop.stop_id
-        # if ids in existing_stop_ids:
-        #    existed += 1
-        #    p_stop = None
-        child_stop = Stop(stop_name=name, parent_station=p_stop, stop_lat=main_stop.stop_lat,
-                          stop_lon=main_stop.stop_lon,
-                          stop_url='https://fahrplan.oebb.at/bin/stboard.exe/dn?protocol=https:&input=' + str(ids),
-                          location_type=0, crawled=True, ext_id=ids)
-        new_stop = add_stop(child_stop)
-        stop_list.append(new_stop)
-    if 0 < existed == len(stop_names):
-        main_stop.location_type = 0
-    return stop_list
-
-
 def save_stop(stop_id, stop_name):
     new_stop = Stop(stop_name=stop_name,
                     stop_url='https://fahrplan.oebb.at/bin/stboard.exe/dn?protocol=https:&input=' + str(stop_id),
@@ -474,6 +455,7 @@ def add_stop_times_from_web_page(tree, page: PageDTO, current_stops_dict, trip):
     add_stop_times(stop_time_list)
 
 
+@timing
 def process_page(url, page: PageDTO):
     if page.calendar_data is None:
         raise CalendarDataNotFoundError(f'no calendar_data')
@@ -490,7 +472,6 @@ def process_page(url, page: PageDTO):
         new_trip = Trip(route_id=route.route_id, service_id=calendar.service_id, oebb_url=url)
         trip: Trip = add_trip(new_trip, f'{page.first_station}{page.dep_time}')
     except:
-        logger.exception(traceback.format_exc())
         raise
     else:
         stops_on_db = get_all_stops_in_list(page.stop_ids)
@@ -501,10 +482,7 @@ def process_page(url, page: PageDTO):
                 new_stop = Stop(stop_name=stop_name,
                                 stop_url=stop_url, location_type=0,
                                 ext_id=stop_id)
-                try:
-                    new_stop = add_stop_without_check(new_stop)
-                except:
-                    logger.exception(traceback.format_exc())
+                new_stop = add_stop_without_check(new_stop)
                 current_stops_dict[stop_id] = new_stop
         tree = html.fromstring(page.page)
         stop_times_to_add.append((tree, page, current_stops_dict, trip))
@@ -588,8 +566,9 @@ def request_processing_hook(resp, *args, **kwargs):
                         all_links_of_station, resp.content)
 
 
+@timing
 def load_data_async(routes):
-    future_session = requests_retry_session_async(session=FuturesSession())
+    future_session = requests_retry_session_async(session=FuturesSession(max_workers=max_stops_to_crawl))
     futures = [future_session.get(route, timeout=6, verify=False, hooks={'response': request_processing_hook}) for
                route
                in routes]
@@ -599,13 +578,16 @@ def load_data_async(routes):
             q.append(response)
         except TripAlreadyPresentError:
             pass
-        except requests.exceptions.ConnectionError as error:
-            logger.info(f'Trying again with {error.request.url}')
+        except (ReadTimeoutError, MaxRetryError) as error:
+            logger.debug(f'Retrying Url: {error.url}')
             futures.append(
                 future_session.get(error.request.url, verify=False, hooks={'response': request_processing_hook}))
-        except Exception as error:
-            logger.exception(error)
-            logger.exception(f'url: {error.request.url}')
+        except requests.exceptions.ConnectionError as error:
+            logger.debug(f'Retrying Url: {error.request.url}')
+            futures.append(
+                future_session.get(error.request.url, verify=False, hooks={'response': request_processing_hook}))
+        except Exception:
+            logger.exception(traceback.format_exc())
     exit(0)
 
 
@@ -699,8 +681,11 @@ def commit_():
     new_session()
 
 
+max_stops_to_crawl = 8
+
+
 def crawl():
-    global stop_times_to_add, finishUp, date_arr
+    global stop_times_to_add, finishUp, date_arr, max_stops_to_crawl
     try:
         max_stops_to_crawl = getConfig('batchSize')
     except KeyError:
@@ -742,12 +727,14 @@ def crawl():
             page = q.pop()
             try:
                 process_page(page.url, page.data)
-            except (CalendarDataNotFoundError, TripAlreadyPresentError) as e:
+            except TripAlreadyPresentError:
                 rollback()
-                logger.debug(f'Could\'t load {page.url}')
+            except CalendarDataNotFoundError:
+                rollback()
+                logger.exception(traceback.format_exc() + f'\n{page.url}')
             except Exception as e:
                 rollback()
-                logger.exception(traceback.format_exc() + f' with {page.url}')
+                logger.exception(traceback.format_exc() + f'\n{page.url}')
             except KeyboardInterrupt:
                 logger.exception('Keyboard interrupt')
                 exit(0)

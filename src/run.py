@@ -10,7 +10,30 @@ from Scripts.crawl_oebb import crawl, crawl_routes
 from Scripts.stop_crawler import start_stop_crawler, crawl_stops
 from constants import logs_path
 
-loggers = ['timed', 'console']
+loggers = ['timed', 'console', 'failed-url']
+
+
+class LogFilter(logging.Filter):
+    def __init__(self, params=None, allow=False):
+        super(LogFilter, self).__init__()
+        self.params = params
+        self.allow = allow
+
+    def filter(self, record):
+        if self.params is None:
+            return True
+
+        for param in self.params:
+            if param in record.msg:
+                if self.allow:
+                    return True
+                if not self.allow:
+                    return False
+
+        if self.allow:
+            return False
+        return True
+
 
 dictConfig({
     'version': 1,
@@ -18,12 +41,36 @@ dictConfig({
     'formatters': {'default': {
         'format': '[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
     }},
+    'filters': {
+        'DisallowFilter': {
+            '()': LogFilter,
+            'params': ['TripAlreadyPresentError', 'CalendarDataNotFoundError', 'Timing - func', 'Retrying Url'],
+            'allow': False
+        },
+        'AllowExceptionFilter': {
+            '()': LogFilter,
+            'params': ['TripAlreadyPresentError', 'CalendarDataNotFoundError'],
+            'allow': True
+        },
+        'AllowTimingFilter': {
+            '()': LogFilter,
+            'params': ['Timing - func'],
+            'allow': True
+        },
+        'AllowRetryFilter': {
+            '()': LogFilter,
+            'params': ['Retrying Url'],
+            'allow': True
+        },
+    },
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
             'level': 'DEBUG',
             'stream': sys.stdout,
-            'formatter': 'default'
+            'formatter': 'default',
+            'filters': ['DisallowExceptionFilter']
+
         },
         'timed': {
             'class': 'logging.handlers.TimedRotatingFileHandler',
@@ -31,7 +78,35 @@ dictConfig({
             'formatter': 'default',
             'backupCount': 3,
             'filename': f'{str(logs_path)}/aptc.log',
-            'when': 'W0'
+            'when': 'W0',
+            'filters': ['DisallowExceptionFilter']
+        },
+        'failed-url': {
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'level': 'DEBUG',
+            'formatter': 'default',
+            'backupCount': 3,
+            'filename': f'{str(logs_path)}/failed-urls.log',
+            'when': 'W0',
+            'filters': ['AllowExceptionFilter']
+        },
+        'timings': {
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'level': 'DEBUG',
+            'formatter': 'default',
+            'backupCount': 3,
+            'filename': f'{str(logs_path)}/function-timings.log',
+            'when': 'W0',
+            'filters': ['AllowTimingFilter']
+        }
+        'retry': {
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'level': 'DEBUG',
+            'formatter': 'default',
+            'backupCount': 3,
+            'filename': f'{str(logs_path)}/retry-urls.log',
+            'when': 'W0',
+            'filters': ['AllowRetryFilter']
         }
     },
     'loggers': {
