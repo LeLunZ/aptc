@@ -69,7 +69,7 @@ dictConfig({
             'level': 'DEBUG',
             'stream': sys.stdout,
             'formatter': 'default',
-            'filters': ['DisallowExceptionFilter']
+            'filters': ['DisallowFilter']
 
         },
         'timed': {
@@ -79,7 +79,7 @@ dictConfig({
             'backupCount': 3,
             'filename': f'{str(logs_path)}/aptc.log',
             'when': 'W0',
-            'filters': ['DisallowExceptionFilter']
+            'filters': ['DisallowFilter']
         },
         'failed-url': {
             'class': 'logging.handlers.TimedRotatingFileHandler',
