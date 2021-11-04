@@ -24,7 +24,8 @@ from Classes.DTOs import PageDTO
 from Classes.exceptions import TripAlreadyPresentError, CalendarDataNotFoundError, NoAgencyPresentError
 from Classes.oebb_date import OebbDate, service_months, begin_date, end_date, get_std_date
 from Functions.config import getConfig
-from Functions.geometry import stop_is_to_crawl_geometry
+from Functions.geometry import stop_is_to_crawl_geometry, northLatBorder, southLatBorder, eastLonBorder, westLonBorder, \
+    fiona_geometry_available
 from Functions.helper import add_day_to_calendar, extract_date_from_date_arr, merge_date, add_days_to_calendar, \
     get_all_name_of_transport_distinct, extract_date_objects_from_str
 from Functions.oebb_requests import requests_retry_session_async, date_w, set_date, weekday_name
@@ -39,7 +40,7 @@ from Models.stop_times import StopTime
 from Models.trip import Trip
 from Scripts.crud import add_stop, add_stop_times, get_all_ext_id_from_crawled_stops, add_route, \
     add_agency, add_calendar_dates, add_trip, add_stop_without_check, get_all_stops_in_list, \
-    commit, get_from_table, new_session, load_all_uncrawled_stops, add_transport_name, rollback
+    commit, get_from_table, new_session, load_all_uncrawled_stops, add_transport_name, rollback, check_stops
 from constants import pickle_path, chrome_driver_path
 
 logger = logging.getLogger(__name__)
@@ -705,6 +706,8 @@ def crawl():
                 stop.is_allowed = True
     except KeyError:
         pass
+    if not fiona_geometry_available:
+        check_stops(northLatBorder, southLatBorder, eastLonBorder, westLonBorder)
     commit()
     new_session()
     count12 = 0
