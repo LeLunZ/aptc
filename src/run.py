@@ -144,11 +144,11 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 if __name__ == '__main__':
     try:
-        crawl = getConfig('crawl')
+        start_crawl = getConfig('crawl')
     except KeyError as e:
         logger.debug('Not crawling - no key in csv found')
     else:
-        if crawl:
+        if start_crawl
             skip_csv = False
             try:
                 skip_csv = getConfig('skipCSV')
