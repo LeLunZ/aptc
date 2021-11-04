@@ -37,23 +37,23 @@ s = Session()
 
 
 def get_last_agency_id():
-    return s.query(Agency.agency_id).filter(func.max(Agency.agency_id)).first()
+    return s.query(func.max(Agency.agency_id)).first()
 
 
 def get_last_calendar_id():
-    return s.query(Calendar.service_id).filter(func.max(Calendar.service_id)).first()
+    return s.query(func.max(Calendar.service_id)).first()
 
 
 def get_last_route_id():
-    return s.query(Route.route_id).filter(func.max(Route.route_id)).first()
+    return s.query(func.max(Route.route_id)).first()
 
 
 def get_last_stop_id():
-    return s.query(Stop.stop_id).filter(func.max(Stop.stop_id)).first()
+    return s.query(func.max(Stop.stop_id)).first()
 
 
 def get_last_trip_id():
-    return s.query(Trip.trip_id).filter(func.max(Trip.trip_id)).first()
+    return s.query(func.max(Trip.trip_id)).first()
 
 
 primary_keys.agency_id_count = id_ if (id_ := get_last_agency_id()) is not None else -1
