@@ -17,6 +17,7 @@ from Models.stop_time_text import StopTimeText
 from Models.stop_times import StopTime
 from Models.transport_type_image import TransportTypeImage
 from Models.trip import Trip
+from Scripts import primary_keys
 
 logger = logging.getLogger(__name__)
 lock = threading.Lock()
@@ -33,6 +34,33 @@ engine = create_engine(DATABASE_URI, executemany_mode='values')
 Session = sessionmaker(bind=engine, autoflush=True, autocommit=False, expire_on_commit=True)
 
 s = Session()
+
+
+def get_last_agency_id():
+    return s.query(Agency.agency_id).filter(func.max(Agency.agency_id)).first()
+
+
+def get_last_calendar_id():
+    return s.query(Calendar.service_id).filter(func.max(Calendar.service_id)).first()
+
+
+def get_last_route_id():
+    return s.query(Route.route_id).filter(func.max(Route.route_id)).first()
+
+
+def get_last_stop_id():
+    return s.query(Stop.stop_id).filter(func.max(Stop.stop_id)).first()
+
+
+def get_last_trip_id():
+    return s.query(Trip.trip_id).filter(func.max(Trip.trip_id)).first()
+
+
+primary_keys.agency_id_count = id_ if (id_ := get_last_agency_id()) is not None else -1
+primary_keys.calendar_id_count = id_ if (id_ := get_last_calendar_id()) is not None else -1
+primary_keys.route_id_count = id_ if (id_ := get_last_route_id()) is not None else -1
+primary_keys.stop_id_count = id_ if (id_ := get_last_stop_id()) is not None else -1
+primary_keys.trip_id_count = id_ if (id_ := get_last_trip_id()) is not None else -1
 
 
 def lockF(lock):
@@ -358,26 +386,6 @@ def end_session():
         s.close()
     except Exception as e:
         logger.exception(e)
-
-
-def get_last_agency_id():
-    return s.query(Agency.agency_id).filter(func.max(Agency.agency_id)).first()
-
-
-def get_last_calendar_id():
-    return s.query(Calendar.service_id).filter(func.max(Calendar.service_id)).first()
-
-
-def get_last_route_id():
-    return s.query(Route.route_id).filter(func.max(Route.route_id)).first()
-
-
-def get_last_stop_id():
-    return s.query(Stop.stop_id).filter(func.max(Stop.stop_id)).first()
-
-
-def get_last_trip_id():
-    return s.query(Trip.trip_id).filter(func.max(Trip.trip_id)).first()
 
 
 def column_windows(session, column, windowsize):
