@@ -37,7 +37,7 @@ from Functions.request_hooks import response_journey_hook
 from Functions.config import getConfig
 from Scripts.crud import add_stop, add_stop_times, get_all_ext_id_from_crawled_stops, get_from_table_first, add_route, \
     add_agency, add_calendar_dates, add_trip, add_stop_without_check, get_all_stops_in_list, \
-    commit, get_from_table, new_session, load_all_uncrawled_stops, add_transport_name
+    commit, get_from_table, new_session, load_all_uncrawled_stops, add_transport_name, rollback
 from constants import pickle_path, chrome_driver_path
 
 logger = logging.getLogger(__name__)
@@ -404,7 +404,7 @@ def add_date_to_allg_feiertage(feiertag, year):
 def load_allg_feiertage():
     try:
         with open(
-                pickle_path / f'{begin_date.year}-{begin_date.month}-{begin_date.day}-{end_date.year}-{end_date.month}-{end_date.day}.pickle',
+                str(pickle_path / f'{begin_date.year}-{begin_date.month}-{begin_date.day}-{end_date.year}-{end_date.month}-{end_date.day}.pickle'),
                 'rb') as f:
             allg_feiertage.extend(pickle.load(f))
     except:
@@ -484,24 +484,30 @@ def process_page(url, page: PageDTO):
         new_agency: Agency = add_agency(page.agency)
 
     page.route.agency_id = new_agency.agency_id
-    route = add_route(page.route)
-    calendar = add_calendar_dates(page.calendar_data[0], page.calendar_data[1], page.calendar_data[2])
-    new_trip = Trip(route_id=route.route_id, service_id=calendar.service_id, oebb_url=url)
-    if new_trip.service_id is None:
-        raise Exception(f'no service_id {url}')
-    trip: Trip = add_trip(new_trip, f'{page.first_station}{page.dep_time}')
-    stops_on_db = get_all_stops_in_list(page.stop_ids)
-    current_stops_dict = {i.ext_id: i for i in stops_on_db}
-    for i, (stop_name, stop_id) in enumerate(zip(page.stop_names, page.stop_ids)):
-        if stop_id not in current_stops_dict:
-            stop_url = page.stop_links[i]
-            new_stop = Stop(stop_name=stop_name,
-                            stop_url=stop_url, location_type=0,
-                            ext_id=stop_id)
-            new_stop = add_stop_without_check(new_stop)
-            current_stops_dict[stop_id] = new_stop
-    tree = html.fromstring(page.page)
-    stop_times_to_add.append((tree, page, current_stops_dict, trip))
+    try:
+        route = add_route(page.route)
+        calendar = add_calendar_dates(page.calendar_data[0], page.calendar_data[1], page.calendar_data[2])
+        new_trip = Trip(route_id=route.route_id, service_id=calendar.service_id, oebb_url=url)
+        trip: Trip = add_trip(new_trip, f'{page.first_station}{page.dep_time}')
+    except:
+        logger.exception(traceback.format_exc())
+        raise
+    else:
+        stops_on_db = get_all_stops_in_list(page.stop_ids)
+        current_stops_dict = {i.ext_id: i for i in stops_on_db}
+        for i, (stop_name, stop_id) in enumerate(zip(page.stop_names, page.stop_ids)):
+            if stop_id not in current_stops_dict:
+                stop_url = page.stop_links[i]
+                new_stop = Stop(stop_name=stop_name,
+                                stop_url=stop_url, location_type=0,
+                                ext_id=stop_id)
+                try:
+                    new_stop = add_stop_without_check(new_stop)
+                except:
+                    logger.exception(traceback.format_exc())
+                current_stops_dict[stop_id] = new_stop
+        tree = html.fromstring(page.page)
+        stop_times_to_add.append((tree, page, current_stops_dict, trip))
 
 
 transport_type_not_found = {}
@@ -597,8 +603,9 @@ def load_data_async(routes):
             logger.info(f'Trying again with {error.request.url}')
             futures.append(
                 future_session.get(error.request.url, verify=False, hooks={'response': request_processing_hook}))
-        except Exception as e:
-            logger.exception(e)
+        except Exception as error:
+            logger.exception(error)
+            logger.exception(f'url: {error.request.url}')
     exit(0)
 
 
@@ -684,6 +691,14 @@ def load_all_routes_from_stops(stops: List[Stop]):
     return routes, stop_ext_id_dict.keys()
 
 
+def commit_():
+    try:
+        commit()
+    except:
+        logger.exception(traceback.format_exc())
+    new_session()
+
+
 def crawl():
     global stop_times_to_add, finishUp, date_arr
     try:
@@ -701,6 +716,7 @@ def crawl():
         if getConfig('resetDBstatus'):
             for stop in get_from_table(Stop):
                 stop.crawled = False
+                stop.is_allowed = True
     except KeyError:
         pass
     commit()
@@ -726,15 +742,17 @@ def crawl():
             page = q.pop()
             try:
                 process_page(page.url, page.data)
-            except CalendarDataNotFoundError as e:
+            except (CalendarDataNotFoundError, TripAlreadyPresentError) as e:
+                rollback()
                 logger.debug(f'Could\'t load {page.url}')
-            except TripAlreadyPresentError as e:
-                pass
             except Exception as e:
-                logger.exception(str(e) + f' with {page.url}')
+                rollback()
+                logger.exception(traceback.format_exc() + f' with {page.url}')
             except KeyboardInterrupt:
                 logger.exception('Keyboard interrupt')
                 exit(0)
+            else:
+                commit_()
         stop_times_executor = ThreadPoolExecutor()
         for tree, page, current_stops_dict, trip in stop_times_to_add:
             stop_times_executor.submit(add_stop_times_from_web_page, tree, page, current_stops_dict,
@@ -743,11 +761,7 @@ def crawl():
         for t, u in transport_type_not_found.items():
             add_transport_name(t, u)
         transport_type_not_found.clear()
-        try:
-            commit()
-        except:
-            print(traceback.format_exc())
-        new_session()
+        commit_()
         crawled_stop_ids.update(ext_ids)
         count12 = count12 + 1
         logger.info(f'finished route batch {count12 * max_stops_to_crawl}')

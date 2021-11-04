@@ -29,7 +29,7 @@ from sqlalchemy.orm import sessionmaker
 
 engine = create_engine(DATABASE_URI, executemany_mode='values')
 
-Session = sessionmaker(bind=engine, autoflush=False, autocommit=False, expire_on_commit=True)
+Session = sessionmaker(bind=engine, autoflush=True, autocommit=False, expire_on_commit=True)
 
 s = Session()
 
@@ -55,7 +55,6 @@ def add_agency(agency):
     data = s.query(Agency).filter(Agency.agency_name == agency.agency_name).first()
     if data is None:
         s.add(agency)
-        s.flush()
     else:
         agency = data
     return agency
@@ -71,7 +70,6 @@ def add_route(route: Route):
              Route.agency_id == route.agency_id)).first()
     if data is None:
         s.add(route)
-        s.flush()
     else:
         route = data
     return route
@@ -87,7 +85,6 @@ def add_transport_name(route, url):
     data = s.query(TransportTypeImage).filter(TransportTypeImage.name == route).first()
     if data is None:
         s.add(transport_type_name)
-        s.flush()
     else:
         pass
     return
@@ -98,7 +95,6 @@ def add_stop_time_text(text1):
     data = s.query(StopTimeText).filter(StopTimeText.working_days == text1).first()
     if data is None:
         s.add(stop_time_text)
-        s.flush()
     else:
         pass
     return
@@ -118,7 +114,6 @@ def add_calendar_dates(calendar_dates: [CalendarDate], only_dates_as_string: str
         service.calendar_dates_hash = None
         if data is None:
             s.add(service)
-            s.flush()
         else:
             if data.no_fix_date and service.no_fix_date:
                 data.start_date = service.start_date
@@ -139,11 +134,9 @@ def add_calendar_dates(calendar_dates: [CalendarDate], only_dates_as_string: str
         if calendar is None:
             service.calendar_dates_hash = hash_value
             s.add(service)
-            s.flush()
             for i in calendar_dates:
                 i.service_id = service.service_id
             s.bulk_save_objects(calendar_dates)
-            s.flush()
         else:
             if calendar.no_fix_date and service.no_fix_date:
                 calendar.start_date = service.start_date
@@ -158,7 +151,7 @@ def get_all_stops_in_list(stops):
 
 
 def get_all_ext_id_from_crawled_stops():
-    data = s.query(Stop.ext_id).filter(Stop.crawled == True).all()
+    data = s.query(Stop.ext_id).filter(and_(Stop.crawled == True, Stop.is_allowed == True)).all()
     return data
 
 
@@ -184,7 +177,6 @@ def get_all_names_from_searched_stops():
 
 def add_stop_without_check(stop: Stop):
     s.add(stop)
-    s.flush()
     return stop
 
 
@@ -192,7 +184,6 @@ def add_stop(stop: Stop):
     data: Stop = s.query(Stop).filter(Stop.ext_id == stop.ext_id).first()
     if data is None:
         s.add(stop)
-        s.flush()
     else:
         if stop.crawled is True and (data.crawled is False or data.crawled is None):
             data.crawled = True
@@ -226,22 +217,28 @@ def remove_parent_from_all():
 
 
 def load_all_uncrawled_stops(max_stops_to_crawl, check_stop_method):
-    stops = s.query(Stop).filter(
-        and_(Stop.crawled == False, Stop.info_searched == True, Stop.prod_class != None)).order_by(Stop.ext_id,
-                                                                                                   Stop.prod_class).limit(
-        max_stops_to_crawl).all()
-
     all_stops = []
-    for stop in stops:
-        if check_stop_method(stop):
-            all_stops.append(stop)
-            all_stops.extend(
-                s.query(Stop).filter(and_(Stop.crawled == False, or_(Stop.group_ext_id.like(f'%,{stop.ext_id}'),
-                                                                     Stop.group_ext_id.like(f'{stop.ext_id},%'),
-                                                                     Stop.group_ext_id.like(f'%,{stop.ext_id},%'),
-                                                                     Stop.group_ext_id.like(f'{stop.ext_id}')))).all())
-        else:
-            stop.crawled = True
+    while len(all_stops) == 0:
+        stops = s.query(Stop).filter(
+            and_(Stop.crawled == False, Stop.info_searched == True, Stop.prod_class != None)).order_by(Stop.ext_id,
+                                                                                                       Stop.prod_class).limit(
+            max_stops_to_crawl).all()
+        if len(stops) == 0:
+            break
+
+        all_stops = []
+        for stop in stops:
+            if check_stop_method(stop):
+                all_stops.append(stop)
+                all_stops.extend(
+                    s.query(Stop).filter(and_(Stop.crawled == False, or_(Stop.group_ext_id.like(f'%,{stop.ext_id}'),
+                                                                         Stop.group_ext_id.like(f'{stop.ext_id},%'),
+                                                                         Stop.group_ext_id.like(f'%,{stop.ext_id},%'),
+                                                                         Stop.group_ext_id.like(
+                                                                             f'{stop.ext_id}')))).all())
+            else:
+                stop.crawled = True
+                stop.is_allowed = False
 
     return set(all_stops)
 
@@ -289,7 +286,6 @@ def add_trip(trip, hash1):
                                            Trip.station_departure_time == trip.station_departure_time)).first()
     if data is None:
         s.add(trip)
-        s.flush()
     else:
         raise TripAlreadyPresentError()
     return trip
@@ -322,6 +318,15 @@ def query_element(e):
     return s.query(e)
 
 
+def rollback():
+    global s
+    try:
+        s.rollback()
+    except:
+        end_session()
+        new_session()
+
+
 @lockF(lock)
 def commit():
     global s
@@ -329,8 +334,7 @@ def commit():
         s.commit()
     except Exception as e:
         logger.exception(e)
-        if s.session is not None:
-            s.rollback()
+        s.rollback()
 
         def new_session_nested():
             global s

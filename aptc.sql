@@ -71,6 +71,7 @@ create table stops
     prod_class          integer,
     siblings_searched   boolean not null,
     info_searched       boolean not null,
+    is_allowed         boolean not null DEFAULT True,
     group_ext_id        text
 );
 
@@ -135,7 +136,7 @@ create table shapes
 create table trips
 (
     route_id               integer not null,
-    service_id             integer,
+    service_id             integer not null,
     trip_short_name        text,
     trip_headsign          text,
     direction_id           boolean,

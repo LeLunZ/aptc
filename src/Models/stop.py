@@ -23,6 +23,7 @@ class Stop(Base):
     prod_class = Column(Integer, nullable=True)
     siblings_searched = Column(Boolean, nullable=False, default=False)
     info_searched = Column(Boolean, nullable=False, default=False)
+    is_allowed = Column(Boolean, nullable=False, default=True)
     group_ext_id = Column(Text, nullable=True)
 
     def __repr__(self):
