@@ -148,7 +148,7 @@ if __name__ == '__main__':
     except KeyError as e:
         logger.debug('Not crawling - no key in csv found')
     else:
-        if start_crawl
+        if start_crawl:
             skip_csv = False
             try:
                 skip_csv = getConfig('skipCSV')
