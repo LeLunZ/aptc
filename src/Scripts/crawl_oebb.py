@@ -4,6 +4,7 @@ import json
 import logging
 import pickle
 import time
+import traceback
 from concurrent.futures import as_completed, ThreadPoolExecutor
 from threading import Thread
 from typing import List
@@ -594,7 +595,8 @@ def load_data_async(routes):
             pass
         except requests.exceptions.ConnectionError as error:
             logger.info(f'Trying again with {error.request.url}')
-            futures.append(future_session.get(error.request.url, verify=False, hooks={'response': request_processing_hook}))
+            futures.append(
+                future_session.get(error.request.url, verify=False, hooks={'response': request_processing_hook}))
         except Exception as e:
             logger.exception(e)
     exit(0)
@@ -741,7 +743,10 @@ def crawl():
         for t, u in transport_type_not_found.items():
             add_transport_name(t, u)
         transport_type_not_found.clear()
-        commit()
+        try:
+            commit()
+        except:
+            print(traceback.format_exc())
         new_session()
         crawled_stop_ids.update(ext_ids)
         count12 = count12 + 1

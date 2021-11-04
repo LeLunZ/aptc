@@ -1,5 +1,6 @@
 import logging
 import threading
+import traceback
 
 import sqlalchemy
 import xxhash
@@ -19,9 +20,9 @@ from Models.trip import Trip
 logger = logging.getLogger(__name__)
 lock = threading.Lock()
 try:
-    DATABASE_URI = 'postgres+psycopg2://' + str(getConfig('postgres'))
+    DATABASE_URI = 'postgresql+psycopg2://' + str(getConfig('postgres'))
 except KeyError:
-    DATABASE_URI = 'postgres+psycopg2://postgres:password@localhost:5432/postgres'
+    DATABASE_URI = 'postgresql+psycopg2://postgres:password@localhost:5432/postgres'
 
 from sqlalchemy import create_engine, and_, or_, func
 from sqlalchemy.orm import sessionmaker
@@ -31,6 +32,7 @@ engine = create_engine(DATABASE_URI, executemany_mode='values')
 Session = sessionmaker(bind=engine, autoflush=False, autocommit=False, expire_on_commit=True)
 
 s = Session()
+
 
 def lockF(lock):
     def wrap(func):
@@ -327,7 +329,8 @@ def commit():
         s.commit()
     except Exception as e:
         logger.exception(e)
-        s.rollback()
+        if s.session is not None:
+            s.rollback()
 
         def new_session_nested():
             global s
