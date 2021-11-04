@@ -108,7 +108,15 @@ dictConfig({
             'filename': f'{str(logs_path)}/retry-urls.log',
             'when': 'W0',
             'filters': ['AllowRetryFilter']
-        }
+        },
+        'sqlalchemy': {
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'level': 'WARNING',
+            'formatter': 'default',
+            'backupCount': 3,
+            'filename': f'{str(logs_path)}/sqlalchemy.log',
+            'when': 'W0',
+        },
     },
     'loggers': {
         'Scripts': {
@@ -123,6 +131,11 @@ dictConfig({
         },
         'Classes': {
             'handlers': loggers,
+            'level': 'DEBUG',
+            'propagate': False
+        },
+        'sqlalchemy':{
+            'handlers': ['sqlalchemy'],
             'level': 'DEBUG',
             'propagate': False
         },

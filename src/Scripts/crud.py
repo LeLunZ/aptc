@@ -321,8 +321,8 @@ def add_stop_time(stoptime: StopTime):
     return stoptime
 
 
-def add_stop_times(stoptime):
-    s.add_all(stoptime)
+def add_stop_times(stoptimes):
+    s.bulk_save_objects(stoptimes)
 
 
 def add_transfer():
