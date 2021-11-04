@@ -50,11 +50,6 @@ dictConfig({
             'level': 'DEBUG',
             'propagate': False
         },
-        'sqlalchemy': {
-            'handlers': loggers,
-            'level': 'DEBUG',
-            'propagate': False
-        },
         '__main__': {
             'handlers': loggers,
             'level': 'DEBUG',
