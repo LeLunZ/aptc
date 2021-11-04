@@ -255,13 +255,16 @@ def remove_parent_from_all():
 
 def check_stops(north, south, east, west):
     s.query(Stop).filter(
-        or_(north > Stop.stop_lat, south < Stop.stop_lat, east > Stop.stop_lon, west < Stop.stop_lon)).update(
+        and_(or_(north < Stop.stop_lat, south > Stop.stop_lat, east < Stop.stop_lon, west > Stop.stop_lon),
+             Stop.stop_lat != None)).update(
         {Stop.is_allowed: False})
 
 
 def load_all_uncrawled_stops(max_stops_to_crawl, check_stop_method):
     all_stops = []
     while len(all_stops) == 0:
+        # prod_class != None garanties that lon lat is set
+        # it doesnt prove it for updated stops without oebb api
         stops = s.query(Stop).filter(
             and_(Stop.crawled == False, Stop.info_searched == True, Stop.prod_class != None,
                  Stop.is_allowed == True)).order_by(Stop.ext_id, Stop.prod_class).limit(max_stops_to_crawl).all()
