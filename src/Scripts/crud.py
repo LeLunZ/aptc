@@ -31,7 +31,7 @@ from sqlalchemy.orm import sessionmaker
 
 engine = create_engine(DATABASE_URI, executemany_mode='values')
 
-Session = sessionmaker(bind=engine, autoflush=True, autocommit=False, expire_on_commit=True)
+Session = sessionmaker(bind=engine, autoflush=False, autocommit=False, expire_on_commit=True)
 
 s = Session()
 
