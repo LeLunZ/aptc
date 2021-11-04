@@ -297,7 +297,7 @@ def add_trip(trip, hash1):
         s.add(trip)
         s.flush()
     else:
-        raise TripAlreadyPresentError()
+        raise TripAlreadyPresentError(f'Trip with id {data.trip_id} already present.')
     return trip
 
 
@@ -333,7 +333,6 @@ def rollback():
     try:
         s.rollback()
     except:
-        end_session()
         new_session()
 
 

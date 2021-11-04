@@ -674,6 +674,7 @@ def load_all_routes_from_stops(stops: List[Stop]):
     return routes, stop_ext_id_dict.keys()
 
 
+@timing
 def commit_():
     try:
         commit()
