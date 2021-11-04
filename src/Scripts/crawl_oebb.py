@@ -717,7 +717,7 @@ def crawl():
         if uncrawled is None or len(uncrawled) == 0:
             break
         routes, ext_ids = load_all_routes_from_stops(uncrawled)
-        commit()
+        commit_()
         stop_times_to_add = []
         t = Thread(target=load_data_async, args=(routes,))
         t.daemon = True
@@ -742,6 +742,7 @@ def crawl():
                 logger.exception(traceback.format_exc() + f'\n{page.url}')
             else:
                 commit_()
+        new_session()
         stop_times_executor = ThreadPoolExecutor()
         for tree, page, current_stops_dict, trip in stop_times_to_add:
             stop_times_executor.submit(add_stop_times_from_web_page, tree, page, current_stops_dict,
