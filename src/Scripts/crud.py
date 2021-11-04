@@ -263,9 +263,8 @@ def load_all_uncrawled_stops(max_stops_to_crawl, check_stop_method):
     all_stops = []
     while len(all_stops) == 0:
         stops = s.query(Stop).filter(
-            and_(Stop.crawled == False, Stop.info_searched == True, Stop.prod_class != None)).order_by(Stop.ext_id,
-                                                                                                       Stop.prod_class).limit(
-            max_stops_to_crawl).all()
+            and_(Stop.crawled == False, Stop.info_searched == True, Stop.prod_class != None,
+                 Stop.is_allowed == True)).order_by(Stop.ext_id, Stop.prod_class).limit(max_stops_to_crawl).all()
         if len(stops) == 0:
             break
 
