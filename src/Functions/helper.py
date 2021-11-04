@@ -1,21 +1,14 @@
 import csv
 import datetime
-import logging
 import os
-from functools import wraps
-from time import time
 from zipfile import ZipFile
 
 import googlemaps
-from Models.calendar import Calendar
+
 from Classes.oebb_date import begin_date, end_date, OebbDate, service_months
-
-from Scripts.crud import commit, get_stops_with_parent, get_stop_with_id, \
-    update_location_of_stop, \
-    remove_parent_from_all, new_session, query_element, windowed_query, get_from_table, end_session
 from Functions.config import getConfig
-
 from Models.agency import Agency
+from Models.calendar import Calendar
 from Models.calendar_date import CalendarDate
 from Models.frequencies import Frequency
 from Models.route import Route
@@ -24,6 +17,9 @@ from Models.stop import Stop
 from Models.stop_times import StopTime
 from Models.transfers import Transfer
 from Models.trip import Trip
+from Scripts.crud import commit, get_stops_with_parent, get_stop_with_id, \
+    update_location_of_stop, \
+    remove_parent_from_all, new_session, query_element, windowed_query, get_from_table, end_session
 from constants import db_path
 
 inv_map = {v: k for k, v in service_months.items()}

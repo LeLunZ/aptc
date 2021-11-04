@@ -1,10 +1,11 @@
-import requests
-from requests_futures.sessions import FuturesSession
-from requests.adapters import HTTPAdapter
-from urllib3 import Retry
 import json
-from lxml import html
 from datetime import datetime
+
+import requests
+from lxml import html
+from requests.adapters import HTTPAdapter
+from requests_futures.sessions import FuturesSession
+from urllib3 import Retry
 
 date_w = ['13.07.2020']
 days_name = {
@@ -93,7 +94,8 @@ def get_all_routes_from_station(station_id):
             'https://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_scotty.vs_liveticker&evaId=' + str(
                 int(station_id)) + '&boardType=arr&time=00:00'
                                    '&additionalTime=0&maxJourneys=100000&outputMode=tickerDataOnly&start=yes&selectDate'
-                                   '=period&dateBegin=' + date_w[0] + 'dateEnd=' + date_w[0] + '&productsFilter=1011111111011',
+                                   '=period&dateBegin=' + date_w[0] + 'dateEnd=' + date_w[
+                0] + '&productsFilter=1011111111011',
             verify=False)
         json_data = json.loads(routes_of_station.content.decode('iso-8859-1')[14:-1])
     except:
@@ -127,9 +129,10 @@ def get_all_routes_of_transport_and_station(transport_number, station):
 
 def get_stops_near_coordinates():
     url = 'https://fahrplan.oebb.at/bin/mgate.exe'
-    payload = {"id": "zhig4m8imm4dyg4s", "ver": "1.32", "lang": "deu", "auth": {"type": "AID", "aid": "5vHavmuWPWIfetEe"},
-            "client": {"id": "OEBB", "type": "WEB", "name": "webapp", "l": "vs_webapp"}, "formatted": False,
-            "ext": "OEBB.7", "svcReqL": [{"meth": "LocGeoPos", "req": {
+    payload = {"id": "zhig4m8imm4dyg4s", "ver": "1.32", "lang": "deu",
+               "auth": {"type": "AID", "aid": "5vHavmuWPWIfetEe"},
+               "client": {"id": "OEBB", "type": "WEB", "name": "webapp", "l": "vs_webapp"}, "formatted": False,
+               "ext": "OEBB.7", "svcReqL": [{"meth": "LocGeoPos", "req": {
             "ring": {"cCrd": {"x": 14390716, "y": 48319277}, "minDist": 0, "maxDist": 10000}, "maxLoc": 10,
             "locFltrL": [{"type": "PROD", "mode": "INC", "value": 8191}], "getPOIs": False}, "id": "1|15|"}]}
 
@@ -137,4 +140,3 @@ def get_stops_near_coordinates():
     # live map for the new web app https://fahrplan.oebb.at/webapp/#!P|TP!histId|0!histKey|H362702
     json_data = json.loads(locations.content.decode('iso-8859-1'))
     return json_data
-

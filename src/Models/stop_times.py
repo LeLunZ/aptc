@@ -1,5 +1,5 @@
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, Float, Text, Interval
+from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
@@ -22,7 +22,8 @@ class StopTime(Base):
 
     @staticmethod
     def firstline():
-        return ['trip_id', 'stop_sequence', 'stop_id', 'arrival_time', 'departure_time', 'stop_headsign', 'pickup_type', 'drop_off_type', 'shape_dist_traveled']
+        return ['trip_id', 'stop_sequence', 'stop_id', 'arrival_time', 'departure_time', 'stop_headsign', 'pickup_type',
+                'drop_off_type', 'shape_dist_traveled']
 
     def tocsv(self):
         return [self.trip_id, self.stop_sequence, self.stop_id, self.arrival_time, self.departure_time,

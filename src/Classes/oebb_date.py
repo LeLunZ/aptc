@@ -64,4 +64,3 @@ def get_std_date():
     end_date.day = int(date_end[0])
     end_date.month = inv_map[int(date_end[1])]
     end_date.year = int(date_end[2])
-

@@ -1,9 +1,10 @@
 import json
 from urllib.parse import parse_qs, urlparse
 
+from lxml import html
+
 from Functions.helper import str_to_geocord
 from Models.stop import Stop
-from lxml import html
 
 
 def extract_real_name_from_stop_page(resp, *args, **kwargs):
@@ -33,14 +34,14 @@ def request_stops_processing_hook(resp, *args, **kwargs):
                     location_type = -1  # 0 or 1
             else:
                 if (int(se['prodClass']) & 63) != 0:
-                    location_type = -1 # 0 or 1
+                    location_type = -1  # 0 or 1
                     pass  # Its a station (metahst) (Bus, Tram, Train etc). But sometimes its also a stop
                 if (int(se['prodClass']) & 63) == 0:
                     pass  # its a single stop no parent
                     location_type = 0
 
         if (ext_id_str := str(int(se['extId']))).startswith('11'):
-            pass   # continue?? Meta Object like Cities
+            pass  # continue?? Meta Object like Cities
         elif ext_id_str.startswith('13') and (int(se['prodClass']) & 63) != 0:
             pass  # Its a station (metahst) (Bus, Tram, Train etc)
             location_type = 1

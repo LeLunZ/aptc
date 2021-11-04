@@ -1,5 +1,5 @@
+from sqlalchemy import Column, Integer, Boolean, Numeric
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, Date, Float, Text, Boolean, Numeric, BigInteger
 
 from Scripts import primary_keys
 
@@ -19,7 +19,7 @@ class Calendar(Base):
     start_date = Column(Numeric, nullable=True)
     end_date = Column(Numeric, nullable=False)
     no_fix_date = Column(Boolean, nullable=False, default=False)
-    includes_public_holidays = Column(Boolean, nullable=False,default=False)
+    includes_public_holidays = Column(Boolean, nullable=False, default=False)
     calendar_dates_hash = Column(Numeric, nullable=True)
 
     def __repr__(self):

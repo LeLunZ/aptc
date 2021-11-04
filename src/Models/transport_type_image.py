@@ -1,5 +1,5 @@
+from sqlalchemy import Column, Text
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, Date, Float, Text
 
 TransportTypeImageBase = declarative_base()
 

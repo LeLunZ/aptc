@@ -1,5 +1,5 @@
+from sqlalchemy import Column, Integer, Text, Boolean
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, Date, Float, Text, Boolean
 
 from Scripts import primary_keys
 
