@@ -98,7 +98,7 @@ dictConfig({
             'filename': f'{str(logs_path)}/function-timings.log',
             'when': 'W0',
             'filters': ['AllowTimingFilter']
-        }
+        },
         'retry': {
             'class': 'logging.handlers.TimedRotatingFileHandler',
             'level': 'DEBUG',
