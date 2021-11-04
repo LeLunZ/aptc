@@ -255,7 +255,7 @@ def remove_parent_from_all():
 
 def check_stops(north, south, east, west):
     s.query(Stop).filter(
-        and_(north > Stop.stop_lat, south < Stop.stop_lat, east > Stop.stop_lon, west < Stop.stop_lon)).update(
+        or_(north > Stop.stop_lat, south < Stop.stop_lat, east > Stop.stop_lon, west < Stop.stop_lon)).update(
         {Stop.is_allowed: False})
 
 
