@@ -1,12 +1,14 @@
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, Date, Float, Text, Boolean, Numeric, BigInteger
 
+from Scripts import primary_keys
+
 Base = declarative_base()
 
 
 class Calendar(Base):
     __tablename__ = 'calendar'
-    service_id = Column(Integer, primary_key=True, autoincrement=True)
+    service_id = Column(Integer, primary_key=True, autoincrement=False)
     monday = Column(Boolean, nullable=False)
     tuesday = Column(Boolean, nullable=False)
     wednesday = Column(Boolean, nullable=False)
@@ -23,6 +25,10 @@ class Calendar(Base):
     def __repr__(self):
         return "<Calendar(id='{}', start='{}', end={})>" \
             .format(self.service_id, self.start_date, self.end_date)
+
+    def set_id(self):
+        primary_keys.calendar_id_count += 1
+        self.service_id = primary_keys.calendar_id_count
 
     @staticmethod
     def firstline():

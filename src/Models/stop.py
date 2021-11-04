@@ -1,12 +1,14 @@
 from sqlalchemy import Column, Integer, Float, Text, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 
+from Scripts import primary_keys
+
 Base = declarative_base()
 
 
 class Stop(Base):
     __tablename__ = 'stops'
-    stop_id = Column(Integer, primary_key=True, autoincrement=True)
+    stop_id = Column(Integer, primary_key=True, autoincrement=False)
     stop_code = Column(Text, nullable=False)
     stop_name = Column(Text, nullable=False)
     stop_desc = Column(Text, nullable=True)
@@ -29,6 +31,10 @@ class Stop(Base):
     def __repr__(self):
         return "<Stop(name='{}', url='{}', id={})>" \
             .format(self.stop_name, self.stop_url, self.stop_id)
+
+    def set_id(self):
+        primary_keys.stop_id_count += 1
+        self.stop_id = primary_keys.stop_id_count
 
     @staticmethod
     def firstline():

@@ -4,3 +4,7 @@ class TripAlreadyPresentError(Exception):
 
 class CalendarDataNotFoundError(Exception):
     pass
+
+
+class NoAgencyPresentError(Exception):
+    pass

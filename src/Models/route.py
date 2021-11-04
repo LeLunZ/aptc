@@ -1,13 +1,15 @@
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, Date, Float, Text, Boolean
 
+from Scripts import primary_keys
+
 Base = declarative_base()
 
 
 class Route(Base):
     __tablename__ = 'routes'
     agency_id = Column(Integer, nullable=True)
-    route_id = Column(Integer, primary_key=True, autoincrement=True)
+    route_id = Column(Integer, primary_key=True, autoincrement=False)
     route_short_name = Column(Text, nullable=True)
     route_long_name = Column(Text, nullable=False)
     route_desc = Column(Text, nullable=True)
@@ -19,6 +21,10 @@ class Route(Base):
     def __repr__(self):
         return "<Route(name='{}', url='{}', id={})>" \
             .format(self.route_short_name, self.route_url, self.route_id)
+
+    def set_id(self):
+        primary_keys.route_id_count += 1
+        self.route_id = primary_keys.route_id_count
 
     @staticmethod
     def firstline():

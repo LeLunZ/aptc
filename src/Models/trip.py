@@ -1,6 +1,8 @@
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, Date, Float, Text, Boolean
 
+from Scripts import primary_keys
+
 Base = declarative_base()
 
 
@@ -14,13 +16,17 @@ class Trip(Base):
     block_id = Column(Text, nullable=True)
     shape_id = Column(Text, nullable=True)
     wheelchair_accessible = Column(Text, nullable=True)
-    trip_id = Column(Integer, nullable=False, primary_key=True, autoincrement=True)
+    trip_id = Column(Integer, nullable=False, primary_key=True, autoincrement=False)
     oebb_url = Column(Text, nullable=True)
     station_departure_time = Column(Text, nullable=False)
 
     def __repr__(self):
         return "<Trip(name='{}', id={})>" \
             .format(self.trip_short_name, self.trip_id)
+
+    def set_id(self):
+        primary_keys.trip_id_count += 1
+        self.trip_id = primary_keys.trip_id_count
 
     @staticmethod
     def firstline():

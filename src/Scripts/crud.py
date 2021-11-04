@@ -56,8 +56,8 @@ def lockF(lock):
 def add_agency(agency):
     data = s.query(Agency).filter(Agency.agency_name == agency.agency_name).first()
     if data is None:
+        agency.set_id()
         s.add(agency)
-        s.flush()
     else:
         agency = data
     return agency
@@ -72,8 +72,8 @@ def add_route(route: Route):
         and_(Route.route_type == route.route_type, Route.route_long_name == route.route_long_name,
              Route.agency_id == route.agency_id)).first()
     if data is None:
+        route.set_id()
         s.add(route)
-        s.flush()
     else:
         route = data
     return route
@@ -118,8 +118,8 @@ def add_calendar_dates(calendar_dates: [CalendarDate], only_dates_as_string: str
                  Calendar.sunday == service.sunday)).first()
         service.calendar_dates_hash = None
         if data is None:
+            service.set_id()
             s.add(service)
-            s.flush()
         else:
             if data.no_fix_date and service.no_fix_date:
                 data.start_date = service.start_date
@@ -139,8 +139,8 @@ def add_calendar_dates(calendar_dates: [CalendarDate], only_dates_as_string: str
         calendar = calendar.first()
         if calendar is None:
             service.calendar_dates_hash = hash_value
+            service.set_id()
             s.add(service)
-            s.flush()
             for i in calendar_dates:
                 i.service_id = service.service_id
             s.add_all(calendar_dates)
@@ -183,16 +183,16 @@ def get_all_names_from_searched_stops():
 
 
 def add_stop_without_check(stop: Stop):
+    stop.set_id()
     s.add(stop)
-    s.flush()
     return stop
 
 
 def add_stop(stop: Stop):
     data: Stop = s.query(Stop).filter(Stop.ext_id == stop.ext_id).first()
     if data is None:
+        stop.set_id()
         s.add(stop)
-        s.flush()
     else:
         if stop.crawled is True and (data.crawled is False or data.crawled is None):
             data.crawled = True
@@ -294,8 +294,8 @@ def add_trip(trip, hash1):
     data: Trip = s.query(Trip).filter(and_(Trip.service_id == trip.service_id, Trip.route_id == trip.route_id,
                                            Trip.station_departure_time == trip.station_departure_time)).first()
     if data is None:
+        trip.set_id()
         s.add(trip)
-        s.flush()
     else:
         raise TripAlreadyPresentError(f'Trip with id {data.trip_id} already present.')
     return trip
@@ -358,6 +358,26 @@ def end_session():
         s.close()
     except Exception as e:
         logger.exception(e)
+
+
+def get_last_agency_id():
+    return s.query(Agency.agency_id).filter(func.max(Agency.agency_id)).first()
+
+
+def get_last_calendar_id():
+    return s.query(Calendar.service_id).filter(func.max(Calendar.service_id)).first()
+
+
+def get_last_route_id():
+    return s.query(Route.route_id).filter(func.max(Route.route_id)).first()
+
+
+def get_last_stop_id():
+    return s.query(Stop.stop_id).filter(func.max(Stop.stop_id)).first()
+
+
+def get_last_trip_id():
+    return s.query(Trip.trip_id).filter(func.max(Trip.trip_id)).first()
 
 
 def column_windows(session, column, windowsize):

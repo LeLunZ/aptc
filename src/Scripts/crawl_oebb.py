@@ -20,7 +20,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from urllib3.exceptions import ReadTimeoutError, MaxRetryError
 
 from Classes.DTOs import PageDTO
-from Classes.exceptions import TripAlreadyPresentError, CalendarDataNotFoundError
+from Classes.exceptions import TripAlreadyPresentError, CalendarDataNotFoundError, NoAgencyPresentError
 from Functions.geometry import stop_is_to_crawl_geometry
 from Functions.timing import timing
 from Models.agency import Agency
@@ -39,6 +39,7 @@ from Functions.config import getConfig
 from Scripts.crud import add_stop, add_stop_times, get_all_ext_id_from_crawled_stops, get_from_table_first, add_route, \
     add_agency, add_calendar_dates, add_trip, add_stop_without_check, get_all_stops_in_list, \
     commit, get_from_table, new_session, load_all_uncrawled_stops, add_transport_name, rollback
+from Scripts.primary_keys import set_agency_id
 from constants import pickle_path, chrome_driver_path
 
 logger = logging.getLogger(__name__)
@@ -462,7 +463,7 @@ def process_page(url, page: PageDTO):
         raise CalendarDataNotFoundError(f'no calendar_data')
 
     if page.agency is None:
-        new_agency: Agency = get_from_table_first(Agency)
+        raise NoAgencyPresentError(f'No Agency found in {url}')
     else:
         new_agency: Agency = add_agency(page.agency)
 
@@ -731,7 +732,7 @@ def crawl():
                 process_page(page.url, page.data)
             except TripAlreadyPresentError:
                 rollback()
-            except CalendarDataNotFoundError:
+            except (CalendarDataNotFoundError, NoAgencyPresentError):
                 rollback()
                 logger.exception(traceback.format_exc() + f'\n{page.url}')
             except KeyboardInterrupt:

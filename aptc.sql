@@ -4,8 +4,9 @@ TRUNCATE stop_time_text;
 TRUNCATE stop_times;
 TRUNCATE transport_type_image;
 TRUNCATE trips;
-TRUNCATE stops;
 TRUNCATE routes;
+
+TRUNCATE stops;
 TRUNCATE agency;
 
 DROP table if exists trips;
@@ -71,7 +72,7 @@ create table stops
     prod_class          integer,
     siblings_searched   boolean not null,
     info_searched       boolean not null,
-    is_allowed         boolean not null DEFAULT True,
+    is_allowed          boolean not null DEFAULT True,
     group_ext_id        text
 );
 
@@ -173,6 +174,9 @@ create table transfers
 
 create table stop_times
 (
+    stop_times_id       serial  not null
+        constraint stop_times_pk
+            primary key,
     trip_id             integer not null,
     stop_sequence       integer not null,
     stop_id             integer not null,
@@ -185,10 +189,7 @@ create table stop_times
     drop_off_type       integer
         constraint stop_times_drop_off_type_check
             check ((drop_off_type >= 0) AND (drop_off_type <= 3)),
-    shape_dist_traveled double precision,
-    stop_times_id       integer not null
-        constraint stop_times_pk
-            primary key
+    shape_dist_traveled double precision
 );
 
 create table calendar_dates
