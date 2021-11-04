@@ -22,6 +22,7 @@ from urllib3.exceptions import ReadTimeoutError, MaxRetryError
 from Classes.DTOs import PageDTO
 from Classes.exceptions import TripAlreadyPresentError, CalendarDataNotFoundError
 from Functions.geometry import stop_is_to_crawl_geometry
+from Functions.timing import timing
 from Models.agency import Agency
 from Models.calendar import Calendar
 from Models.calendar_date import CalendarDate
@@ -31,7 +32,7 @@ from Models.stop_times import StopTime
 from Models.trip import Trip
 from Classes.oebb_date import OebbDate, service_months, begin_date, end_date, get_std_date
 from Functions.helper import add_day_to_calendar, extract_date_from_date_arr, merge_date, add_days_to_calendar, \
-    get_all_name_of_transport_distinct, extract_date_objects_from_str, timing
+    get_all_name_of_transport_distinct, extract_date_objects_from_str
 from Functions.oebb_requests import requests_retry_session_async, date_w, set_date, weekday_name
 from Functions.request_hooks import response_journey_hook
 from Functions.config import getConfig

@@ -7,7 +7,7 @@ import xxhash
 
 from Classes.exceptions import TripAlreadyPresentError
 from Functions.config import getConfig
-from Functions.helper import timing
+from Functions.timing import timing
 from Models.agency import Agency
 from Models.calendar import Calendar
 from Models.calendar_date import CalendarDate
