@@ -37,7 +37,8 @@ try:
             del fiona_iteration
             fiona_geometry_available = len(fiona_geometry) > 0
         except (KeyError, FileNotFoundError, Exception) as e:
-            logger.exception(e)
+            fiona_geometry_available = False
+            fiona_geometry = None
 
     if crawlStopOptions:
         northLatBorder = getConfig('crawlStopOptions.northLatBorder')
