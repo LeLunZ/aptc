@@ -753,8 +753,8 @@ def crawl():
         transport_type_not_found.clear()
         commit_()
         crawled_stop_ids.update(ext_ids)
-        count12 = count12 + 1
-        logger.info(f'finished route batch {count12 * max_stops_to_crawl}')
+        count12 = count12 + len(uncrawled)
+        logger.info(f'finished route batch {count12}')
     logger.info("finished route crawling")
     commit()
     return count12

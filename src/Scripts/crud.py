@@ -270,7 +270,7 @@ def load_all_uncrawled_stops(max_stops_to_crawl, check_stop_method):
         # prod_class != None garanties that lon lat is set
         # it doesnt prove it for updated stops without oebb api
         stops = s.query(Stop).filter(
-            and_(Stop.crawled == False, Stop.info_searched == True, Stop.prod_class != None,
+            and_(Stop.crawled == False, Stop.info_searched == True, Stop.stop_lat != None, Stop.stop_lon != None,
                  Stop.is_allowed == True)).order_by(Stop.ext_id, Stop.prod_class).limit(max_stops_to_crawl).all()
         if len(stops) == 0:
             break
@@ -303,9 +303,19 @@ def sibling_search_stops(max_stops_to_crawl):
 
 
 def get_all_stops_without_location(max_stops_to_crawl):
-    return s.query(Stop).filter(and_(Stop.stop_lat == None, Stop.prod_class == None)).order_by(Stop.ext_id,
-                                                                                               Stop.prod_class).limit(
+    return s.query(Stop).filter(and_(Stop.stop_lat == None, Stop.stop_lon == None)).order_by(Stop.ext_id,
+                                                                                             Stop.prod_class).limit(
         max_stops_to_crawl).all()
+
+
+def group_stops():
+    sub = s.query(Stop.group_ext_id).filter(Stop.group_ext_id != None).group_by(Stop.group_ext_id).having(
+        func.count(Stop.group_ext_id) == func.array_length(func.string_to_array(Stop.group_ext_id, ','), 1)).subquery()
+    return s.query(Stop).filter(Stop.group_ext_id.in_(sub)).all()
+
+
+def get_all_stops_with_group():
+    return s.query(Stop).filter(Stop.group_ext_id != None).all()
 
 
 @lockF(lock)

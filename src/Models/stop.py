@@ -26,6 +26,7 @@ class Stop(Base):
     siblings_searched = Column(Boolean, nullable=False, default=False)
     info_searched = Column(Boolean, nullable=False, default=False)
     is_allowed = Column(Boolean, nullable=False, default=True)
+    used_gmaps = Column(Boolean, nullable=False, default=False)
     group_ext_id = Column(Text, nullable=True)
 
     def __repr__(self):

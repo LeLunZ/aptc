@@ -19,7 +19,8 @@ from Models.transfers import Transfer
 from Models.trip import Trip
 from Scripts.crud import commit, get_stops_with_parent, get_stop_with_id, \
     update_location_of_stop, \
-    remove_parent_from_all, new_session, query_element, windowed_query, get_from_table, end_session
+    remove_parent_from_all, new_session, query_element, windowed_query, get_from_table, end_session, \
+    get_stops_without_location
 from constants import db_path
 
 inv_map = {v: k for k, v in service_months.items()}
@@ -216,10 +217,10 @@ def extract_date_objects_from_str(dates_list, dates, start_date, finish_date):
             month = None
 
 
-def match_station_with_google_maps(stops):
+def match_station_with_google_maps():
     key = getConfig('googleMapsKey')
     gmaps = googlemaps.Client(key=key)
-    all_stops = stops
+    all_stops = get_stops_without_location()
     for stop in all_stops:
         geocoding = gmaps.geocode(stop.stop_name)
         if geocoding is None or len(geocoding) == 0:
@@ -230,6 +231,7 @@ def match_station_with_google_maps(stops):
             lng = location['lng']
             stop.stop_lat = lat
             stop.stop_lon = lng
+            stop.used_gmaps = True
     commit()
 
 

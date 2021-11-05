@@ -9,7 +9,7 @@ import urllib3
 from requests_futures.sessions import FuturesSession
 
 from Functions.geometry import stop_is_to_crawl_geometry
-from Functions.helper import skip_stop
+from Functions.helper import skip_stop, match_station_with_google_maps
 from Functions.oebb_requests import requests_retry_session_async
 from Functions.request_hooks import request_stops_processing_hook, extract_real_name_from_stop_page, \
     request_station_id_processing_hook
@@ -19,8 +19,7 @@ from constants import data_path, state_path
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 stop_ids_db = set([int(e.ext_id) for e in get_all_ext_id_from_stops()])
-stop_ids_searched = set([int(e.ext_id) for e in get_all_ext_id_from_stops_where_siblings_searched()])
-stop_ids_info = set([int(e.ext_id) for e in get_all_ext_id_from_stops_where_info_searched()])
+# stop_ids_info = set([int(e.ext_id) for e in get_all_ext_id_from_stops_where_info_searched()])
 searched_text = set([str(e.stop_name) for e in get_all_names_from_searched_stops()])
 cur_line = 0
 finished_crawling = None
@@ -73,10 +72,7 @@ def load_all_stops_to_crawl(stop_names):
             response_data = response.data
             for count, stop in enumerate(response_data):
                 if stop_is_to_crawl(stop):
-                    if stop.siblings_searched:
-                        stop_ids_searched.add(stop.ext_id)
                     stop_ids_db.add(stop.ext_id)
-                    stop_ids_info.add(stop.ext_id)
                     stop_url = f'https://fahrplan.oebb.at/bin/stboard.exe/dn?protocol=https:&input={stop.ext_id}'
                     stop_ext_id_dict[stop.ext_id] = stop
                     stop_page_req.append(stop_url)
@@ -138,12 +134,10 @@ def load_all_stops_to_crawl_(stops):
             response_data = response.data
             real_stop = response.stop
             if real_stop.siblings_searched is False:
-                stop_ids_searched.add(real_stop.ext_id)
                 real_stop.siblings_searched = True
                 all_stops_to_add = [stop.stop_name for stop in response_data if stop_is_to_crawl(stop)]
                 stops_for_search.update(all_stops_to_add)
             if real_stop.info_searched is False:
-                stop_ids_info.add(real_stop.ext_id)
                 real_stop.info_searched = True
                 hopeful_stop = [stop for stop in response_data if stop.ext_id == real_stop.ext_id]
                 if len(hopeful_stop) != 0:
@@ -228,16 +222,19 @@ def crawl_stops(init=False):
     global stop_ids_db
     stop_ids_db = set([int(e.ext_id) for e in get_all_ext_id_from_stops()])
     uncrawled = sibling_search_stops(max_stops_to_crawl)
+    count = 0
     while len(uncrawled) != 0:
         load_all_stops_to_crawl_(uncrawled)
         for stop in uncrawled:
             stop.siblings_searched = True
             stop.info_searched = True
         commit()
+        count += len(uncrawled)
+        logger.info(f'finished stop batch {count}')
         uncrawled = sibling_search_stops(max_stops_to_crawl)
 
     logger.info("finished stops crawling")
-    # match_station_with_google_maps()
+    match_station_with_google_maps()
     # Call after crawling whole Routes
     # match_station_with_parents()
 

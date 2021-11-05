@@ -74,7 +74,8 @@ create table stops
     siblings_searched   boolean not null,
     info_searched       boolean not null,
     is_allowed          boolean not null DEFAULT True,
-    group_ext_id        text
+    group_ext_id        text,
+    used_gmaps          boolean not null DEFAULT False
 );
 
 create index stops_stop_name_uindex
