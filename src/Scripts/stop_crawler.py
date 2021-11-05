@@ -42,7 +42,7 @@ def handle_stop_group_response(f, stop_ext_id_dict):
             map(lambda x: unquote(''.join(x.split('|')[:-1]), encoding='iso-8859-1'), all_stations))
         station_ids = list(map(lambda x: int(x.split('|')[-1]), all_stations))
         main_station: Stop = stop_ext_id_dict[station_ids[0]]
-        if (ext_id_str := ','.join(str(s) for s in station_ids[1:])) != '':
+        if (ext_id_str := ','.join(str(s) for s in sorted(station_ids[:]))) != '':
             main_station.group_ext_id = ext_id_str
         for s_n, s_i in zip(station_names[1:], station_ids[1:]):
             if s_i not in stop_ids_db:
@@ -234,7 +234,9 @@ def crawl_stops(init=False):
         uncrawled = sibling_search_stops(max_stops_to_crawl)
 
     logger.info("finished stops crawling")
+    logger.info('starting google stop search')
     match_station_with_google_maps()
+    logger.info('google stop search finished')
     # Call after crawling whole Routes
     # match_station_with_parents()
 
