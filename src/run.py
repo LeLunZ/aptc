@@ -157,7 +157,6 @@ logger = logging.getLogger(__name__)
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 if __name__ == '__main__':
-    group()
     try:
         start_crawl = getConfig('crawl')
     except KeyError as e:
