@@ -126,7 +126,6 @@ route_types = {
     'zug_pic.gif': 2
 }
 date_arr = []
-stop_times_executor = None
 stop_times_to_add = []
 crawled_stop_ids = set([e.ext_id for e in get_all_ext_id_from_crawled_stops()])
 default_agency_id = get_default_agency_id()
@@ -426,7 +425,7 @@ def load_allg_feiertage():
             pickle.dump(allg_feiertage, f)
 
 
-def add_stop_times_from_web_page(tree, page: PageDTO, current_stops_dict, trip):
+def add_stop_times_from_web_page(tree, page: PageDTO, trip_id):
     headsign = None
     stop_before_current = None
     stop_time_list = []
@@ -437,8 +436,7 @@ def add_stop_times_from_web_page(tree, page: PageDTO, current_stops_dict, trip):
                                         second="zebracol-1", third='center sepline', count=i + 1)))
         if str(all_times[2]).strip() != '' and str(all_times[2]).strip() != page.route.route_long_name.strip():
             headsign = str(all_times[2]).strip()
-        stop = current_stops_dict[page.stop_ids[i]]
-        new_stop_time = StopTime(stop_id=stop.stop_id, trip_id=trip.trip_id,
+        new_stop_time = StopTime(stop_id=page.stop_ids[i], trip_id=trip_id,
                                  arrival_time=all_times[0] if all_times[0] == '' else all_times[0] + ':00',
                                  departure_time=all_times[1] if all_times[1] == '' else all_times[1] + ':00',
                                  stop_sequence=i + 1, pickup_type=0, drop_off_type=0, stop_headsign=headsign)
@@ -487,7 +485,7 @@ def process_page(url, page: PageDTO):
                 new_stop = add_stop_without_check(new_stop)
                 current_stops_dict[stop_id] = new_stop
         tree = html.fromstring(page.page)
-        stop_times_to_add.append((tree, page, current_stops_dict, trip))
+        stop_times_to_add.append((tree, page, trip.trip_id))
 
 
 transport_type_not_found = {}
@@ -747,9 +745,8 @@ def crawl():
                 commit_()
         new_session()
         stop_times_executor = ThreadPoolExecutor()
-        for tree, page, current_stops_dict, trip in stop_times_to_add:
-            stop_times_executor.submit(add_stop_times_from_web_page, tree, page, current_stops_dict,
-                                       trip)
+        for tree, page, trip_id in stop_times_to_add:
+            stop_times_executor.submit(add_stop_times_from_web_page, tree, page, trip_id)
         stop_times_executor.shutdown(wait=True)
         for t, u in transport_type_not_found.items():
             add_transport_name(t, u)

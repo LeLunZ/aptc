@@ -322,7 +322,7 @@ def add_stop_time(stoptime: StopTime):
 
 
 def add_stop_times(stoptimes):
-    s.bulk_save_objects(stoptimes)
+    s.add_all(stoptimes)
 
 
 def add_transfer():
