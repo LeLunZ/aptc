@@ -13,7 +13,7 @@ from Models.calendar_date import CalendarDate
 from Models.frequencies import Frequency
 from Models.route import Route
 from Models.shape import Shape
-from Models.stop import Stop
+from Models.stop import Stop, StopType
 from Models.stop_times import StopTime
 from Models.transfers import Transfer
 from Models.trip import Trip
@@ -250,6 +250,38 @@ def match_station_with_parents():
             update_location_of_stop(child, parent_stop.stop_lat, parent_stop.stop_lon)
     remove_parent_from_all()
     commit()
+
+
+def stop_type(stop: Stop):
+    # TODO Implement
+    if str(stop.ext_id).startswith('81'):
+        if (int(stop.prod_class) & 2280) != 0:
+            # its a meta object with routes. but sometimes it doesnt have children (so its not a meta anymore)
+            location_type = -1  # 1 or 0
+            return StopType.ALL
+        else:
+            pass  # its a train station. Comes with other stations which are also stations.
+            # but sometimes object is a parent station with routes and children stops
+            location_type = -1  # 0 or 1
+            return StopType.ALL
+    else:
+        if (int(stop.prod_class) & 63) != 0:
+            location_type = -1  # 0 or 1
+            return StopType.ALL
+            # Its a station (metahst) (Bus, Tram, Train etc). But sometimes its also a stop
+        if (int(stop.prod_class) & 63) == 0:
+            pass  # its a single stop no parent
+            location_type = 0
+            return StopType.STOP
+
+    if (ext_id_str := str(stop.ext_id)).startswith('11'):
+        return StopType.USELESS
+        pass  # continue?? Meta Object like Cities
+    elif ext_id_str.startswith('13') and (int(stop.prod_class) & 63) != 0:
+        pass  # Its a station (metahst) (Bus, Tram, Train etc)
+        return StopType.STATION
+    elif ext_id_str.startswith('13') and (int(stop.prod_class) & 63) == 0:
+        return StopType.STATION
 
 
 def export_all_tables():

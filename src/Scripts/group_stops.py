@@ -13,11 +13,12 @@ def group():
             stop_dict[stop.group_ext_id].append(stop)
 
     '''
+def group()
     stops = get_all_stops_with_group()
 
     for stop in stops:
         group_id = [int(e_id) for e_id in str(stop.group_ext_id).split(',')]
         group_id.append(stop.ext_id)
         stop.group_ext_id = ','.join(str(e_id) for e_id in sorted(set(group_id)))
-    '''
     commit()
+    '''

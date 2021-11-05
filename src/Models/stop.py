@@ -1,9 +1,18 @@
+from enum import Enum
+
 from sqlalchemy import Column, Integer, Float, Text, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 
 from Scripts import primary_keys
 
 Base = declarative_base()
+
+
+class StopType(Enum):
+    USELESS = 1
+    STOP = 2
+    STATION = 3
+    ALL = 4
 
 
 class Stop(Base):

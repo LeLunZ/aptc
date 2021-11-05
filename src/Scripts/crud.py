@@ -26,7 +26,7 @@ try:
 except KeyError:
     DATABASE_URI = 'postgresql+psycopg2://postgres:password@localhost:5432/postgres'
 
-from sqlalchemy import create_engine, and_, or_, func
+from sqlalchemy import create_engine, and_, or_, func, distinct
 from sqlalchemy.orm import sessionmaker
 
 engine = create_engine(DATABASE_URI, executemany_mode='values')
@@ -352,6 +352,12 @@ def add_trip(trip, hash1):
 
 
 def get_from_table(t):
+    if t is Stop:
+        sub = s.query(distinct(StopTime.stop_id)).subquery()
+        return s.query(t).filter(Stop.stop_id.in_(sub)).all()
+    if t is Agency:
+        sub = s.query(distinct(Route.agency_id)).subquery()
+        return s.query(t).filter(Stop.stop_id.in_(sub)).all()
     return s.query(t).all()
 
 
