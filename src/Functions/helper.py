@@ -223,9 +223,7 @@ def match_station_with_google_maps():
     all_stops = get_stops_without_location()
     for stop in all_stops:
         geocoding = gmaps.geocode(stop.stop_name)
-        if geocoding is None or len(geocoding) == 0:
-            print(f'couldnt find {stop.stop_name} on google maps')
-        else:
+        if geocoding is not None and len(geocoding) > 0:
             location = geocoding[0]['geometry']['location']
             lat = location['lat']
             lng = location['lng']
