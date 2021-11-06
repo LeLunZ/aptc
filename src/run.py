@@ -4,6 +4,7 @@ from logging.config import dictConfig
 
 import urllib3
 
+from Classes.oebb_date import get_std_date
 from Functions.config import getConfig
 from Functions.helper import export_all_tables
 from Scripts.crawl_oebb import crawl, crawl_routes
@@ -157,6 +158,7 @@ logger = logging.getLogger(__name__)
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 if __name__ == '__main__':
+    get_std_date()
     try:
         start_crawl = getConfig('crawl')
     except KeyError as e:
@@ -182,4 +184,4 @@ if __name__ == '__main__':
             logger.debug('Exporting Tables')
             export_all_tables()
     except KeyError:
-        logger.debug('Not Export - no key in csv found')
+        logger.debug('Not Exporting - no key in csv found')

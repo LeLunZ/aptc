@@ -774,9 +774,9 @@ def crawl():
 
 
 def crawl_routes():
-    get_std_date()
     crawl()
 
 
 if __name__ == '__main__':
+    get_std_date()
     crawl_routes()
