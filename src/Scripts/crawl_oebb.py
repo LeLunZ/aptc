@@ -434,7 +434,7 @@ def load_allg_feiertage():
             pickle.dump(allg_feiertage, f)
 
 
-def add_stop_times_from_web_page(tree, page: PageDTO, trip_id):
+def add_stop_times_from_web_page(tree, page: PageDTO, trip_id, real_ids):
     headsign = None
     stop_before_current = None
     stop_time_list = []
@@ -445,7 +445,7 @@ def add_stop_times_from_web_page(tree, page: PageDTO, trip_id):
                                         second="zebracol-1", third='center sepline', count=i + 1)))
         if str(all_times[2]).strip() != '' and str(all_times[2]).strip() != page.route.route_long_name.strip():
             headsign = str(all_times[2]).strip()
-        new_stop_time = StopTime(stop_id=page.stop_ids[i], trip_id=trip_id,
+        new_stop_time = StopTime(stop_id=real_ids[i], trip_id=trip_id,
                                  arrival_time=all_times[0] if all_times[0] == '' else all_times[0] + ':00',
                                  departure_time=all_times[1] if all_times[1] == '' else all_times[1] + ':00',
                                  stop_sequence=i + 1, pickup_type=0, drop_off_type=0, stop_headsign=headsign)
@@ -485,6 +485,7 @@ def process_page(url, page: PageDTO):
     else:
         stops_on_db = get_all_stops_in_list(page.stop_ids)
         current_stops_dict = {i.ext_id: i for i in stops_on_db}
+        real_ids = []
         for i, (stop_name, stop_id) in enumerate(zip(page.stop_names, page.stop_ids)):
             if stop_id not in current_stops_dict:
                 stop_url = page.stop_links[i]
@@ -493,8 +494,11 @@ def process_page(url, page: PageDTO):
                                 ext_id=stop_id)
                 new_stop = add_stop_without_check(new_stop)
                 current_stops_dict[stop_id] = new_stop
+            else:
+                new_stop = current_stops_dict[stop_id]
+            real_ids.append(new_stop.stop_id)
         tree = html.fromstring(page.page)
-        stop_times_to_add.append((tree, page, trip.trip_id))
+        stop_times_to_add.append((tree, page, trip.trip_id, real_ids))
 
 
 transport_type_not_found = {}
@@ -754,8 +758,8 @@ def crawl():
                 commit_()
         new_session()
         stop_times_executor = ThreadPoolExecutor()
-        for tree, page, trip_id in stop_times_to_add:
-            stop_times_executor.submit(add_stop_times_from_web_page, tree, page, trip_id)
+        for tree, page, trip_id, real_ids in stop_times_to_add:
+            stop_times_executor.submit(add_stop_times_from_web_page, tree, page, trip_id, real_ids)
         stop_times_executor.shutdown(wait=True)
         for t, u in transport_type_not_found.items():
             add_transport_name(t, u)
