@@ -357,7 +357,7 @@ def get_from_table(t):
         return s.query(t).filter(Stop.stop_id.in_(sub)).all()
     if t is Agency:
         sub = s.query(distinct(Route.agency_id))
-        return s.query(t).filter(Stop.stop_id.in_(sub)).all()
+        return s.query(t).filter(Agency.agency_id.in_(sub)).all()
     return s.query(t).all()
 
 
