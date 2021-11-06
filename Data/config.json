@@ -4,10 +4,9 @@
     "skipCSV": true,
     "export": true,
     "matchWithParent": true,
-    "batchSize": 4,
+    "batchSize": 5,
     "csvFile": "bus_stops.csv",
     "crawlStopOptions": {
-      "shapefile": "austria/out.shp",
       "northLatBorder": 48.380244,
       "southLatBorder": 48.210879,
       "westLonBorder": 14.235355,
@@ -17,7 +16,15 @@
       "08.11.2021",
       "12.11.2021",
       "13.11.2021",
-      "14.11.2021"
+      "14.11.2021",
+      "23.11.2021",
+      "26.11.2021",
+      "27.11.2021",
+      "28.11.2021",
+      "18.01.2022",
+      "21.01.2022",
+      "22.11.2022",
+      "23.11.2022"
     ],
     "exportOptions": {
       "excludeRouteTypes": [

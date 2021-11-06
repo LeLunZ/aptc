@@ -165,7 +165,7 @@ def extract_date_from_str(calendar: Calendar, date_str: str):
     if 'fährt am' in working_dates:
         index_a = date_arr.index('am')
         try:
-            int(date_arr[index_a + 1:][0].replace('.', ''))
+            int(date_arr[index_a + 1:][0].replace('.', '').replace(',', ''))
         except:
             index_a = date_arr.index('am', index_a + 1)
         index_a = index_a + 1
@@ -289,7 +289,11 @@ def extract_dates_from_oebb_page(tree, calendar):
         current_day = today.day
         current_month = today.month
         current_year = today.year
-        first_month = service_months[extra_info_traffic_day[0][0:3]]
+        try:
+            first_month = service_months[extra_info_traffic_day[0][0:3]]
+        except KeyError:
+            logger.exception('Traffic days')
+            logger.exception(extra_info_traffic_day)
         last_month = service_months[extra_info_traffic_day[-1][0:3]]
         short_month = extra_info_traffic_day[0][0:3]
         short_last_month = extra_info_traffic_day[-1][0:3]
@@ -316,7 +320,12 @@ def extract_dates_from_oebb_page(tree, calendar):
 
         for index_month, month in enumerate(extra_info_traffic_day):
             short_month = month[0:3]
-            month_as_int = service_months[short_month]
+            try:
+                month_as_int = service_months[short_month]
+            except KeyError:
+                logger.exception('short month')
+                logger.exception(short_month)
+                pass
             month = month.replace(f'{short_month} ', '')
             year = begin_year
             if month_as_int == 12:

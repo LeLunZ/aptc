@@ -259,8 +259,8 @@ def remove_parent_from_all():
 
 def check_stops(north, south, east, west):
     s.query(Stop).filter(
-        and_(or_(north < Stop.stop_lat, south > Stop.stop_lat, east < Stop.stop_lon, west > Stop.stop_lon),
-             Stop.stop_lat != None)).update(
+        and_(Stop.stop_lat != None,
+             or_(north < Stop.stop_lat, south > Stop.stop_lat, east < Stop.stop_lon, west > Stop.stop_lon))).update(
         {Stop.is_allowed: False})
 
 
@@ -310,7 +310,7 @@ def get_all_stops_without_location(max_stops_to_crawl):
 
 def group_stops():
     sub = s.query(Stop.group_ext_id).filter(Stop.group_ext_id != None).group_by(Stop.group_ext_id).having(
-        func.count(Stop.group_ext_id) == func.array_length(func.string_to_array(Stop.group_ext_id, ','), 1)).subquery()
+        func.count(Stop.group_ext_id) == func.array_length(func.string_to_array(Stop.group_ext_id, ','), 1))
     return s.query(Stop).filter(Stop.group_ext_id.in_(sub)).all()
 
 
@@ -353,10 +353,10 @@ def add_trip(trip, hash1):
 
 def get_from_table(t):
     if t is Stop:
-        sub = s.query(distinct(StopTime.stop_id)).subquery()
+        sub = s.query(distinct(StopTime.stop_id))
         return s.query(t).filter(Stop.stop_id.in_(sub)).all()
     if t is Agency:
-        sub = s.query(distinct(Route.agency_id)).subquery()
+        sub = s.query(distinct(Route.agency_id))
         return s.query(t).filter(Stop.stop_id.in_(sub)).all()
     return s.query(t).all()
 
