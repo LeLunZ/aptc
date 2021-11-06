@@ -7,6 +7,7 @@ import googlemaps
 
 from Classes.oebb_date import begin_date, end_date, OebbDate, service_months
 from Functions.config import getConfig
+from Functions.timing import timing
 from Models.agency import Agency
 from Models.calendar import Calendar
 from Models.calendar_date import CalendarDate
@@ -284,6 +285,7 @@ def stop_type(stop: Stop):
         return StopType.STATION
 
 
+@timing
 def export_all_tables():
     tables = [Agency, Calendar, CalendarDate, Frequency, Route, Trip, StopTime, Shape, Stop, Transfer]
     file_names = []

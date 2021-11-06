@@ -179,6 +179,7 @@ if __name__ == '__main__':
                 count = crawl()
     try:
         if getConfig('export'):
+            logger.debug('Exporting Tables')
             export_all_tables()
     except KeyError:
         logger.debug('Not Export - no key in csv found')
