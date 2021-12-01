@@ -1,8 +1,11 @@
 import atexit
 import csv
+import errno
+import os
 import pickle
 import signal
 from concurrent.futures import as_completed
+from pathlib import Path
 from urllib.parse import unquote
 
 import urllib3
@@ -173,21 +176,27 @@ def load_all_stops_to_crawl_(stops):
 def crawl_stops(init=False):
     global cur_line, finished_crawling, file_hash
     stop_set = set()
-    file_path: str = getConfig('csvFile')
-    csv_path = data_path / file_path
-    if init and csv_path.exists():
-        with open(csv_path) as csv_file:
-            file_hash = xxhash.xxh3_64(''.join(csv_file.readlines())).hexdigest()
-            csv_file.seek(0)
-            csv_reader = csv.reader(csv_file, delimiter=',')
-            row_count = sum(1 for _ in csv_reader)
-            begin = 1
-            end = row_count - 1
-            csv_file.seek(0)
+    if init:
+        try:
+            file_path: str = getConfig('csvFile')
+        except KeyError:
+            pass
+        else:
+            csv_path = data_path / file_path
+            if not csv_path.exists():
+                raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), str(csv_path))
 
-            for row in skip_stop(csv_reader, begin, end):
-                stop_set.add(row[0])
+            with open(csv_path) as csv_file:
+                file_hash = xxhash.xxh3_64(''.join(csv_file.readlines())).hexdigest()
+                csv_file.seek(0)
+                csv_reader = csv.reader(csv_file, delimiter=',')
+                row_count = sum(1 for _ in csv_reader)
+                begin = 1
+                end = row_count - 1
+                csv_file.seek(0)
 
+                for row in skip_stop(csv_reader, begin, end):
+                    stop_set.add(row[0])
     try:
         max_stops_to_crawl = getConfig('batchSize')
     except KeyError:

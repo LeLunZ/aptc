@@ -171,7 +171,11 @@ if __name__ == '__main__':
             except Exception:
                 skip_csv = False
             finally:
-                start_stop_crawler(skip_csv)
+                try:
+                    start_stop_crawler(skip_csv)
+                except FileNotFoundError as e:
+                    logger.debug(str(e))
+                    exit(e.errno)
             crawl_routes()
             count = 1
             while count != 0:
