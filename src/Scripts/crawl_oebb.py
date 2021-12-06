@@ -263,15 +263,31 @@ def extract_date_from_str(calendar: Calendar, date_str: str):
 
 @timing
 def extract_dates_from_oebb_page(tree, calendar):
-    extra_info_traffic_day = tree.xpath('//*/strong[text() =$first]/../text()', first='Verkehrstage:')
-    traffic_day = None
+    extra_info_traffic_day = tree.xpath('//*/strong[text() =$first]/..', first='Verkehrstage:')[0]
+    all_xmark_calendar = tree.xpath('//*/strong[text() =$first]/..//span[@class="pre"]', first='Verkehrstage:')
+    all_xmark_calendar_text = tree.xpath('//*/strong[text() =$first]/..//span[@class="pre"]/pre/text()', first='Verkehrstage:')
 
+    for cal in all_xmark_calendar:
+        cal.getparent().remove(cal)
+
+    all_calendar_text = list(filter(''.__ne__, map(lambda x: x.strip(), extra_info_traffic_day.xpath('./text()'))))
+
+    # TODO implement
+    # all_calendar_text == 1 && all_xmark_calendar == 0
+    # all_xmark_calendar == 1 && all_calendar_text == 0
+    # all_xmark_calendar > 1 && all_calendar_text == 0
+    # all_xmark_calendar == 0 && all_calendar_text > 1
+    # all_xmark_calendar > 1 && all_calendar_text > 1
+    traffic_day = None
     if extra_info_traffic_day:
         traffic_day = list(filter(lambda x: x.strip() != '', extra_info_traffic_day))
         if traffic_day:
             traffic_day = ' '.join(filter(lambda x: x.strip() != '', traffic_day[0].split('\n'))).replace(';', '')
         else:
             pass
+
+    # TODO implement both ways together
+    # TODO implement station to station parsing
     calendar.monday = False
     calendar.tuesday = False
     calendar.wednesday = False
@@ -282,7 +298,12 @@ def extract_dates_from_oebb_page(tree, calendar):
     calendar.sunday = False
     if not extra_info_traffic_day or traffic_day is None or isinstance(traffic_day, list):
         extra_info_traffic_day = tree.xpath('//*/strong[text() =$first]/../*/pre/text()', first='Verkehrstage:')[0]
-        extra_info_traffic_day = extra_info_traffic_day.split('\n')[3:]
+        if len(tree.xpath('//*/strong[text() =$first]/../*/pre/text()', first='Verkehrstage:')) > 1: # TODO Implement multiple
+            logger.debug('Verkehrstage - MULTIPLE PRE Texts!!!!!  ' + str(
+                tree.xpath('//*/strong[text() =$first]/../*/pre/text()', first='Verkehrstage:')))
+        if traffic_day != '':
+            logger.debug('Verkehrstage - MULTIPLE Pre + Text!!!! ' + str(traffic_day))
+        extra_info_traffic_day = extra_info_traffic_day.strip().split('\n')[3:]
         extra_info_traffic_day = list(filter(lambda traffic_line: traffic_line.strip() != '', extra_info_traffic_day))
         day_exceptions = []
         today = datetime.date.today()
@@ -297,7 +318,12 @@ def extract_dates_from_oebb_page(tree, calendar):
         last_month = service_months[extra_info_traffic_day[-1][0:3]]
         short_month = extra_info_traffic_day[0][0:3]
         short_last_month = extra_info_traffic_day[-1][0:3]
-        month_as_int = service_months[short_month]
+        try:
+            month_as_int = service_months[short_month]  # TODO here is an error
+            # KeyError: '   '
+        except KeyError:
+            logger.debug(
+                f"Verkehrstage - {str(tree.xpath('//*/strong[text() =$first]/../*/pre/text()', first='Verkehrstage:'))}")
         last_month_as_int = service_months[short_last_month]
         month = extra_info_traffic_day[0].replace(f'{short_month} ', '')
         last_month = extra_info_traffic_day[-1].replace(f'{short_last_month} ', '')

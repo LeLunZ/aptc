@@ -11,7 +11,7 @@ from Scripts.crawl_oebb import crawl, crawl_routes
 from Scripts.stop_crawler import start_stop_crawler, crawl_stops
 from constants import logs_path
 
-loggers = ['timed', 'console', 'failed-url', 'timings', 'retry']
+loggers = ['timed', 'console', 'failed-url', 'timings', 'retry', 'traffic']
 
 
 class LogFilter(logging.Filter):
@@ -35,7 +35,7 @@ class LogFilter(logging.Filter):
             return False
         return True
 
-
+# Verkehrstage -
 dictConfig({
     'version': 1,
     'disable_existing_loggers': False,
@@ -57,6 +57,11 @@ dictConfig({
         'AllowTimingFilter': {
             '()': LogFilter,
             'params': ['Timing - func'],
+            'allow': True
+        },
+        'AllowVerkehrstageFilter': {
+            '()': LogFilter,
+            'params': ['Verkehrstage -'],
             'allow': True
         },
         'AllowRetryFilter': {
@@ -100,6 +105,15 @@ dictConfig({
             'filename': f'{str(logs_path)}/function-timings.log',
             'when': 'W0',
             'filters': ['AllowTimingFilter']
+        },
+        'traffic': {
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'level': 'DEBUG',
+            'formatter': 'default',
+            'backupCount': 3,
+            'filename': f'{str(logs_path)}/verkehrstage.log',
+            'when': 'W0',
+            'filters': ['AllowVerkehrstageFilter']
         },
         'retry': {
             'class': 'logging.handlers.TimedRotatingFileHandler',

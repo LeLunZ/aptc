@@ -45,7 +45,8 @@ def remove_param_from_url(url, to_remove):
 
 def extract_date_from_date_arr(date_arr: [str]):
     date = OebbDate()
-    date.day = int(date_arr[0].replace('.', ''))
+    date.day = int(date_arr[0].replace('.', '')) # TODO here is an error
+                                                # ValueError: invalid literal for int() with base 10: '7,'
     date.month = None
     date.year = None
     if len(date_arr) > 1 and date_arr[1] in service_months:

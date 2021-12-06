@@ -29,7 +29,8 @@ class OebbDate:
         day = str(self.day)
         if len(day) == 1:
             day = f'0{self.day}'
-        month = service_months[self.month]
+        month = service_months[self.month] # TODO here is an error
+                                           # KeyError: None
         if month < 10:
             month = f'0{service_months[self.month]}'
         return int(f'{self.year}{month}{day}')
