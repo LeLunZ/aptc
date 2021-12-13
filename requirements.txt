@@ -1,4 +1,4 @@
-lxml==4.6.3
+lxml==4.6.5
 googlemaps==4.5.3
 xxhash==2.0.2
 psycopg2-binary==2.9.1
